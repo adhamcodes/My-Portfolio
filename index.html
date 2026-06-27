@@ -363,7 +363,7 @@
 <div class="hero">
   <div class="wrap" style="position:relative;width:100%">
     <div>
-      <span class="status reveal" style="transition-delay:.05s"><span class="d"></span>Available for freelance projects</span>
+      <span class="status reveal" style="transition-delay:.05s"><span class="d"></span>Available for collaboration</span>
       <h1 class="reveal" style="transition-delay:.12s">I craft <span class="ser">premium</span> <br>web experiences <br>that <span class="ser">convert.</span></h1>
       <p class="lead reveal" style="transition-delay:.2s">Front-end developer from Dhaka building fast, modern, high-converting landing pages and web apps — pixel-perfect, on every screen.</p>
       <div class="hero-cta reveal" style="transition-delay:.28s">
@@ -436,7 +436,7 @@
       <div class="about-main">
         <div class="glow"></div>
         <div class="sig">Hi, I'm Adham.</div>
-        <p>A front-end developer and applied-AI engineering student based in Dhaka, Bangladesh. I build clean, modern, high-converting websites for founders and businesses around the world.</p>
+        <p>A self-taught front-end developer from Dhaka, Bangladesh — now expanding into <b style="color:var(--green2);font-weight:600">full-stack development</b> and <b style="color:var(--green2);font-weight:600">AI/ML engineering</b>. I build clean, modern, high-converting websites for founders and businesses worldwide.</p>
         <p>I obsess over detail, motion, and performance — and I treat every project like it's my own. When you work with me, you don't just get code; you get a partner who genuinely wants your project to win.</p>
       </div>
       <div class="about-feats">
@@ -607,8 +607,8 @@
 <script>
   // MARQUEE build (two identical groups => seamless)
   (function(){
-    const items=['Landing Pages','Web Apps','React & Next.js','UI / UX','Framer Motion','Conversion Design','Performance','Accessibility'];
-    const group=()=>{const g=document.createElement('div');g.className='mgroup';items.forEach(t=>{const s=document.createElement('span');s.className='mi';s.textContent=t;g.appendChild(s);});return g;};
+    const items=['Landing Pages','Web Apps','Full-Stack Dev','AI / ML Engineering','React & Next.js','UI / UX','Framer Motion','Conversion Design','Performance','Accessibility'];
+    const group=()=>{const g=document.createElement('div');g.className='mgroup';for(let r=0;r<3;r++){items.forEach(t=>{const s=document.createElement('span');s.className='mi';s.textContent=t;g.appendChild(s);});}return g;};
     const track=document.getElementById('track');track.appendChild(group());track.appendChild(group());
   })();
 
@@ -738,7 +738,7 @@
   // SCRAMBLE ROTATOR
   (function(){
     const el=document.getElementById('rotate'); if(!el) return;
-    const words=['landing pages','web apps','brands','startups','digital experiences'];
+    const words=['landing pages','web apps','full-stack apps','AI-powered tools','digital experiences'];
     const chars='!<>-_\\/[]{}=+*^?#abcdef0123'; let wi=0;
     function scramble(text){
       let f=0; const dur=26; clearInterval(el._t);
@@ -758,8 +758,8 @@
     if(!inp) return;
     const cmds={
       help:()=>`available commands:\n  whoami    - who I am\n  skills    - my tech stack\n  projects  - my work\n  contact   - reach me\n  hire      - let's work together\n  clear     - clear the screen`,
-      whoami:()=>`Adham - self-taught front-end developer from Dhaka, Bangladesh.\nRelentless. Honest. Detail-obsessed. I build modern, high-converting web experiences.`,
-      skills:()=>`HTML · CSS · JavaScript · React · Next.js · Tailwind · Framer Motion · UI/UX · Web Audio API`,
+      whoami:()=>`Adham - self-taught front-end developer from Dhaka, Bangladesh.\nRelentless. Honest. Detail-obsessed. Currently leveling up into full-stack & AI/ML engineering.`,
+      skills:()=>`HTML · CSS · JavaScript · React · Next.js · Tailwind · Framer Motion · UI/UX\nleveling up -> Full-Stack Development · AI/ML Engineering`,
       projects:()=>`Nova   -> https://nova-preview-six.vercel.app   (SaaS marketing site)\nQuiet  -> https://quiet-amber.vercel.app   (browser focus app)`,
       contact:()=>`email    -> adhammahmood83@gmail.com\nwhatsapp -> +8801811643000\nfiverr   -> https://www.fiverr.com/s/2K3qBNr`,
       hire:()=>`Smart move. Tap "Start a project" at the top, or message me on Fiverr. Let's build something legendary.`,
