@@ -8,6 +8,7 @@
 <meta property="og:title" content="Adham — Front-End Developer" />
 <meta property="og:description" content="Premium, high-converting landing pages & web apps." />
 <meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23070a09'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' font-weight='700' fill='%2334d399' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -752,7 +753,7 @@
     });
   })();
 
-  // DHAKA CLOCK
+  // LOCAL CLOCK
   (function(){
     const el=document.getElementById('clock');
     const tick=()=>{try{const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});el.textContent='LOCAL — '+t;}catch(e){}};
@@ -902,7 +903,12 @@
       acc.appendChild(el);
     });
     // vertical wheel scrolls the strips horizontally
-    acc.addEventListener('wheel',e=>{ if(e.deltaY!==0 && acc.scrollWidth>acc.clientWidth){ acc.scrollLeft+=e.deltaY; e.preventDefault(); } },{passive:false});
+    acc.addEventListener('wheel',e=>{
+      const max=acc.scrollWidth-acc.clientWidth; if(max<=0) return;
+      const atStart=acc.scrollLeft<=0, atEnd=acc.scrollLeft>=max-1;
+      if((e.deltaY<0&&atStart)||(e.deltaY>0&&atEnd)) return; // let the page scroll past once strips end
+      acc.scrollLeft+=e.deltaY; e.preventDefault();
+    },{passive:false});
   })();
   // COMMAND PALETTE (Ctrl/Cmd + K)
   (function(){
