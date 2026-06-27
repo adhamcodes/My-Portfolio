@@ -316,24 +316,25 @@
   /* PROJECT ACCORDION (expanding strips) */
   .moretitle{font-family:var(--font-h);font-weight:700;font-size:clamp(20px,3vw,30px);letter-spacing:-.02em;margin-top:14px}
   .moretitle .ser{color:var(--green2)}
-  .acc{display:flex;gap:12px;height:440px;margin-top:40px}
-  .panel{position:relative;flex:1;min-width:0;border-radius:16px;overflow:hidden;border:1px solid var(--glass-b);background:#0d1311;cursor:pointer;text-decoration:none;transition:flex .55s cubic-bezier(.22,.7,.2,1)}
-  .panel.featured{flex:2.6}
-  .panel:hover{flex:6}
+  .acc{display:flex;gap:12px;height:460px;margin-top:40px;overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;padding-bottom:14px}
+  .acc::-webkit-scrollbar{height:8px}.acc::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}.acc::-webkit-scrollbar-track{background:transparent}
+  .panel{position:relative;flex:0 0 86px;min-width:86px;border-radius:16px;overflow:hidden;border:1px solid var(--glass-b);background:#0d1311;cursor:pointer;text-decoration:none;transition:flex-basis .55s cubic-bezier(.22,.7,.2,1)}
+  .panel.featured{flex-basis:360px}
+  .panel:hover{flex-basis:420px}
   .pimg{position:absolute;inset:0;background-size:cover;background-position:center top;transition:background-position 4.5s ease}
   .panel:hover .pimg{background-position:center bottom}
   .pshade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,10,9,.12),rgba(7,10,9,.88))}
   .plabel{position:absolute;left:50%;bottom:26px;transform:translateX(-50%) rotate(180deg);writing-mode:vertical-rl;font-family:var(--font-m);font-size:13px;letter-spacing:.14em;color:var(--text);white-space:nowrap;z-index:2;transition:opacity .3s}
   .panel:hover .plabel,.panel.featured .plabel{opacity:0}
-  .pmeta{position:absolute;left:0;right:0;bottom:0;padding:22px;opacity:0;transform:translateY(12px);transition:.45s .1s;z-index:2}
+  .pmeta{position:absolute;left:0;bottom:0;padding:22px;width:360px;max-width:62vw;opacity:0;transform:translateY(12px);transition:.45s .1s;z-index:2}
   .panel:hover .pmeta,.panel.featured .pmeta{opacity:1;transform:none}
   .pmeta .tag{font-family:var(--font-m);font-size:11px;color:var(--green2);letter-spacing:.1em;text-transform:uppercase}
   .pmeta h4{font-family:var(--font-h);font-size:22px;margin:5px 0 3px;white-space:nowrap}
   .pmeta .popen{font-family:var(--font-m);font-size:12px;color:var(--text)}
   @media(max-width:760px){
-    .acc{height:auto;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:14px}
-    .panel,.panel.featured{flex:0 0 80%;height:320px;scroll-snap-align:center}
-    .plabel{display:none}.pmeta{opacity:1;transform:none}
+    .acc{height:auto;scroll-snap-type:x mandatory}
+    .panel,.panel.featured{flex:0 0 78%;min-width:78%;height:300px;scroll-snap-align:center}
+    .plabel{display:none}.pmeta{opacity:1;transform:none;width:auto;max-width:100%}
   }
 </style>
 </head>
@@ -426,34 +427,22 @@
           <span class="go">View live <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span>
         </div>
       </a>
-      <a class="proj reveal" href="https://quiet-amber.vercel.app/" target="_blank" rel="noopener" data-c data-tilt>
+      <a class="proj reveal" href="https://zeroupload-8e8.pages.dev/" target="_blank" rel="noopener" data-c data-tilt>
         <div class="frame">
-          <div class="bar"><i></i><i></i><i></i><span class="url">quiet-amber.vercel.app</span><span class="lv"><b></b>LIVE</span></div>
-          <div class="shot" style="background-image:url('https://image.thum.io/get/width/1200/crop/2000/wait/6/https://quiet-amber.vercel.app/')"></div>
+          <div class="bar"><i></i><i></i><i></i><span class="url">zeroupload-8e8.pages.dev</span><span class="lv"><b></b>LIVE</span></div>
+          <div class="shot" style="background-image:url('https://image.thum.io/get/width/1200/crop/1700/wait/8/https://zeroupload-8e8.pages.dev/')"></div>
         </div>
         <div class="meta">
-          <div class="cat">Web App / Focus Tool</div>
-          <h3>Quiet</h3>
-          <p>A minimal focus sanctuary with 8 soundscapes synthesised live in the browser — zero audio files, works offline.</p>
-          <div class="tags"><b>Web Audio API</b><b>Vanilla JS</b><b>PWA</b><b>Offline</b></div>
+          <div class="cat">Web App / File Sharing</div>
+          <h3>ZeroUpload</h3>
+          <p>A fast, privacy-first file-sharing web app — share files in seconds, no sign-up, nothing left on a server.</p>
+          <div class="tags"><b>JavaScript</b><b>Web App</b><b>No sign-up</b><b>PWA</b></div>
           <span class="go">View live <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></span>
         </div>
       </a>
     </div>
     <div class="reveal" style="margin-top:64px"><div class="eyebrow"><b>+</b> More Work</div><h3 class="moretitle">The full lineup — <span class="ser">hover to explore, click to open.</span></h3></div>
-    <div class="acc reveal">
-      <a class="panel featured" href="https://zeroupload-8e8.pages.dev/" target="_blank" rel="noopener">
-        <div class="pimg" style="background-image:url('https://image.thum.io/get/width/700/crop/1500/wait/8/https://zeroupload-8e8.pages.dev/')"></div>
-        <div class="pshade"></div>
-        <div class="plabel">ZeroUpload</div>
-        <div class="pmeta"><div class="tag">File Sharing</div><h4>ZeroUpload</h4><span class="popen">open ↗</span></div>
-      </a>
-      <div class="panel"><div class="pimg" style="background:linear-gradient(160deg,#0b3b2e,#0e7490)"></div><div class="pshade"></div><div class="plabel">Aurora</div><div class="pmeta"><div class="tag">Landing Page</div><h4>Aurora</h4><span class="popen">demo</span></div></div>
-      <div class="panel"><div class="pimg" style="background:linear-gradient(160deg,#10241d,#1f6f5c)"></div><div class="pshade"></div><div class="plabel">Flux</div><div class="pmeta"><div class="tag">Dashboard</div><h4>Flux</h4><span class="popen">demo</span></div></div>
-      <div class="panel"><div class="pimg" style="background:linear-gradient(160deg,#0e2a3a,#2dd4bf)"></div><div class="pshade"></div><div class="plabel">Pulse</div><div class="pmeta"><div class="tag">SaaS</div><h4>Pulse</h4><span class="popen">demo</span></div></div>
-      <div class="panel"><div class="pimg" style="background:linear-gradient(160deg,#1a2a10,#5b8a2a)"></div><div class="pshade"></div><div class="plabel">Drift</div><div class="pmeta"><div class="tag">Portfolio</div><h4>Drift</h4><span class="popen">demo</span></div></div>
-      <div class="panel"><div class="pimg" style="background:linear-gradient(160deg,#0b2230,#0e7490)"></div><div class="pshade"></div><div class="plabel">Vertex</div><div class="pmeta"><div class="tag">Agency</div><h4>Vertex</h4><span class="popen">demo</span></div></div>
-    </div>
+    <div class="acc reveal" id="acc"></div>
     <a class="proj cta-card reveal" href="#contact" data-c>
       <div>
         <div class="cat">Your project</div>
@@ -743,7 +732,7 @@
   });
   // INTERACTIVE NETWORK CANVAS (hero "aura")
   (function(){
-    const c=document.getElementById('net'); if(!c) return;
+    const c=document.getElementById('net'); if(!c || matchMedia('(hover:none)').matches || innerWidth<760) return;
     const ctx=c.getContext('2d'); let w,h,dpr;
     const COUNT=Math.max(28,Math.min(64,Math.floor(innerWidth/22)));
     const parts=[];
@@ -847,6 +836,30 @@
   })();
   // relocate terminal to the top (right after the marquee), happens under the preloader
   (function(){var t=document.getElementById('terminal-sec'),m=document.querySelector('.marquee');if(t&&m&&m.parentNode){m.parentNode.insertBefore(t,m.nextElementSibling);}})();
+  // PROJECT ACCORDION — data-driven. TO ADD A PROJECT: add one line to this array.
+  (function(){
+    const acc=document.getElementById('acc'); if(!acc) return;
+    const projects=[
+      {name:'Quiet', tag:'Web App', url:'https://quiet-amber.vercel.app/', img:'https://image.thum.io/get/width/700/crop/1500/wait/6/https://quiet-amber.vercel.app/', featured:true},
+      {name:'Aurora', tag:'Landing Page', grad:'linear-gradient(160deg,#0b3b2e,#0e7490)'},
+      {name:'Flux', tag:'Dashboard', grad:'linear-gradient(160deg,#10241d,#1f6f5c)'},
+      {name:'Pulse', tag:'SaaS', grad:'linear-gradient(160deg,#0e2a3a,#2dd4bf)'},
+      {name:'Drift', tag:'Portfolio', grad:'linear-gradient(160deg,#1a2a10,#5b8a2a)'},
+      {name:'Vertex', tag:'Agency', grad:'linear-gradient(160deg,#0b2230,#0e7490)'},
+      {name:'Nimbus', tag:'Mobile App', grad:'linear-gradient(160deg,#13243a,#3b5bdb)'},
+      {name:'Echo', tag:'AI Tool', grad:'linear-gradient(160deg,#241033,#7c3aed)'}
+    ];
+    projects.forEach(p=>{
+      const el=document.createElement(p.url?'a':'div');
+      el.className='panel'+(p.featured?' featured':'');
+      if(p.url){el.href=p.url;el.target='_blank';el.rel='noopener';}
+      const bg=p.img?`background-image:url('${p.img}')`:`background:${p.grad}`;
+      el.innerHTML=`<div class="pimg" style="${bg}"></div><div class="pshade"></div><div class="plabel">${p.name}</div><div class="pmeta"><div class="tag">${p.tag}</div><h4>${p.name}</h4><span class="popen">${p.url?'open ↗':'demo'}</span></div>`;
+      acc.appendChild(el);
+    });
+    // vertical wheel scrolls the strips horizontally
+    acc.addEventListener('wheel',e=>{ if(e.deltaY!==0 && acc.scrollWidth>acc.clientWidth){ acc.scrollLeft+=e.deltaY; e.preventDefault(); } },{passive:false});
+  })();
 </script>
 </body>
 </html>
