@@ -336,6 +336,31 @@
     .panel,.panel.featured{flex:0 0 78%;min-width:78%;height:300px;scroll-snap-align:center}
     .plabel{display:none}.pmeta{opacity:1;transform:none;width:auto;max-width:100%}
   }
+  /* center the terminal */
+  #terminal-sec .wrap{text-align:center}
+  #terminal-sec .eyebrow{justify-content:center}
+  #terminal-sec > .wrap > p{margin-left:auto;margin-right:auto}
+  #terminal-sec .term{margin-left:auto;margin-right:auto;text-align:left}
+
+  /* COMMAND PALETTE */
+  #kbar{position:fixed;inset:0;z-index:1300;background:rgba(4,6,5,.6);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding-top:14vh}
+  #kbar.show{display:flex}
+  .kbox{width:min(560px,92vw);background:rgba(10,15,13,.97);border:1px solid var(--glass-b);border-radius:16px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .ksearch{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .ksearch span{color:var(--green2);font-family:var(--font-m);font-size:14px}
+  .ksearch input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--font-m);font-size:15px}
+  .klist{max-height:340px;overflow-y:auto;padding:8px}
+  .klist::-webkit-scrollbar{width:8px}.klist::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+  .kitem{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;color:var(--text);font-size:14.5px}
+  .kitem .ki{width:24px;text-align:center;color:var(--green2);font-family:var(--font-m);font-size:13px}
+  .kitem .kt{font-family:var(--font-m);font-size:11px;color:var(--muted);margin-left:auto;text-transform:uppercase;letter-spacing:.08em}
+  .kitem.active{background:rgba(var(--acc-rgb),.14)}
+  .kfoot{padding:11px 16px;border-top:1px solid var(--line);font-family:var(--font-m);font-size:11px;color:var(--muted);display:flex;gap:18px;justify-content:center}
+  .khint{position:fixed;right:20px;bottom:20px;z-index:590;font-family:var(--font-m);font-size:12px;color:var(--muted);background:rgba(7,10,9,.6);backdrop-filter:blur(10px);border:1px solid var(--glass-b);padding:9px 14px;border-radius:999px;cursor:pointer;transition:.2s}
+  .khint:hover{color:var(--text);border-color:var(--green2)}
+  .khint b{color:var(--green2)}
+  .ripple{position:fixed;border-radius:50%;border:1.5px solid var(--green2);pointer-events:none;z-index:1250;transform:translate(-50%,-50%)}
+  @media(hover:none){.khint .kk{display:none}}
 </style>
 </head>
 <body>
@@ -629,6 +654,16 @@
   </div>
 </footer>
 
+<!-- COMMAND PALETTE -->
+<div class="khint" id="khint"><b class="kk">⌘ K</b> <span class="kk">·</span> command palette</div>
+<div id="kbar">
+  <div class="kbox">
+    <div class="ksearch"><span>$</span><input id="kin" placeholder="Type a command or search…" autocomplete="off" spellcheck="false"></div>
+    <div class="klist" id="klist"></div>
+    <div class="kfoot"><span>↑↓ navigate</span><span>⏎ select</span><span>esc close</span></div>
+  </div>
+</div>
+
 <script>
   // MARQUEE build (two identical groups => seamless)
   (function(){
@@ -847,7 +882,16 @@
       {name:'Drift', tag:'Portfolio', grad:'linear-gradient(160deg,#1a2a10,#5b8a2a)'},
       {name:'Vertex', tag:'Agency', grad:'linear-gradient(160deg,#0b2230,#0e7490)'},
       {name:'Nimbus', tag:'Mobile App', grad:'linear-gradient(160deg,#13243a,#3b5bdb)'},
-      {name:'Echo', tag:'AI Tool', grad:'linear-gradient(160deg,#241033,#7c3aed)'}
+      {name:'Echo', tag:'AI Tool', grad:'linear-gradient(160deg,#241033,#7c3aed)'},
+      {name:'Orbit', tag:'SaaS', grad:'linear-gradient(160deg,#0b2230,#1f6f5c)'},
+      {name:'Verse', tag:'Landing Page', grad:'linear-gradient(160deg,#10241d,#0e7490)'},
+      {name:'Slate', tag:'Dashboard', grad:'linear-gradient(160deg,#1a1f2a,#3b5bdb)'},
+      {name:'Mosaic', tag:'Portfolio', grad:'linear-gradient(160deg,#2a1810,#b45309)'},
+      {name:'Lumen', tag:'Agency', grad:'linear-gradient(160deg,#0b3b2e,#34d399)'},
+      {name:'Cobalt', tag:'Web App', grad:'linear-gradient(160deg,#0e2235,#2563eb)'},
+      {name:'Fable', tag:'Brand Site', grad:'linear-gradient(160deg,#241033,#a855f7)'},
+      {name:'Atlas', tag:'Marketing', grad:'linear-gradient(160deg,#10241d,#0d9488)'},
+      {name:'Halo', tag:'Concept', grad:'linear-gradient(160deg,#0b2230,#06b6d4)'}
     ];
     projects.forEach(p=>{
       const el=document.createElement(p.url?'a':'div');
@@ -860,6 +904,60 @@
     // vertical wheel scrolls the strips horizontally
     acc.addEventListener('wheel',e=>{ if(e.deltaY!==0 && acc.scrollWidth>acc.clientWidth){ acc.scrollLeft+=e.deltaY; e.preventDefault(); } },{passive:false});
   })();
+  // COMMAND PALETTE (Ctrl/Cmd + K)
+  (function(){
+    const bar=document.getElementById('kbar'), input=document.getElementById('kin'), list=document.getElementById('klist'), hint=document.getElementById('khint');
+    if(!bar) return;
+    const go=id=>{const el=document.querySelector(id); if(el) el.scrollIntoView({behavior:'smooth'});};
+    const theme=t=>{const b=document.querySelector('.theme-pick button[data-t="'+t+'"]'); if(b) b.click();};
+    function confetti(){const g=getComputedStyle(document.documentElement).getPropertyValue('--green2').trim()||'#34d399';const cs=[g,'#2dd4bf','#e9f0ec'];for(let i=0;i<80;i++){const d=document.createElement('div');d.style.cssText='position:fixed;width:9px;height:9px;border-radius:2px;z-index:1400;top:-20px;left:'+(Math.random()*100)+'vw;background:'+cs[i%cs.length];document.body.appendChild(d);const dur=2200+Math.random()*1500;d.animate([{transform:'translateY(0) rotate(0)'},{transform:'translateY('+(innerHeight+60)+'px) rotate('+(Math.random()*720)+'deg)'}],{duration:dur,easing:'cubic-bezier(.2,.6,.4,1)'});setTimeout(()=>d.remove(),dur);}}
+    const cmds=[
+      {ic:'→',label:'Go to Work',hint:'section',run:()=>go('#work')},
+      {ic:'>_',label:'Open the terminal',hint:'section',run:()=>go('#terminal-sec')},
+      {ic:'→',label:'About me',hint:'section',run:()=>go('#about')},
+      {ic:'→',label:'Services & pricing',hint:'section',run:()=>go('#services')},
+      {ic:'→',label:'How I work',hint:'section',run:()=>go('#process')},
+      {ic:'→',label:'FAQ',hint:'section',run:()=>go('#faq')},
+      {ic:'→',label:'Contact me',hint:'section',run:()=>go('#contact')},
+      {ic:'↗',label:'Open ZeroUpload',hint:'project',run:()=>window.open('https://zeroupload-8e8.pages.dev/','_blank')},
+      {ic:'↗',label:'Open Nova',hint:'project',run:()=>window.open('https://nova-preview-six.vercel.app/','_blank')},
+      {ic:'↗',label:'Open Quiet',hint:'project',run:()=>window.open('https://quiet-amber.vercel.app/','_blank')},
+      {ic:'✉',label:'Email Adham',hint:'contact',run:()=>{location.href='mailto:adhammahmood83@gmail.com';}},
+      {ic:'◆',label:'Hire on Fiverr',hint:'contact',run:()=>window.open('https://www.fiverr.com/s/2K3qBNr','_blank')},
+      {ic:'●',label:'Theme: Emerald',hint:'theme',run:()=>theme('emerald')},
+      {ic:'●',label:'Theme: Crimson',hint:'theme',run:()=>theme('crimson')},
+      {ic:'●',label:'Theme: Violet',hint:'theme',run:()=>theme('violet')},
+      {ic:'●',label:'Theme: Amber',hint:'theme',run:()=>theme('amber')},
+      {ic:'✦',label:'Surprise me',hint:'fun',run:confetti}
+    ];
+    let filtered=cmds.slice(), active=0;
+    function render(){list.innerHTML='';filtered.forEach((c,i)=>{const d=document.createElement('div');d.className='kitem'+(i===active?' active':'');d.innerHTML='<span class="ki">'+c.ic+'</span><span>'+c.label+'</span><span class="kt">'+c.hint+'</span>';d.addEventListener('click',()=>exec(i));d.addEventListener('mousemove',()=>{active=i;upd();});list.appendChild(d);});}
+    function upd(){[...list.children].forEach((el,i)=>el.classList.toggle('active',i===active));}
+    function open(){bar.classList.add('show');input.value='';filtered=cmds.slice();active=0;render();setTimeout(()=>input.focus(),30);}
+    function close(){bar.classList.remove('show');}
+    function exec(i){const c=filtered[i];close();if(c)setTimeout(c.run,120);}
+    input.addEventListener('input',()=>{const q=input.value.toLowerCase();filtered=cmds.filter(c=>c.label.toLowerCase().includes(q)||c.hint.includes(q));active=0;render();});
+    input.addEventListener('keydown',e=>{
+      if(e.key==='ArrowDown'){e.preventDefault();active=Math.min(active+1,filtered.length-1);upd();if(list.children[active])list.children[active].scrollIntoView({block:'nearest'});}
+      else if(e.key==='ArrowUp'){e.preventDefault();active=Math.max(active-1,0);upd();if(list.children[active])list.children[active].scrollIntoView({block:'nearest'});}
+      else if(e.key==='Enter'){e.preventDefault();exec(active);}
+      else if(e.key==='Escape'){close();}
+    });
+    addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();bar.classList.contains('show')?close():open();}});
+    bar.addEventListener('click',e=>{if(e.target===bar)close();});
+    hint.addEventListener('click',open);
+    render();
+  })();
+
+  // CLICK RIPPLE
+  addEventListener('click',e=>{
+    if(e.target.closest('#kbar, .theme-pick, input, .term')) return;
+    const r=document.createElement('div'); r.className='ripple';
+    r.style.left=e.clientX+'px'; r.style.top=e.clientY+'px'; r.style.width=r.style.height='8px';
+    document.body.appendChild(r);
+    r.animate([{width:'8px',height:'8px',opacity:.8},{width:'120px',height:'120px',opacity:0}],{duration:600,easing:'ease-out'});
+    setTimeout(()=>r.remove(),620);
+  });
 </script>
 </body>
 </html>
