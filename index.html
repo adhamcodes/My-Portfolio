@@ -10,7 +10,7 @@
 <meta property="og:type" content="website" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#070a09; --bg2:#0a0e0c; --glass:rgba(255,255,255,.035); --glass-b:rgba(255,255,255,.09);
@@ -18,7 +18,7 @@
     --green:#10b981; --green2:#34d399; --cyan:#2dd4bf; --emerald:#065f46;
     --acc-rgb:16,185,129; --acc2-rgb:52,211,153; --acc3-rgb:45,212,191;
     --text:#e9f0ec; --muted:#7e948b;
-    --r:20px; --font-h:'Space Grotesk',sans-serif; --font-b:'Inter',sans-serif; --font-m:'JetBrains Mono',monospace;
+    --r:20px; --font-h:'Bricolage Grotesque',sans-serif; --font-b:'Hanken Grotesk',sans-serif; --font-m:'JetBrains Mono',monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -285,6 +285,34 @@
   .now{margin-top:28px;font-family:var(--font-m);font-size:14px;color:var(--muted);display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
   .now .nd{width:8px;height:8px;border-radius:50%;background:var(--green2);box-shadow:0 0 10px var(--green2);animation:pulse 1.8s infinite}
   .now .scram{color:var(--green2);font-weight:500;min-width:140px;display:inline-block}
+  /* MANIFESTO */
+  .manifesto{padding:96px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .manifesto .big{font-family:var(--font-h);font-weight:800;font-size:clamp(30px,5.4vw,66px);line-height:1.04;letter-spacing:-.03em;max-width:1000px}
+  .manifesto .big .g{color:var(--green2)}
+  .manifesto .sig{font-family:var(--font-m);font-size:12.5px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase;margin-top:26px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .manifesto .sig:before{content:'';width:30px;height:1px;background:var(--green2)}
+
+  /* TERMINAL */
+  .term{margin-top:42px;border:1px solid var(--glass-b);border-radius:16px;overflow:hidden;background:rgba(5,8,7,.72);backdrop-filter:blur(10px);max-width:820px;box-shadow:0 30px 70px rgba(0,0,0,.45)}
+  .term-bar{display:flex;align-items:center;gap:8px;padding:0 16px;height:42px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--line)}
+  .term-bar i{width:11px;height:11px;border-radius:50%;display:block}
+  .term-bar i:nth-child(1){background:#ff5f57}.term-bar i:nth-child(2){background:#febc2e}.term-bar i:nth-child(3){background:#28c840}
+  .term-bar span{margin-left:10px;font-family:var(--font-m);font-size:12px;color:var(--muted)}
+  .term-body{padding:20px 22px;font-family:var(--font-m);font-size:13.5px;line-height:1.7;height:300px;overflow-y:auto}
+  .term-body::-webkit-scrollbar{width:8px}.term-body::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+  .tline{color:var(--text);white-space:pre-wrap;word-break:break-word}
+  .tprompt{color:var(--green2);margin-right:8px}
+  .tout{color:var(--muted);white-space:pre-wrap;margin:2px 0 12px;word-break:break-word}
+  .tout a{color:var(--green2)} .tout b{color:var(--text);font-weight:500}
+  .term-input{display:flex;align-items:center;padding:0 22px 18px}
+  .term-input span{color:var(--green2);font-family:var(--font-m);margin-right:8px}
+  .term-input input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--font-m);font-size:13.5px;caret-color:var(--green2)}
+  .term-input input::placeholder{color:#4d5d55}
+
+  /* EASTER-EGG TOAST + CONFETTI */
+  #toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(30px);background:rgba(5,8,7,.92);backdrop-filter:blur(12px);border:1px solid var(--green2);color:var(--text);font-family:var(--font-m);font-size:12.5px;padding:14px 22px;border-radius:999px;z-index:1200;opacity:0;pointer-events:none;transition:.4s;box-shadow:0 14px 40px rgba(var(--acc-rgb),.3);max-width:90vw;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .confetti{position:fixed;width:9px;height:9px;z-index:1100;pointer-events:none;border-radius:2px;top:-20px}
 </style>
 </head>
 <body>
@@ -518,6 +546,32 @@
   </div>
 </section>
 
+<!-- MANIFESTO -->
+<section class="manifesto">
+  <div class="wrap reveal">
+    <div class="eyebrow"><b>✦</b> Manifesto</div>
+    <div class="big" style="margin-top:18px">Engineering the future —<br><span class="g">one line of code at a time.</span></div>
+    <div class="sig">Relentless · Modern · Authentic · Built from Dhaka 🇧🇩</div>
+  </div>
+</section>
+
+<!-- TERMINAL -->
+<section id="terminal-sec" style="padding-top:0">
+  <div class="wrap reveal">
+    <div class="eyebrow"><b>&gt;_</b> Interactive</div>
+    <h2 class="stitle">Talk to my <span class="ser">terminal.</span></h2>
+    <p style="color:var(--muted);margin-top:14px;max-width:560px">Go on — type a command. Try <b style="color:var(--green2)">help</b>. (And there may be a secret hidden somewhere on this page… 😉)</p>
+    <div class="term" id="term">
+      <div class="term-bar"><i></i><i></i><i></i><span>adham@portfolio: ~</span></div>
+      <div class="term-body" id="termBody">
+        <div class="tline"><span class="tprompt">$</span>whoami</div>
+        <div class="tout">Adham — a relentless, self-taught front-end developer from Dhaka 🇧🇩. Type <b>help</b> to explore.</div>
+      </div>
+      <div class="term-input"><span>$</span><input id="termIn" autocomplete="off" spellcheck="false" aria-label="terminal input" placeholder="type a command…"></div>
+    </div>
+  </div>
+</section>
+
 <!-- CONTACT -->
 <section id="contact" style="padding-top:0">
   <div class="wrap reveal">
@@ -697,6 +751,63 @@
     }
     let i2=0; function next(){scramble(words[i2%words.length]); i2++;}
     next(); setInterval(next,2800);
+  })();
+  // INTERACTIVE TERMINAL
+  (function(){
+    const inp=document.getElementById('termIn'), body=document.getElementById('termBody'), term=document.getElementById('term');
+    if(!inp) return;
+    const cmds={
+      help:()=>`available commands:\n  whoami    - who I am\n  skills    - my tech stack\n  projects  - my work\n  contact   - reach me\n  hire      - let's work together\n  clear     - clear the screen`,
+      whoami:()=>`Adham - self-taught front-end developer from Dhaka, Bangladesh.\nRelentless. Honest. Detail-obsessed. I build modern, high-converting web experiences.`,
+      skills:()=>`HTML · CSS · JavaScript · React · Next.js · Tailwind · Framer Motion · UI/UX · Web Audio API`,
+      projects:()=>`Nova   -> https://nova-preview-six.vercel.app   (SaaS marketing site)\nQuiet  -> https://quiet-amber.vercel.app   (browser focus app)`,
+      contact:()=>`email    -> adhammahmood83@gmail.com\nwhatsapp -> +8801811643000\nfiverr   -> https://www.fiverr.com/s/2K3qBNr`,
+      hire:()=>`Smart move. Tap "Start a project" at the top, or message me on Fiverr. Let's build something legendary.`,
+      sudo:()=>`Permission granted. You've just met the Aura Guy. 😎`,
+      ls:()=>`projects/  skills/  contact/  secrets/`,
+      cat:()=>`nice try. nothing to see here 👀`
+    };
+    function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+    function fmt(s){return esc(s).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>').replace(/\n/g,'<br>').replace(/\b(help|whoami|skills|projects|contact|hire|clear)\b/g,'<b>$1</b>');}
+    function print(line,out){
+      const a=document.createElement('div');a.className='tline';a.innerHTML='<span class="tprompt">$</span>'+esc(line);body.appendChild(a);
+      if(out){const b=document.createElement('div');b.className='tout';b.innerHTML=fmt(out);body.appendChild(b);}
+      body.scrollTop=body.scrollHeight;
+    }
+    inp.addEventListener('keydown',e=>{
+      if(e.key!=='Enter')return;
+      const raw=inp.value.trim(); if(!raw){return;} const cmd=raw.toLowerCase().split(' ')[0]; inp.value='';
+      if(cmd==='clear'){body.innerHTML='';return;}
+      const fn=cmds[cmd];
+      print(raw, fn?fn():`command not found: ${raw}  (type "help")`);
+    });
+    term.addEventListener('click',()=>inp.focus());
+  })();
+
+  // KONAMI EASTER EGG
+  (function(){
+    const seq=['arrowup','arrowup','arrowdown','arrowdown','arrowleft','arrowright','arrowleft','arrowright','b','a'];
+    let pos=0;
+    addEventListener('keydown',e=>{
+      const k=e.key.toLowerCase();
+      pos = (k===seq[pos]) ? pos+1 : (k===seq[0]?1:0);
+      if(pos===seq.length){pos=0; party();}
+    });
+    function toast(msg){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t);}t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),4500);}
+    function party(){
+      toast('🟢 ACCESS GRANTED — you found the Aura Guy. Let\'s build something legendary.');
+      const g=getComputedStyle(document.documentElement).getPropertyValue('--green2').trim()||'#34d399';
+      const colors=[g,'#2dd4bf','#e9f0ec'];
+      for(let i=0;i<90;i++){
+        const d=document.createElement('div');d.className='confetti';
+        d.style.background=colors[i%colors.length];
+        d.style.left=Math.random()*100+'vw';
+        document.body.appendChild(d);
+        const dur=2200+Math.random()*1600, x=(Math.random()-.5)*260, rot=Math.random()*720;
+        d.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${x}px,${innerHeight+80}px) rotate(${rot}deg)`,opacity:.9}],{duration:dur,easing:'cubic-bezier(.2,.6,.4,1)'});
+        setTimeout(()=>d.remove(),dur);
+      }
+    }
   })();
 </script>
 </body>
