@@ -280,6 +280,11 @@
     .stitle{text-align:center}
     #redesign .reveal>p{margin-left:auto;margin-right:auto;text-align:center}
   }
+  /* INTERACTIVE NETWORK + NOW LINE */
+  #net{position:fixed;inset:0;z-index:-2;pointer-events:none}
+  .now{margin-top:28px;font-family:var(--font-m);font-size:14px;color:var(--muted);display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .now .nd{width:8px;height:8px;border-radius:50%;background:var(--green2);box-shadow:0 0 10px var(--green2);animation:pulse 1.8s infinite}
+  .now .scram{color:var(--green2);font-weight:500;min-width:140px;display:inline-block}
 </style>
 </head>
 <body>
@@ -293,6 +298,7 @@
 
 <div class="aurora"><i class="g1"></i><i class="g2"></i><i class="g3"></i></div>
 <div class="gridbg"></div>
+<canvas id="net"></canvas>
 <div class="grain"></div>
 <div id="spot"></div>
 <div id="dot"></div><div id="ring"></div>
@@ -336,6 +342,7 @@
         <a href="#work" class="btn" data-c>View my work →</a>
         <a href="#contact" class="btn ghost" data-c>Start a project</a>
       </div>
+      <div class="now reveal" style="transition-delay:.34s"><span class="nd"></span>Currently crafting <span id="rotate" class="scram">landing pages</span></div>
     </div>
     <div class="float-cards reveal" style="transition-delay:.36s">
       <div class="fcard"><div class="k">2–3d</div><div class="v">Average delivery time</div></div>
@@ -644,6 +651,53 @@
     const l=document.querySelector('.nav-links');const open=l.style.display==='flex';
     Object.assign(l.style,{display:open?'none':'flex',flexDirection:'column',position:'absolute',top:'78px',right:'26px',background:'rgba(7,10,9,.95)',backdropFilter:'blur(14px)',padding:'22px 28px',borderRadius:'16px',border:'1px solid var(--line)',gap:'16px'});
   });
+  // INTERACTIVE NETWORK CANVAS (hero "aura")
+  (function(){
+    const c=document.getElementById('net'); if(!c) return;
+    const ctx=c.getContext('2d'); let w,h,dpr;
+    const COUNT=Math.max(28,Math.min(64,Math.floor(innerWidth/22)));
+    const parts=[];
+    const accent=()=>(getComputedStyle(document.documentElement).getPropertyValue('--acc2-rgb').trim()||'52,211,153');
+    function resize(){dpr=Math.min(devicePixelRatio||1,2);c.width=innerWidth*dpr;c.height=innerHeight*dpr;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';w=innerWidth;h=innerHeight;}
+    resize(); addEventListener('resize',resize);
+    for(let i=0;i<COUNT;i++)parts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25});
+    function frame(){
+      const rgb=accent();
+      ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,h);
+      for(const p of parts){
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>w)p.vx*=-1; if(p.y<0||p.y>h)p.vy*=-1;
+        const dx=p.x-mx,dy=p.y-my,d=Math.hypot(dx,dy);
+        if(d<130&&d>0){const f=(130-d)/130*0.8;p.x+=dx/d*f;p.y+=dy/d*f;}
+        ctx.beginPath();ctx.arc(p.x,p.y,1.5,0,6.2832);ctx.fillStyle='rgba('+rgb+',.6)';ctx.fill();
+      }
+      for(let i=0;i<parts.length;i++)for(let j=i+1;j<parts.length;j++){
+        const a=parts[i],b=parts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+        if(d<140){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle='rgba('+rgb+','+(0.13*(1-d/140)).toFixed(3)+')';ctx.lineWidth=1;ctx.stroke();}
+      }
+      for(const p of parts){const dx=p.x-mx,dy=p.y-my,d=Math.hypot(dx,dy);if(d<170){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(mx,my);ctx.strokeStyle='rgba('+rgb+','+(0.2*(1-d/170)).toFixed(3)+')';ctx.lineWidth=1;ctx.stroke();}}
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  // SCRAMBLE ROTATOR
+  (function(){
+    const el=document.getElementById('rotate'); if(!el) return;
+    const words=['landing pages','web apps','brands','startups','digital experiences'];
+    const chars='!<>-_\\/[]{}=+*^?#abcdef0123'; let wi=0;
+    function scramble(text){
+      let f=0; const dur=26; clearInterval(el._t);
+      el._t=setInterval(()=>{
+        let out=''; const reveal=(f/dur)*text.length;
+        for(let i=0;i<text.length;i++){ out += (i<reveal||text[i]===' ') ? text[i] : chars[Math.floor(Math.random()*chars.length)]; }
+        el.textContent=out; f++;
+        if(f>dur){clearInterval(el._t); el.textContent=text;}
+      },26);
+    }
+    let i2=0; function next(){scramble(words[i2%words.length]); i2++;}
+    next(); setInterval(next,2800);
+  })();
 </script>
 </body>
 </html>
