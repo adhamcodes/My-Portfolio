@@ -362,6 +362,11 @@
   .khint b{color:var(--green2)}
   .ripple{position:fixed;border-radius:50%;border:1.5px solid var(--green2);pointer-events:none;z-index:1250;transform:translate(-50%,-50%)}
   @media(hover:none){.khint .kk{display:none}}
+  /* respect reduced-motion (perf + accessibility) */
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+    .reveal{opacity:1 !important;transform:none !important}
+  }
 </style>
 </head>
 <body>
@@ -424,7 +429,7 @@
     <div class="float-cards reveal" style="transition-delay:.36s">
       <div class="fcard"><div class="k">2–3d</div><div class="v">Average delivery time</div></div>
       <div class="fcard"><div class="k">100%</div><div class="v">Responsive & accessible</div></div>
-      <div class="fcard"><div class="k">∞</div><div class="v">Revisions until perfect</div></div>
+      <div class="fcard"><div class="k">2–3</div><div class="v">Rounds of focused revisions</div></div>
     </div>
   </div>
   <div class="scroll-cue"><span class="l"></span>Scroll</div>
@@ -591,7 +596,7 @@
     <div class="faq reveal">
       <details open><summary>How long does a project take?<span class="pm">+</span></summary><p>A landing page is usually 2–3 days. Larger web apps take a bit longer, but I'll always give you a clear timeline upfront.</p></details>
       <details><summary>How do we communicate?<span class="pm">+</span></summary><p>WhatsApp, email, or Fiverr — whatever's easiest for you. I reply fast and keep you updated at every step.</p></details>
-      <details><summary>Do you offer revisions?<span class="pm">+</span></summary><p>Yes — I revise until you're genuinely happy. Your satisfaction is the whole point.</p></details>
+      <details><summary>Do you offer revisions?<span class="pm">+</span></summary><p>Yes — every project includes 2–3 rounds of focused revisions to get it perfectly aligned. Clear scope, no endless back-and-forth.</p></details>
       <details><summary>How do I pay?<span class="pm">+</span></summary><p>Through Fiverr for the safest experience, or directly via agreed methods for repeat clients.</p></details>
     </div>
   </div>
