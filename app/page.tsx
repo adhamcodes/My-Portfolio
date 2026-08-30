@@ -3,7 +3,9 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
+import CoreDirector from "@/components/CoreDirector";
 import CursorSystem from "@/components/CursorSystem";
+import FoundryEngine from "@/components/FoundryEngine";
 import IdentityGlyph from "@/components/IdentityGlyph";
 import InitializationSequence from "@/components/InitializationSequence";
 import KineticField from "@/components/KineticField";
@@ -28,12 +30,14 @@ export default function Home() {
   const [progress, setProgress] = useState(0);
   const [visited, setVisited] = useState<string[]>([]);
   const current = useMemo(() => projects.find((project) => project.state === "building") ?? projects[0], []);
+  const familiarity = Math.round((visited.length / Math.max(projects.length, 1)) * 100);
 
   const markVisited = useCallback((id: string) => {
     setVisited((existing) => {
       if (existing.includes(id)) return existing;
       const next = [...existing, id];
       try { localStorage.setItem("adham:visited-worlds", JSON.stringify(next)); } catch {}
+      window.dispatchEvent(new CustomEvent("aura:signal", { detail: `MEMORY / ${next.length}:${projects.length} WORLDS MAPPED` }));
       return next;
     });
   }, []);
@@ -63,6 +67,8 @@ export default function Home() {
     else run();
   }, []);
 
+  const toggleXray = useCallback(() => setXray((value) => !value), []);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem("adham:aura");
@@ -71,7 +77,6 @@ export default function Home() {
       if (Array.isArray(seen)) setVisited(seen.filter((item): item is string => typeof item === "string"));
     } catch {}
     setAuraReady(true);
-
     const systemId = new URL(window.location.href).searchParams.get("system");
     const linked = projects.find((project) => project.id === systemId);
     if (linked) openProject(linked, false);
@@ -92,7 +97,13 @@ export default function Home() {
     document.documentElement.dataset.aura = aura;
     if (!auraReady) return;
     try { localStorage.setItem("adham:aura", aura); } catch {}
+    window.dispatchEvent(new CustomEvent("aura:signal", { detail: `AURA / ${aura.toUpperCase()} / PERSONALITY ACTIVE` }));
   }, [aura, auraReady]);
+
+  useEffect(() => {
+    document.documentElement.dataset.xray = xray ? "on" : "off";
+    window.dispatchEvent(new CustomEvent("aura:signal", { detail: `XRAY / ${xray ? "EXPOSED" : "SEALED"}` }));
+  }, [xray]);
 
   useEffect(() => {
     const update = () => {
@@ -107,7 +118,7 @@ export default function Home() {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
-      if (event.key.toLowerCase() === "x") setXray((value) => !value);
+      if (event.key.toLowerCase() === "x") toggleXray();
       if (event.key.toLowerCase() === "a") {
         setAura((currentMode) => {
           const index = auraModes.findIndex((mode) => mode.id === currentMode);
@@ -117,7 +128,7 @@ export default function Home() {
     };
     addEventListener("keydown", onKey);
     return () => removeEventListener("keydown", onKey);
-  }, []);
+  }, [toggleXray]);
 
   useEffect(() => {
     let ctx: { revert: () => void } | undefined;
@@ -129,27 +140,14 @@ export default function Home() {
       gsap.registerPlugin(ScrollTrigger);
       ctx = gsap.context(() => {
         gsap.utils.toArray<HTMLElement>("[data-rise]").forEach((element) => {
-          gsap.fromTo(element, { y: 80, opacity: 0 }, {
-            y: 0,
-            opacity: 1,
-            duration: 1.05,
-            ease: "power4.out",
-            scrollTrigger: { trigger: element, start: "top 88%", once: true },
-          });
+          gsap.fromTo(element, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 1.05, ease: "power4.out", scrollTrigger: { trigger: element, start: "top 88%", once: true } });
         });
         gsap.utils.toArray<HTMLElement>("[data-drift]").forEach((element, index) => {
-          gsap.to(element, {
-            yPercent: index % 2 ? -10 : 12,
-            ease: "none",
-            scrollTrigger: { trigger: element, start: "top bottom", end: "bottom top", scrub: 1.4 },
-          });
+          gsap.to(element, { yPercent: index % 2 ? -10 : 12, ease: "none", scrollTrigger: { trigger: element, start: "top bottom", end: "bottom top", scrub: 1.4 } });
         });
       });
     });
-    return () => {
-      cancelled = true;
-      ctx?.revert();
-    };
+    return () => { cancelled = true; ctx?.revert(); };
   }, []);
 
   return (
@@ -157,82 +155,46 @@ export default function Home() {
       <InitializationSequence />
       <PerformanceGovernor />
       <KineticField />
+      <CoreDirector />
       <SecretProtocol />
       <VisualErrorBoundary><AuraCanvas aura={aura} /></VisualErrorBoundary>
       <CursorSystem />
       <XRay on={xray} />
-      <OperatorDeck
-        aura={aura}
-        xray={xray}
-        visited={visited}
-        onAura={setAura}
-        onXray={() => setXray((value) => !value)}
-        onProject={(project) => openProject(project)}
-      />
+      <OperatorDeck aura={aura} xray={xray} visited={visited} onAura={setAura} onXray={toggleXray} onProject={(project) => openProject(project)} />
       <div className="noise-layer" />
       <div className="vignette" />
       <div className="kinetic-glow" aria-hidden="true" />
       <div className="progress-rail"><span style={{ transform: `scaleY(${progress})` }} /></div>
 
       <header className="chrome">
-        <a className="brand" href="#origin" data-cursor="signal">
-          <b>ADHAM</b><span>MAHMOOD</span>
-        </a>
-        <nav>
-          <a href="#work">WORK</a>
-          <a href="#state">STATE</a>
-          <a href="#trajectory">PATH</a>
-          <a href="#machine">SYSTEM</a>
-          <a href="#contact">CONTACT</a>
-        </nav>
+        <a className="brand" href="#origin" data-cursor="signal"><b>ADHAM</b><span>MAHMOOD</span></a>
+        <nav><a href="#work">WORK</a><a href="#state">STATE</a><a href="#trajectory">PATH</a><a href="#machine">SYSTEM</a><a href="#contact">CONTACT</a></nav>
         <div className="chrome-tools">
-          <button onClick={() => setXray((value) => !value)} className={xray ? "xray-toggle on" : "xray-toggle"} data-cursor="signal">
-            XRAY <kbd>X</kbd>
-          </button>
+          <button onClick={toggleXray} className={xray ? "xray-toggle on" : "xray-toggle"} data-cursor="signal">XRAY <kbd>X</kbd></button>
           <Soundscape aura={aura} />
         </div>
       </header>
 
       <aside className="aura-switcher" aria-label="Aura mode">
         <span>STATE / AURA</span>
-        {auraModes.map((mode) => (
-          <button key={mode.id} className={aura === mode.id ? "active" : ""} onClick={() => setAura(mode.id)} data-cursor="signal">
-            <i /> <b>{mode.label}</b><small>{mode.note}</small>
-          </button>
-        ))}
+        {auraModes.map((mode) => <button key={mode.id} className={aura === mode.id ? "active" : ""} onClick={() => setAura(mode.id)} data-cursor="signal"><i /> <b>{mode.label}</b><small>{mode.note}</small></button>)}
         <em>press A to cycle</em>
       </aside>
 
       <section id="origin" className="hero scene">
         <div className="hero-copy">
           <div className="eyebrow"><span /> LIVE IDENTITY / VERSION {identity.version}</div>
-          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}>
-            <span>ADHAM</span>
-            <span>MAHMOOD</span>
-          </motion.h1>
-          <motion.div className="hero-subline" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 0.9 }}>
-            <strong>{identity.short}</strong>
-            <p>This is not a finished title. It is a live build.</p>
-          </motion.div>
-          <motion.p className="hero-thesis" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.9 }}>
-            {identity.thesis}
-          </motion.p>
-          <div className="hero-actions">
-            <a href="#work" className="primary-action" data-cursor="enter"><span>ENTER THE BUILD</span><i>↘</i></a>
-            <button onClick={() => openProject(current)} className="ghost-action" data-cursor="open">CURRENT SYSTEM / {current.name.toUpperCase()} ↗</button>
-          </div>
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}><span>ADHAM</span><span>MAHMOOD</span></motion.h1>
+          <motion.div className="hero-subline" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .5, duration: .9 }}><strong>{identity.short}</strong><p>The work moves. The system keeps the evidence.</p></motion.div>
+          <motion.p className="hero-thesis" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .7, duration: .9 }}>{identity.thesis}</motion.p>
+          <div className="hero-actions"><a href="#work" className="primary-action" data-cursor="enter"><span>ENTER THE BUILD</span><i>↘</i></a><button onClick={() => openProject(current)} className="ghost-action" data-cursor="open">CURRENT SYSTEM / {current.name.toUpperCase()} ↗</button></div>
         </div>
-
         <div className="hero-instrument" data-drift>
-          <div className="instrument-ring ring-one" />
-          <div className="instrument-ring ring-two" />
-          <IdentityGlyph aura={aura} />
-          <div className="instrument-copy top"><span>CORE</span><b>UNSTABLE / EVOLVING</b></div>
+          <div className="instrument-ring ring-one" /><div className="instrument-ring ring-two" /><IdentityGlyph aura={aura} />
+          <div className="instrument-copy top"><span>CORE</span><b>SCENE-DIRECTED / EVOLVING</b></div>
           <div className="instrument-copy bottom"><span>VECTOR</span><b>INTELLIGENT SYSTEMS</b></div>
-          <div className="coordinate c1">NODE / LIVE</div>
-          <div className="coordinate c2">STATE / {aura.toUpperCase()}</div>
+          <div className="coordinate c1">NODE / LIVE</div><div className="coordinate c2">STATE / {aura.toUpperCase()}</div>
         </div>
-
         <SignalTicker />
         <div className="hero-scroll"><span>SCROLL TO ADVANCE STATE</span><i /></div>
       </section>
@@ -240,131 +202,54 @@ export default function Home() {
       <section className="manifest scene" id="state">
         <div className="section-number">01 / BUILD STATE</div>
         <div className="manifest-grid">
-          <div className="manifest-word" data-rise>
-            <span>NOT</span>
-            <span>A</span>
-            <span>STATIC</span>
-            <span>PERSON.</span>
-          </div>
+          <div className="manifest-word" data-rise><span>NOT</span><span>A</span><span>STATIC</span><span>PERSON.</span></div>
           <div className="manifest-copy" data-rise>
-            <p>The portfolio is supposed to age with me. When the work changes, the system changes. Projects move. Signals change. The current obsession takes over the interface.</p>
-            <div className="state-readout">
-              <div><span>NOW</span><strong>SOFTWARE FOUNDATIONS</strong></div>
-              <div><span>BUILDING</span><strong>{current.name.toUpperCase()}</strong></div>
-              <div><span>NEXT PRESSURE</span><strong>SYSTEMS / BACKEND</strong></div>
-              <div><span>LONG VECTOR</span><strong>AI / ML SYSTEMS</strong></div>
-            </div>
+            <p>The interface is allowed to age with the work. Projects move. Signals change. The current obsession takes over the system instead of being buried under an old biography.</p>
+            <div className="state-readout"><div><span>NOW</span><strong>SOFTWARE FOUNDATIONS</strong></div><div><span>BUILDING</span><strong>{current.name.toUpperCase()}</strong></div><div><span>NEXT PRESSURE</span><strong>SYSTEMS / BACKEND</strong></div><div><span>LONG VECTOR</span><strong>AI / ML SYSTEMS</strong></div></div>
           </div>
         </div>
       </section>
 
       <section id="work" className="work scene">
         <div className="section-number">02 / PROJECT WORLDS</div>
-        <div className="work-intro">
-          <h2 data-rise>Projects are not cards.<br /><span>They are places to enter.</span></h2>
-          <p data-rise>The system remembers what you explore. Every project exposes a different field, problem, constraint, architecture and proof.</p>
-        </div>
-
+        <div className="work-intro"><h2 data-rise>Different systems.<br /><span>Different rules.</span></h2><p data-rise>Enter a project and its interaction model changes with the idea. The system remembers what you inspect.</p></div>
         <div className="project-orbits">
           {projects.map((project, index) => (
-            <button
-              key={project.id}
-              className={`project-world world-${project.accent}${visited.includes(project.id) ? " world-seen" : ""}`}
-              onClick={() => openProject(project)}
-              data-cursor="enter"
-              data-rise
-            >
-              <div className="world-index">{String(index + 1).padStart(2, "0")}</div>
-              <div className="world-glow" />
-              <div className="world-lines"><i /><i /><i /></div>
+            <button key={project.id} className={`project-world world-${project.accent}${visited.includes(project.id) ? " world-seen" : ""}`} onClick={() => openProject(project)} data-cursor="enter" data-rise>
+              <div className="world-index">{String(index + 1).padStart(2, "0")}</div><div className="world-glow" /><div className="world-lines"><i /><i /><i /></div>
               <div className="world-meta"><span>{project.chapter}</span><em>{visited.includes(project.id) ? "SEEN / " : ""}{project.state.toUpperCase()}</em></div>
-              <h3>{project.name}</h3>
-              <p>{project.oneLine}</p>
-              <div className="world-architecture">
-                {project.architecture.slice(0, 4).map((item) => <span key={item}>{item}</span>)}
-              </div>
-              <div className="world-enter">ENTER SYSTEM <b>↗</b></div>
+              <h3>{project.name}</h3><p>{project.oneLine}</p><div className="world-architecture">{project.architecture.slice(0, 4).map((item) => <span key={item}>{item}</span>)}</div><div className="world-enter">ENTER WORLD <b>↗</b></div>
             </button>
           ))}
         </div>
-        <div className="memory-strip" data-rise><span>SESSION MEMORY</span><b>{visited.length} / {projects.length} WORLDS DISCOVERED</b><i style={{ transform: `scaleX(${projects.length ? visited.length / projects.length : 0})` }} /></div>
+        <div className={`memory-strip${familiarity === 100 ? " complete" : ""}`} data-rise><span>SYSTEM FAMILIARITY</span><b>{familiarity}% / {visited.length}:{projects.length} WORLDS MAPPED</b><i style={{ transform: `scaleX(${familiarity / 100})` }} /></div>
       </section>
 
       <section className="current scene">
         <div className="section-number">03 / ACTIVE OBSESSION</div>
-        <div className="current-shell">
-          <div className="current-title" data-rise>
-            <span>CURRENT BUILD</span>
-            <h2>{current.name}</h2>
-            <p>{current.oneLine}</p>
-            <button onClick={() => openProject(current)} data-cursor="enter">OPEN THE FORGE ↗</button>
-          </div>
-          <div className="forge-machine" data-drift>
-            <div className="forge-header"><span>FOUNDRY180 / SYSTEM MAP</span><b>BUILDING</b></div>
-            <div className="forge-core"><span>180</span><small>DAYS</small></div>
-            <svg viewBox="0 0 600 420" aria-hidden="true">
-              <path d="M300 210 C240 160 170 155 98 104" />
-              <path d="M300 210 C370 150 438 146 505 87" />
-              <path d="M300 210 C230 270 160 278 95 325" />
-              <path d="M300 210 C370 265 445 270 520 334" />
-            </svg>
-            {current.architecture.slice(0, 4).map((item, index) => <div key={item} className={`forge-node fn-${index + 1}`}><span>0{index + 1}</span>{item}</div>)}
-            <div className="forge-pulse" />
-          </div>
-        </div>
+        <div className="current-title current-title-upgraded" data-rise><span>CURRENT BUILD</span><h2>{current.name}</h2><p>{current.oneLine}</p><button onClick={() => openProject(current)} data-cursor="enter">ENTER THE FULL FORGE ↗</button></div>
+        <FoundryEngine />
       </section>
 
       <section id="trajectory" className="trajectory scene">
         <div className="section-number">04 / TRAJECTORY</div>
-        <div className="trajectory-head">
-          <h2 data-rise>THE MAP IS<br /><span>NOT THE TERRITORY.</span></h2>
-          <p data-rise>Future stages stay visible, but visually unresolved. The portfolio refuses to pretend I have already arrived.</p>
-        </div>
-        <div className="trajectory-system">
-          <div className="trajectory-axis" />
-          {stages.map((stage, index) => (
-            <div className={`stage stop-${stage.state}`} key={stage.id} data-rise>
-              <div className="stage-dot"><i /></div>
-              <span>0{index + 1}</span>
-              <h3>{stage.label}</h3>
-              <em>{stage.state.toUpperCase()}</em>
-              <p>{stage.note}</p>
-            </div>
-          ))}
-        </div>
+        <div className="trajectory-head"><h2 data-rise>THE MAP IS<br /><span>NOT THE TERRITORY.</span></h2><p data-rise>Direction stays public. Proof appears when it exists. Future stages remain visible without being presented as completed work.</p></div>
+        <div className="trajectory-system"><div className="trajectory-axis" />{stages.map((stage, index) => <div className={`stage stop-${stage.state}`} key={stage.id} data-rise><div className="stage-dot"><i /></div><span>0{index + 1}</span><h3>{stage.label}</h3><em>{stage.state.toUpperCase()}</em><p>{stage.note}</p></div>)}</div>
       </section>
 
       <section className="transmissions scene">
         <div className="section-number">05 / INTERNAL TRANSMISSIONS</div>
-        <div className="transmission-stack">
-          {transmissions.map((line, index) => (
-            <div key={line} className="transmission" data-rise>
-              <span>0{index + 1}</span><p>{line}</p>
-            </div>
-          ))}
-        </div>
+        <div className="transmission-stack">{transmissions.map((line, index) => <div key={line} className="transmission" data-rise><span>0{index + 1}</span><p>{line}</p></div>)}</div>
       </section>
 
       <SystemLab aura={aura} xray={xray} />
 
       <section id="contact" className="contact scene">
         <div className="contact-orbit" data-drift />
-        <div className="contact-copy" data-rise>
-          <span className="section-number">07 / OPEN CHANNEL</span>
-          <h2>IF THE SIGNAL<br />MATCHES,<br /><em>TRANSMIT.</em></h2>
-          <p>Interesting software, engineering conversations, collaboration, or just a genuinely good idea.</p>
-          <div className="contact-links">
-            <a href={`mailto:${identity.email}`} data-cursor="enter">EMAIL <span>↗</span></a>
-            <a href={identity.github} target="_blank" rel="noreferrer" data-cursor="enter">GITHUB <span>↗</span></a>
-          </div>
-        </div>
+        <div className="contact-copy" data-rise><span className="section-number">07 / OPEN CHANNEL</span><h2>IF THE SIGNAL<br />MATCHES,<br /><em>TRANSMIT.</em></h2><p>Interesting software, engineering conversations, collaboration, or a genuinely good idea.</p><div className="contact-links"><a href={`mailto:${identity.email}`} data-cursor="enter">EMAIL <span>↗</span></a><a href={identity.github} target="_blank" rel="noreferrer" data-cursor="enter">GITHUB <span>↗</span></a></div></div>
       </section>
 
-      <footer>
-        <div><b>{identity.mark}</b><span>THE SYSTEM CHANGES WHEN THE WORK CHANGES.</span></div>
-        <div><span>MEMORY / {visited.length}:{projects.length}</span><span>AURA / {aura.toUpperCase()}</span><span>XRAY / {xray ? "ON" : "OFF"}</span><span>VERSION / {identity.version}</span><span>© 2026</span></div>
-      </footer>
-
+      <footer><div><b>{identity.mark}</b><span>THE SYSTEM CHANGES WHEN THE WORK CHANGES.</span></div><div><span>FAMILIARITY / {familiarity}%</span><span>AURA / {aura.toUpperCase()}</span><span>XRAY / {xray ? "ON" : "OFF"}</span><span>VERSION / {identity.version}</span><span>© 2026</span></div></footer>
       <ProjectPortal project={portal} onClose={closeProject} />
     </main>
   );
