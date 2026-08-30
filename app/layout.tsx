@@ -6,6 +6,7 @@ import "./initialization.css";
 import "./release-candidate.css";
 import "./resilience.css";
 import "./final-polish.css";
+import "./monster-pass.css";
 
 export const metadata: Metadata = {
   title: {
@@ -69,10 +70,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         {children}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </body>
     </html>
   );
