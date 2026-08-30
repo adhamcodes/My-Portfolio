@@ -5,6 +5,7 @@ import { AdaptiveDpr, Float, MeshDistortMaterial, Points, PointMaterial, Sparkle
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { AuraMode } from "@/data/site";
+import type { AuraQuality } from "@/components/PerformanceGovernor";
 
 const palettes: Record<AuraMode, { primary: string; secondary: string; tertiary: string; base: string; emissive: string }> = {
   pulse: { primary: "#ff4d7e", secondary: "#55d8ff", tertiary: "#a887ff", base: "#12131c", emissive: "#241334" },
@@ -12,10 +13,16 @@ const palettes: Record<AuraMode, { primary: string; secondary: string; tertiary:
   void: { primary: "#a887ff", secondary: "#5267ff", tertiary: "#7fdcff", base: "#080912", emissive: "#0d1032" },
 };
 
-function SignalCloud({ color, energy }: { color: string; energy: number }) {
+const qualityConfig: Record<AuraQuality, { points: number; detail: number; ringSegments: number; sparkles: number; dpr: [number, number] }> = {
+  high: { points: 450, detail: 5, ringSegments: 160, sparkles: 54, dpr: [1, 1.35] },
+  balanced: { points: 320, detail: 4, ringSegments: 120, sparkles: 38, dpr: [0.9, 1.15] },
+  low: { points: 190, detail: 3, ringSegments: 82, sparkles: 22, dpr: [0.72, 1] },
+};
+
+function SignalCloud({ color, energy, count }: { color: string; energy: number; count: number }) {
   const points = useMemo(() => {
-    const arr = new Float32Array(450 * 3);
-    for (let i = 0; i < 450; i++) {
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
       const r = 2.7 + Math.random() * 4.8;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
@@ -24,7 +31,7 @@ function SignalCloud({ color, energy }: { color: string; energy: number }) {
       arr[i * 3 + 2] = r * Math.cos(phi);
     }
     return arr;
-  }, []);
+  }, [count]);
 
   return (
     <Points positions={points} stride={3} frustumCulled={false}>
@@ -71,7 +78,7 @@ const fragmentShader = `
   }
 `;
 
-function SignalMembrane({ color, energy, reduced }: { color: string; energy: number; reduced: boolean }) {
+function SignalMembrane({ color, energy, reduced, detail }: { color: string; energy: number; reduced: boolean; detail: number }) {
   const material = useRef<THREE.ShaderMaterial>(null);
   const uniforms = useMemo(() => ({
     uTime: { value: 0 },
@@ -92,7 +99,7 @@ function SignalMembrane({ color, energy, reduced }: { color: string; energy: num
 
   return (
     <mesh scale={1.47}>
-      <icosahedronGeometry args={[1.28, 5]} />
+      <icosahedronGeometry args={[1.28, detail]} />
       <shaderMaterial
         ref={material}
         uniforms={uniforms}
@@ -107,12 +114,13 @@ function SignalMembrane({ color, energy, reduced }: { color: string; energy: num
   );
 }
 
-function ReactiveCore({ reduced, aura, energy }: { reduced: boolean; aura: AuraMode; energy: number }) {
+function ReactiveCore({ reduced, aura, energy, quality }: { reduced: boolean; aura: AuraMode; energy: number; quality: AuraQuality }) {
   const group = useRef<THREE.Group>(null);
   const ringA = useRef<THREE.Mesh>(null);
   const ringB = useRef<THREE.Mesh>(null);
   const { pointer, viewport } = useThree();
   const palette = palettes[aura];
+  const config = qualityConfig[quality];
 
   useFrame((_state, delta) => {
     if (!group.current) return;
@@ -133,7 +141,7 @@ function ReactiveCore({ reduced, aura, energy }: { reduced: boolean; aura: AuraM
     <group ref={group} position={[1.7, 0.2, 0]}>
       <Float speed={reduced ? 0 : 1.1 + energy * 0.22} rotationIntensity={reduced ? 0 : 0.28 + energy * 0.08} floatIntensity={reduced ? 0 : 0.45 + energy * 0.12}>
         <mesh>
-          <icosahedronGeometry args={[1.28, 5]} />
+          <icosahedronGeometry args={[1.28, config.detail]} />
           <MeshDistortMaterial
             color={palette.base}
             emissive={palette.emissive}
@@ -145,21 +153,21 @@ function ReactiveCore({ reduced, aura, energy }: { reduced: boolean; aura: AuraM
           />
         </mesh>
         <mesh scale={1.02}>
-          <icosahedronGeometry args={[1.28, 2]} />
+          <icosahedronGeometry args={[1.28, Math.max(2, config.detail - 2)]} />
           <meshBasicMaterial color={palette.primary} wireframe transparent opacity={0.075 + energy * 0.045} />
         </mesh>
-        <SignalMembrane color={palette.primary} energy={energy} reduced={reduced} />
+        <SignalMembrane color={palette.primary} energy={energy} reduced={reduced} detail={config.detail} />
       </Float>
 
       <mesh ref={ringA} rotation={[1.2, 0.1, 0.2]}>
-        <torusGeometry args={[1.86, 0.012, 8, 160]} />
+        <torusGeometry args={[1.86, 0.012, 8, config.ringSegments]} />
         <meshBasicMaterial color={palette.secondary} transparent opacity={0.32 + energy * 0.13} />
       </mesh>
       <mesh ref={ringB} rotation={[0.2, 0.9, 1.1]}>
-        <torusGeometry args={[2.22, 0.008, 8, 160]} />
+        <torusGeometry args={[2.22, 0.008, 8, config.ringSegments]} />
         <meshBasicMaterial color={palette.tertiary} transparent opacity={0.22 + energy * 0.1} />
       </mesh>
-      <Sparkles count={reduced ? 18 : Math.round(42 + energy * 12)} scale={5} size={1.4 + energy * 0.35} speed={reduced ? 0 : 0.12 + energy * 0.1} opacity={0.32 + energy * 0.1} color={palette.tertiary} />
+      <Sparkles count={reduced ? 14 : Math.round(config.sparkles + energy * 8)} scale={5} size={1.4 + energy * 0.35} speed={reduced ? 0 : 0.12 + energy * 0.1} opacity={0.32 + energy * 0.1} color={palette.tertiary} />
     </group>
   );
 }
@@ -180,6 +188,7 @@ export default function AuraCanvas({ aura }: { aura: AuraMode }) {
   const [reduced, setReduced] = useState(false);
   const [capable, setCapable] = useState(true);
   const [energy, setEnergy] = useState(1);
+  const [quality, setQuality] = useState<AuraQuality>("high");
   const burstTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -205,24 +214,32 @@ export default function AuraCanvas({ aura }: { aura: AuraMode }) {
         setEnergy(Number.isFinite(cssEnergy) ? cssEnergy : 1);
       }, 850);
     };
+    const onQuality = (event: Event) => {
+      const value = (event as CustomEvent<AuraQuality>).detail;
+      if (value === "high" || value === "balanced" || value === "low") setQuality(value);
+    };
     window.addEventListener("aura:energy", onEnergy as EventListener);
     window.addEventListener("aura:burst", onBurst);
+    window.addEventListener("aura:quality", onQuality as EventListener);
     return () => {
       window.removeEventListener("aura:energy", onEnergy as EventListener);
       window.removeEventListener("aura:burst", onBurst);
+      window.removeEventListener("aura:quality", onQuality as EventListener);
       if (burstTimer.current) clearTimeout(burstTimer.current);
     };
   }, []);
 
   if (!capable) return <div className="aura-fallback" aria-hidden="true" />;
 
+  const config = qualityConfig[quality];
+
   return (
-    <div className="aura-canvas" aria-hidden="true">
-      <Canvas dpr={[1, 1.35]} camera={{ position: [0, 0, 7.4], fov: 44 }} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}>
+    <div className="aura-canvas" aria-hidden="true" data-quality={quality}>
+      <Canvas dpr={config.dpr} camera={{ position: [0, 0, 7.4], fov: 44 }} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}>
         <AdaptiveDpr />
         <LightRig aura={aura} energy={energy} />
-        <SignalCloud color={palettes[aura].tertiary} energy={energy} />
-        <ReactiveCore reduced={reduced} aura={aura} energy={energy} />
+        <SignalCloud color={palettes[aura].tertiary} energy={energy} count={config.points} />
+        <ReactiveCore reduced={reduced} aura={aura} energy={energy} quality={quality} />
       </Canvas>
     </div>
   );
