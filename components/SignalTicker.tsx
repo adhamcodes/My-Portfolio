@@ -16,7 +16,7 @@ const messages = [
 export default function SignalTicker() {
   const [message, setMessage] = useState(messages[0]);
   const index = useRef(0);
-  const liveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const liveTimer = useRef<number | null>(null);
 
   useEffect(() => {
     const rotate = window.setInterval(() => {
@@ -27,7 +27,7 @@ export default function SignalTicker() {
       const value = (event as CustomEvent<string>).detail;
       if (!value) return;
       setMessage(value);
-      if (liveTimer.current) window.clearTimeout(liveTimer.current);
+      if (liveTimer.current !== null) window.clearTimeout(liveTimer.current);
       liveTimer.current = window.setTimeout(() => {
         index.current = (index.current + 1) % messages.length;
         setMessage(messages[index.current]);
@@ -36,7 +36,7 @@ export default function SignalTicker() {
     window.addEventListener("aura:signal", onSignal as EventListener);
     return () => {
       window.clearInterval(rotate);
-      if (liveTimer.current) window.clearTimeout(liveTimer.current);
+      if (liveTimer.current !== null) window.clearTimeout(liveTimer.current);
       window.removeEventListener("aura:signal", onSignal as EventListener);
     };
   }, []);
