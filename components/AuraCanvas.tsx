@@ -124,6 +124,7 @@ function ReactiveCore({ reduced, aura, energy, quality, kinetic, scene }: { redu
   const config = qualityConfig[quality];
   const personality = personalities[aura];
   const sceneState = sceneConfig[scene];
+  const xFactor = viewport.width < 7 ? Math.max(.45, viewport.width / 9) : 1;
 
   useFrame((_state, delta) => {
     if (!group.current) return;
@@ -131,7 +132,7 @@ function ReactiveCore({ reduced, aura, energy, quality, kinetic, scene }: { redu
     const effective = energy + kineticEnergy * .72;
     const pointerX = pointer.x * Math.min(viewport.width * .16, 1.15) * sceneState.pointer;
     const pointerY = pointer.y * Math.min(viewport.height * .12, .85) * sceneState.pointer;
-    group.current.position.x = THREE.MathUtils.damp(group.current.position.x, sceneState.x + pointerX, 2.9, delta);
+    group.current.position.x = THREE.MathUtils.damp(group.current.position.x, sceneState.x * xFactor + pointerX, 2.9, delta);
     group.current.position.y = THREE.MathUtils.damp(group.current.position.y, sceneState.y + pointerY, 2.7, delta);
     group.current.position.z = THREE.MathUtils.damp(group.current.position.z, sceneState.z, 2.3, delta);
     const targetScale = sceneState.scale * personality.scale * (1 + kineticEnergy * .035);
@@ -145,7 +146,7 @@ function ReactiveCore({ reduced, aura, energy, quality, kinetic, scene }: { redu
   });
 
   return (
-    <group ref={group} position={[sceneState.x, sceneState.y, sceneState.z]}>
+    <group ref={group} position={[sceneState.x * xFactor, sceneState.y, sceneState.z]}>
       <Float speed={reduced ? 0 : personality.float + energy * .18} rotationIntensity={reduced ? 0 : personality.rotation} floatIntensity={reduced ? 0 : aura === "void" ? .15 : aura === "forge" ? .28 : .5}>
         <mesh>
           <icosahedronGeometry args={[1.28, config.detail]} />
