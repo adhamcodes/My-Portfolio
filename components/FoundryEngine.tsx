@@ -37,7 +37,8 @@ export default function FoundryEngine({ compact = false }: { compact?: boolean }
           <div className="foundry-days" aria-hidden="true">
             {dayCells.map((cell) => {
               const represented = compact ? cell * 2 : cell;
-              return <i key={cell} className={represented <= visibleDay ? "passed" : represented === visibleDay ? "current" : ""} />;
+              const state = represented === visibleDay ? "current" : represented < visibleDay ? "passed" : "";
+              return <i key={cell} className={state} />;
             })}
           </div>
           <label className="foundry-day-control">
