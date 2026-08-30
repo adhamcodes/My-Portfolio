@@ -6,11 +6,29 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { AuraMode } from "@/data/site";
 import type { AuraQuality } from "@/components/PerformanceGovernor";
+import type { CoreScene } from "@/components/CoreDirector";
 
 const palettes: Record<AuraMode, { primary: string; secondary: string; tertiary: string; base: string; emissive: string }> = {
   pulse: { primary: "#ff4d7e", secondary: "#55d8ff", tertiary: "#a887ff", base: "#12131c", emissive: "#241334" },
   forge: { primary: "#ffb95a", secondary: "#ff624d", tertiary: "#ffe0a3", base: "#171009", emissive: "#3a1808" },
   void: { primary: "#a887ff", secondary: "#5267ff", tertiary: "#7fdcff", base: "#080912", emissive: "#0d1032" },
+};
+
+const personalities: Record<AuraMode, { spin: number; float: number; rotation: number; distort: number; materialSpeed: number; ring: number; density: number; sparkle: number; scale: number }> = {
+  pulse: { spin: .082, float: 1.25, rotation: .34, distort: .24, materialSpeed: 1.15, ring: .17, density: 1, sparkle: 1, scale: 1 },
+  forge: { spin: .036, float: .66, rotation: .18, distort: .38, materialSpeed: .72, ring: .095, density: 1.22, sparkle: 1.38, scale: 1.08 },
+  void: { spin: .014, float: .24, rotation: .08, distort: .105, materialSpeed: .28, ring: .032, density: .55, sparkle: .5, scale: .94 },
+};
+
+const sceneConfig: Record<CoreScene, { x: number; y: number; z: number; scale: number; pointer: number; ghost: number }> = {
+  origin: { x: 1.7, y: .2, z: 0, scale: 1, pointer: 1, ghost: .15 },
+  state: { x: -2.25, y: .15, z: -.2, scale: .63, pointer: .42, ghost: .32 },
+  work: { x: 2.65, y: .35, z: -.25, scale: .56, pointer: .32, ghost: .55 },
+  foundry: { x: .25, y: .05, z: -.55, scale: .3, pointer: .12, ghost: .8 },
+  trajectory: { x: -1.7, y: -.9, z: -1.2, scale: .13, pointer: .06, ghost: 1 },
+  transmissions: { x: 3.2, y: 1.25, z: -1.8, scale: .035, pointer: 0, ghost: 1.3 },
+  machine: { x: 2.25, y: -.05, z: -.2, scale: .72, pointer: .38, ghost: .45 },
+  contact: { x: .45, y: 0, z: .15, scale: 1.28, pointer: .18, ghost: .25 },
 };
 
 const qualityConfig: Record<AuraQuality, { points: number; detail: number; ringSegments: number; sparkles: number; dpr: [number, number] }> = {
@@ -19,10 +37,12 @@ const qualityConfig: Record<AuraQuality, { points: number; detail: number; ringS
   low: { points: 190, detail: 3, ringSegments: 82, sparkles: 22, dpr: [0.72, 1] },
 };
 
-function SignalCloud({ color, energy, count }: { color: string; energy: number; count: number }) {
+function SignalCloud({ color, energy, count, aura }: { color: string; energy: number; count: number; aura: AuraMode }) {
+  const personality = personalities[aura];
+  const adjustedCount = Math.max(80, Math.round(count * personality.density));
   const points = useMemo(() => {
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
+    const arr = new Float32Array(adjustedCount * 3);
+    for (let i = 0; i < adjustedCount; i++) {
       const r = 2.7 + Math.random() * 4.8;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
@@ -31,11 +51,11 @@ function SignalCloud({ color, energy, count }: { color: string; energy: number; 
       arr[i * 3 + 2] = r * Math.cos(phi);
     }
     return arr;
-  }, [count]);
+  }, [adjustedCount]);
 
   return (
     <Points positions={points} stride={3} frustumCulled={false}>
-      <PointMaterial transparent color={color} size={0.015 + energy * 0.004} sizeAttenuation depthWrite={false} opacity={0.22 + energy * 0.1} />
+      <PointMaterial transparent color={color} size={(0.015 + energy * 0.004) * (aura === "void" ? .72 : aura === "forge" ? 1.16 : 1)} sizeAttenuation depthWrite={false} opacity={(0.22 + energy * 0.1) * (aura === "void" ? .55 : 1)} />
     </Points>
   );
 }
@@ -45,7 +65,6 @@ const vertexShader = `
   uniform float uEnergy;
   varying vec3 vNormal;
   varying vec3 vPosition;
-
   void main() {
     vNormal = normalize(normalMatrix * normal);
     vec3 p = position;
@@ -66,7 +85,6 @@ const fragmentShader = `
   uniform float uEnergy;
   varying vec3 vNormal;
   varying vec3 vPosition;
-
   void main() {
     vec3 viewDirection = normalize(-vPosition);
     float fresnel = pow(1.0 - max(dot(normalize(vNormal), viewDirection), 0.0), 2.2);
@@ -80,112 +98,83 @@ const fragmentShader = `
 
 function SignalMembrane({ color, energy, reduced, detail }: { color: string; energy: number; reduced: boolean; detail: number }) {
   const material = useRef<THREE.ShaderMaterial>(null);
-  const uniforms = useMemo(() => ({
-    uTime: { value: 0 },
-    uEnergy: { value: energy },
-    uColor: { value: new THREE.Color(color) },
-  }), []);
-
+  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uEnergy: { value: energy }, uColor: { value: new THREE.Color(color) } }), []);
   useEffect(() => {
     if (!material.current) return;
     material.current.uniforms.uEnergy.value = energy;
     material.current.uniforms.uColor.value.set(color);
   }, [color, energy]);
-
   useFrame(({ clock }) => {
-    if (!material.current) return;
-    material.current.uniforms.uTime.value = reduced ? 0 : clock.getElapsedTime();
+    if (material.current) material.current.uniforms.uTime.value = reduced ? 0 : clock.getElapsedTime();
   });
-
   return (
     <mesh scale={1.47}>
       <icosahedronGeometry args={[1.28, detail]} />
-      <shaderMaterial
-        ref={material}
-        uniforms={uniforms}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        transparent
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-        side={THREE.DoubleSide}
-      />
+      <shaderMaterial ref={material} uniforms={uniforms} vertexShader={vertexShader} fragmentShader={fragmentShader} transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} />
     </mesh>
   );
 }
 
-function ReactiveCore({ reduced, aura, energy, quality, kinetic }: { reduced: boolean; aura: AuraMode; energy: number; quality: AuraQuality; kinetic: { current: number } }) {
+function ReactiveCore({ reduced, aura, energy, quality, kinetic, scene }: { reduced: boolean; aura: AuraMode; energy: number; quality: AuraQuality; kinetic: { current: number }; scene: CoreScene }) {
   const group = useRef<THREE.Group>(null);
   const ringA = useRef<THREE.Mesh>(null);
   const ringB = useRef<THREE.Mesh>(null);
   const { pointer, viewport } = useThree();
   const palette = palettes[aura];
   const config = qualityConfig[quality];
+  const personality = personalities[aura];
+  const sceneState = sceneConfig[scene];
 
   useFrame((_state, delta) => {
     if (!group.current) return;
-    const scroll = typeof window === "undefined" ? 0 : window.scrollY / Math.max(window.innerHeight, 1);
-    const tx = pointer.x * Math.min(viewport.width * 0.16, 1.15);
-    const ty = pointer.y * Math.min(viewport.height * 0.12, 0.85);
     const kineticEnergy = reduced ? 0 : kinetic.current;
-    const effective = energy + kineticEnergy * 0.72;
-    group.current.position.x = THREE.MathUtils.damp(group.current.position.x, tx, 2.6, delta);
-    group.current.position.y = THREE.MathUtils.damp(group.current.position.y, ty - Math.min(scroll * 0.14, 0.9), 2.4, delta);
-    const scale = 1 + kineticEnergy * 0.035;
-    group.current.scale.setScalar(THREE.MathUtils.damp(group.current.scale.x, scale, 5, delta));
+    const effective = energy + kineticEnergy * .72;
+    const pointerX = pointer.x * Math.min(viewport.width * .16, 1.15) * sceneState.pointer;
+    const pointerY = pointer.y * Math.min(viewport.height * .12, .85) * sceneState.pointer;
+    group.current.position.x = THREE.MathUtils.damp(group.current.position.x, sceneState.x + pointerX, 2.9, delta);
+    group.current.position.y = THREE.MathUtils.damp(group.current.position.y, sceneState.y + pointerY, 2.7, delta);
+    group.current.position.z = THREE.MathUtils.damp(group.current.position.z, sceneState.z, 2.3, delta);
+    const targetScale = sceneState.scale * personality.scale * (1 + kineticEnergy * .035);
+    group.current.scale.setScalar(THREE.MathUtils.damp(group.current.scale.x, targetScale, 4.5, delta));
     if (!reduced) {
-      group.current.rotation.y += delta * (0.055 + effective * 0.025);
-      group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, pointer.y * 0.18, 2, delta);
-      if (ringA.current) ringA.current.rotation.z += delta * (0.11 + effective * 0.07);
-      if (ringB.current) ringB.current.rotation.x -= delta * (0.08 + effective * 0.05);
+      group.current.rotation.y += delta * (personality.spin + effective * .018);
+      group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, pointer.y * .18 * sceneState.pointer, 2, delta);
+      if (ringA.current) ringA.current.rotation.z += delta * (personality.ring + effective * .04);
+      if (ringB.current) ringB.current.rotation.x -= delta * (personality.ring * .72 + effective * .028);
     }
   });
 
   return (
-    <group ref={group} position={[1.7, 0.2, 0]}>
-      <Float speed={reduced ? 0 : 1.1 + energy * 0.22} rotationIntensity={reduced ? 0 : 0.28 + energy * 0.08} floatIntensity={reduced ? 0 : 0.45 + energy * 0.12}>
+    <group ref={group} position={[sceneState.x, sceneState.y, sceneState.z]}>
+      <Float speed={reduced ? 0 : personality.float + energy * .18} rotationIntensity={reduced ? 0 : personality.rotation} floatIntensity={reduced ? 0 : aura === "void" ? .15 : aura === "forge" ? .28 : .5}>
         <mesh>
           <icosahedronGeometry args={[1.28, config.detail]} />
-          <MeshDistortMaterial
-            color={palette.base}
-            emissive={palette.emissive}
-            emissiveIntensity={0.38 + energy * 0.18}
-            roughness={0.16}
-            metalness={0.38}
-            distort={reduced ? 0.04 : 0.22 + energy * 0.1}
-            speed={reduced ? 0 : 0.9 + energy * 0.45}
-          />
+          <MeshDistortMaterial color={palette.base} emissive={palette.emissive} emissiveIntensity={aura === "forge" ? .72 + energy * .2 : .38 + energy * .18} roughness={aura === "void" ? .34 : .16} metalness={aura === "forge" ? .5 : .38} distort={reduced ? .04 : personality.distort + energy * .07} speed={reduced ? 0 : personality.materialSpeed + energy * .22} />
         </mesh>
         <mesh scale={1.02}>
           <icosahedronGeometry args={[1.28, Math.max(2, config.detail - 2)]} />
-          <meshBasicMaterial color={palette.primary} wireframe transparent opacity={0.075 + energy * 0.045} />
+          <meshBasicMaterial color={palette.primary} wireframe transparent opacity={(0.075 + energy * .045) * (aura === "void" ? .48 : 1)} />
         </mesh>
-        <SignalMembrane color={palette.primary} energy={energy} reduced={reduced} detail={config.detail} />
+        <SignalMembrane color={palette.primary} energy={energy * (aura === "void" ? .72 : aura === "forge" ? 1.2 : 1)} reduced={reduced} detail={config.detail} />
       </Float>
-
-      <mesh ref={ringA} rotation={[1.2, 0.1, 0.2]}>
-        <torusGeometry args={[1.86, 0.012, 8, config.ringSegments]} />
-        <meshBasicMaterial color={palette.secondary} transparent opacity={0.32 + energy * 0.13} />
+      <mesh ref={ringA} rotation={[1.2, .1, .2]}>
+        <torusGeometry args={[1.86, .012, 8, config.ringSegments]} />
+        <meshBasicMaterial color={palette.secondary} transparent opacity={(.32 + energy * .13) * (aura === "void" ? .36 : 1)} />
       </mesh>
-      <mesh ref={ringB} rotation={[0.2, 0.9, 1.1]}>
-        <torusGeometry args={[2.22, 0.008, 8, config.ringSegments]} />
-        <meshBasicMaterial color={palette.tertiary} transparent opacity={0.22 + energy * 0.1} />
+      <mesh ref={ringB} rotation={[.2, .9, 1.1]}>
+        <torusGeometry args={[2.22, .008, 8, config.ringSegments]} />
+        <meshBasicMaterial color={palette.tertiary} transparent opacity={(.22 + energy * .1) * (aura === "void" ? .42 : 1)} />
       </mesh>
-      <Sparkles count={reduced ? 14 : Math.round(config.sparkles + energy * 8)} scale={5} size={1.4 + energy * 0.35} speed={reduced ? 0 : 0.12 + energy * 0.1} opacity={0.32 + energy * 0.1} color={palette.tertiary} />
+      <Sparkles count={reduced ? 12 : Math.round((config.sparkles + energy * 8) * personality.sparkle)} scale={aura === "void" ? 7 : 5} size={aura === "forge" ? 2.05 + energy * .42 : 1.35 + energy * .32} speed={reduced ? 0 : aura === "forge" ? .36 : aura === "void" ? .035 : .19} opacity={aura === "void" ? .18 : .36 + energy * .08} color={palette.tertiary} />
+      {sceneState.ghost > .5 && <Sparkles count={reduced ? 10 : Math.round(config.sparkles * sceneState.ghost * 1.7)} scale={8 + sceneState.ghost * 4} size={scene === "transmissions" ? 1.1 : 1.7} speed={reduced ? 0 : scene === "trajectory" ? .035 : .08} opacity={scene === "transmissions" ? .16 : .28} color={palette.secondary} />}
     </group>
   );
 }
 
 function LightRig({ aura, energy }: { aura: AuraMode; energy: number }) {
   const palette = palettes[aura];
-  return (
-    <>
-      <ambientLight intensity={0.34 + energy * 0.12} />
-      <pointLight position={[4, 4, 4]} intensity={10 + energy * 5} distance={12} color={palette.primary} />
-      <pointLight position={[-4, -2, 3]} intensity={7 + energy * 3} distance={11} color={palette.secondary} />
-      <pointLight position={[0, 4, -4]} intensity={5 + energy * 2.5} distance={12} color={palette.tertiary} />
-    </>
-  );
+  const factor = aura === "forge" ? 1.24 : aura === "void" ? .46 : 1;
+  return <><ambientLight intensity={(.34 + energy * .12) * factor} /><pointLight position={[4, 4, 4]} intensity={(10 + energy * 5) * factor} distance={12} color={palette.primary} /><pointLight position={[-4, -2, 3]} intensity={(7 + energy * 3) * factor} distance={11} color={palette.secondary} /><pointLight position={[0, 4, -4]} intensity={(5 + energy * 2.5) * factor} distance={12} color={palette.tertiary} /></>;
 }
 
 export default function AuraCanvas({ aura }: { aura: AuraMode }) {
@@ -193,6 +182,7 @@ export default function AuraCanvas({ aura }: { aura: AuraMode }) {
   const [capable, setCapable] = useState(true);
   const [energy, setEnergy] = useState(1);
   const [quality, setQuality] = useState<AuraQuality>("high");
+  const [scene, setScene] = useState<CoreScene>("origin");
   const burstTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const kinetic = useRef(0);
 
@@ -207,50 +197,42 @@ export default function AuraCanvas({ aura }: { aura: AuraMode }) {
   }, []);
 
   useEffect(() => {
-    const onEnergy = (event: Event) => {
-      const value = (event as CustomEvent<number>).detail;
-      if (Number.isFinite(value)) setEnergy(THREE.MathUtils.clamp(value, 0.55, 1.55));
-    };
+    const onEnergy = (event: Event) => { const value = (event as CustomEvent<number>).detail; if (Number.isFinite(value)) setEnergy(THREE.MathUtils.clamp(value, .55, 1.55)); };
     const onBurst = () => {
       if (burstTimer.current) clearTimeout(burstTimer.current);
-      setEnergy((value) => Math.min(1.75, value + 0.5));
+      setEnergy((value) => Math.min(1.75, value + .5));
       burstTimer.current = setTimeout(() => {
         const cssEnergy = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--aura-energy"));
         setEnergy(Number.isFinite(cssEnergy) ? cssEnergy : 1);
       }, 850);
     };
-    const onQuality = (event: Event) => {
-      const value = (event as CustomEvent<AuraQuality>).detail;
-      if (value === "high" || value === "balanced" || value === "low") setQuality(value);
-    };
-    const onKinetic = (event: Event) => {
-      const value = (event as CustomEvent<number>).detail;
-      if (Number.isFinite(value)) kinetic.current = THREE.MathUtils.clamp(value, 0, 1);
-    };
+    const onQuality = (event: Event) => { const value = (event as CustomEvent<AuraQuality>).detail; if (value === "high" || value === "balanced" || value === "low") setQuality(value); };
+    const onKinetic = (event: Event) => { const value = (event as CustomEvent<number>).detail; if (Number.isFinite(value)) kinetic.current = THREE.MathUtils.clamp(value, 0, 1); };
+    const onScene = (event: Event) => { const value = (event as CustomEvent<CoreScene>).detail; if (value in sceneConfig) setScene(value); };
     window.addEventListener("aura:energy", onEnergy as EventListener);
     window.addEventListener("aura:burst", onBurst);
     window.addEventListener("aura:quality", onQuality as EventListener);
     window.addEventListener("aura:kinetic", onKinetic as EventListener);
+    window.addEventListener("aura:scene", onScene as EventListener);
     return () => {
       window.removeEventListener("aura:energy", onEnergy as EventListener);
       window.removeEventListener("aura:burst", onBurst);
       window.removeEventListener("aura:quality", onQuality as EventListener);
       window.removeEventListener("aura:kinetic", onKinetic as EventListener);
+      window.removeEventListener("aura:scene", onScene as EventListener);
       if (burstTimer.current) clearTimeout(burstTimer.current);
     };
   }, []);
 
   if (!capable) return <div className="aura-fallback" aria-hidden="true" />;
-
   const config = qualityConfig[quality];
-
   return (
-    <div className="aura-canvas" aria-hidden="true" data-quality={quality}>
+    <div className="aura-canvas" aria-hidden="true" data-quality={quality} data-scene={scene}>
       <Canvas dpr={config.dpr} camera={{ position: [0, 0, 7.4], fov: 44 }} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}>
         <AdaptiveDpr />
         <LightRig aura={aura} energy={energy} />
-        <SignalCloud color={palettes[aura].tertiary} energy={energy} count={config.points} />
-        <ReactiveCore reduced={reduced} aura={aura} energy={energy} quality={quality} kinetic={kinetic} />
+        <SignalCloud color={palettes[aura].tertiary} energy={energy} count={config.points} aura={aura} />
+        <ReactiveCore reduced={reduced} aura={aura} energy={energy} quality={quality} kinetic={kinetic} scene={scene} />
       </Canvas>
     </div>
   );
