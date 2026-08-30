@@ -4,9 +4,13 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import CursorSystem from "@/components/CursorSystem";
+import IdentityGlyph from "@/components/IdentityGlyph";
 import InitializationSequence from "@/components/InitializationSequence";
+import KineticField from "@/components/KineticField";
+import OperatorDeck from "@/components/OperatorDeck";
 import PerformanceGovernor from "@/components/PerformanceGovernor";
 import ProjectPortal from "@/components/ProjectPortal";
+import SecretProtocol from "@/components/SecretProtocol";
 import SignalTicker from "@/components/SignalTicker";
 import Soundscape from "@/components/Soundscape";
 import SystemLab from "@/components/SystemLab";
@@ -21,10 +25,38 @@ export default function Home() {
   const [aura, setAura] = useState<AuraMode>("pulse");
   const [auraReady, setAuraReady] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [visited, setVisited] = useState<string[]>([]);
   const current = useMemo(() => projects.find((project) => project.state === "building") ?? projects[0], []);
 
-  const openProject = useCallback((project: Project) => {
+  const markVisited = useCallback((id: string) => {
+    setVisited((existing) => {
+      if (existing.includes(id)) return existing;
+      const next = [...existing, id];
+      try { localStorage.setItem("adham:visited-worlds", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  const openProject = useCallback((project: Project, updateHistory = true) => {
+    markVisited(project.id);
+    if (updateHistory) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("system", project.id);
+      window.history.pushState({ auraSystem: project.id }, "", url);
+    }
     const run = () => setPortal(project);
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => void };
+    if (doc.startViewTransition) doc.startViewTransition(run);
+    else run();
+  }, [markVisited]);
+
+  const closeProject = useCallback(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("system")) {
+      url.searchParams.delete("system");
+      window.history.replaceState({}, "", url);
+    }
+    const run = () => setPortal(null);
     const doc = document as Document & { startViewTransition?: (cb: () => void) => void };
     if (doc.startViewTransition) doc.startViewTransition(run);
     else run();
@@ -34,9 +66,26 @@ export default function Home() {
     try {
       const saved = localStorage.getItem("adham:aura");
       if (saved && auraModes.some((mode) => mode.id === saved)) setAura(saved as AuraMode);
+      const seen = JSON.parse(localStorage.getItem("adham:visited-worlds") || "[]") as unknown;
+      if (Array.isArray(seen)) setVisited(seen.filter((item): item is string => typeof item === "string"));
     } catch {}
     setAuraReady(true);
-  }, []);
+
+    const systemId = new URL(window.location.href).searchParams.get("system");
+    const linked = projects.find((project) => project.id === systemId);
+    if (linked) openProject(linked, false);
+  }, [openProject]);
+
+  useEffect(() => {
+    const pop = () => {
+      const systemId = new URL(window.location.href).searchParams.get("system");
+      const linked = projects.find((project) => project.id === systemId) || null;
+      setPortal(linked);
+      if (linked) markVisited(linked.id);
+    };
+    window.addEventListener("popstate", pop);
+    return () => window.removeEventListener("popstate", pop);
+  }, [markVisited]);
 
   useEffect(() => {
     document.documentElement.dataset.aura = aura;
@@ -106,11 +155,22 @@ export default function Home() {
     <main>
       <InitializationSequence />
       <PerformanceGovernor />
+      <KineticField />
+      <SecretProtocol />
       <AuraCanvas aura={aura} />
       <CursorSystem />
       <XRay on={xray} />
+      <OperatorDeck
+        aura={aura}
+        xray={xray}
+        visited={visited}
+        onAura={setAura}
+        onXray={() => setXray((value) => !value)}
+        onProject={(project) => openProject(project)}
+      />
       <div className="noise-layer" />
       <div className="vignette" />
+      <div className="kinetic-glow" aria-hidden="true" />
       <div className="progress-rail"><span style={{ transform: `scaleY(${progress})` }} /></div>
 
       <header className="chrome">
@@ -165,6 +225,7 @@ export default function Home() {
         <div className="hero-instrument" data-drift>
           <div className="instrument-ring ring-one" />
           <div className="instrument-ring ring-two" />
+          <IdentityGlyph aura={aura} />
           <div className="instrument-copy top"><span>CORE</span><b>UNSTABLE / EVOLVING</b></div>
           <div className="instrument-copy bottom"><span>VECTOR</span><b>INTELLIGENT SYSTEMS</b></div>
           <div className="coordinate c1">+23.8103</div>
@@ -200,14 +261,14 @@ export default function Home() {
         <div className="section-number">02 / PROJECT WORLDS</div>
         <div className="work-intro">
           <h2 data-rise>Projects are not cards.<br /><span>They are places to enter.</span></h2>
-          <p data-rise>Each system gets its own visual field, problem, constraint, architecture and proof. The UI changes when you cross into it.</p>
+          <p data-rise>The system remembers what you explore. Every project exposes a different field, problem, constraint, architecture and proof.</p>
         </div>
 
         <div className="project-orbits">
           {projects.map((project, index) => (
             <button
               key={project.id}
-              className={`project-world world-${project.accent}`}
+              className={`project-world world-${project.accent}${visited.includes(project.id) ? " world-seen" : ""}`}
               onClick={() => openProject(project)}
               data-cursor="enter"
               data-rise
@@ -215,7 +276,7 @@ export default function Home() {
               <div className="world-index">{String(index + 1).padStart(2, "0")}</div>
               <div className="world-glow" />
               <div className="world-lines"><i /><i /><i /></div>
-              <div className="world-meta"><span>{project.chapter}</span><em>{project.state.toUpperCase()}</em></div>
+              <div className="world-meta"><span>{project.chapter}</span><em>{visited.includes(project.id) ? "SEEN / " : ""}{project.state.toUpperCase()}</em></div>
               <h3>{project.name}</h3>
               <p>{project.oneLine}</p>
               <div className="world-architecture">
@@ -225,6 +286,7 @@ export default function Home() {
             </button>
           ))}
         </div>
+        <div className="memory-strip" data-rise><span>SESSION MEMORY</span><b>{visited.length} / {projects.length} WORLDS DISCOVERED</b><i style={{ transform: `scaleX(${projects.length ? visited.length / projects.length : 0})` }} /></div>
       </section>
 
       <section className="current scene">
@@ -299,10 +361,10 @@ export default function Home() {
 
       <footer>
         <div><b>{identity.mark}</b><span>THE SYSTEM CHANGES WHEN THE WORK CHANGES.</span></div>
-        <div><span>AURA / {aura.toUpperCase()}</span><span>XRAY / {xray ? "ON" : "OFF"}</span><span>VERSION / {identity.version}</span><span>© 2026</span></div>
+        <div><span>MEMORY / {visited.length}:{projects.length}</span><span>AURA / {aura.toUpperCase()}</span><span>XRAY / {xray ? "ON" : "OFF"}</span><span>VERSION / {identity.version}</span><span>© 2026</span></div>
       </footer>
 
-      <ProjectPortal project={portal} onClose={() => setPortal(null)} />
+      <ProjectPortal project={portal} onClose={closeProject} />
     </main>
   );
 }
