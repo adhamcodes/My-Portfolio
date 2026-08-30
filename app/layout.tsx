@@ -3,6 +3,7 @@ import "./globals.css";
 import "./enhancements.css";
 import "./accessibility.css";
 import "./initialization.css";
+import "./release-candidate.css";
 
 export const metadata: Metadata = {
   title: {
