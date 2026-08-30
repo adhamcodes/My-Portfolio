@@ -7,23 +7,17 @@ import CursorSystem from "@/components/CursorSystem";
 import ProjectPortal from "@/components/ProjectPortal";
 import SignalTicker from "@/components/SignalTicker";
 import Soundscape from "@/components/Soundscape";
+import SystemLab from "@/components/SystemLab";
 import XRay from "@/components/XRay";
-import { identity, projects, stages, transmissions, type Project } from "@/data/site";
+import { auraModes, identity, projects, stages, transmissions, type AuraMode, type Project } from "@/data/site";
 
 const AuraCanvas = dynamic(() => import("@/components/AuraCanvas"), { ssr: false });
-
-const modes = [
-  { id: "pulse", label: "PULSE", note: "default / alive" },
-  { id: "forge", label: "FORGE", note: "heat / current build" },
-  { id: "void", label: "VOID", note: "quiet / depth" },
-] as const;
-
-type AuraMode = (typeof modes)[number]["id"];
 
 export default function Home() {
   const [portal, setPortal] = useState<Project | null>(null);
   const [xray, setXray] = useState(false);
   const [aura, setAura] = useState<AuraMode>("pulse");
+  const [auraReady, setAuraReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const current = useMemo(() => projects.find((project) => project.state === "building") ?? projects[0], []);
 
@@ -35,8 +29,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem("adham:aura");
+      if (saved && auraModes.some((mode) => mode.id === saved)) setAura(saved as AuraMode);
+    } catch {}
+    setAuraReady(true);
+  }, []);
+
+  useEffect(() => {
     document.documentElement.dataset.aura = aura;
-  }, [aura]);
+    if (!auraReady) return;
+    try { localStorage.setItem("adham:aura", aura); } catch {}
+  }, [aura, auraReady]);
 
   useEffect(() => {
     const update = () => {
@@ -54,8 +58,8 @@ export default function Home() {
       if (event.key.toLowerCase() === "x") setXray((value) => !value);
       if (event.key.toLowerCase() === "a") {
         setAura((currentMode) => {
-          const index = modes.findIndex((mode) => mode.id === currentMode);
-          return modes[(index + 1) % modes.length].id;
+          const index = auraModes.findIndex((mode) => mode.id === currentMode);
+          return auraModes[(index + 1) % auraModes.length].id;
         });
       }
     };
@@ -98,7 +102,7 @@ export default function Home() {
 
   return (
     <main>
-      <AuraCanvas />
+      <AuraCanvas aura={aura} />
       <CursorSystem />
       <XRay on={xray} />
       <div className="noise-layer" />
@@ -113,19 +117,20 @@ export default function Home() {
           <a href="#work">WORK</a>
           <a href="#state">STATE</a>
           <a href="#trajectory">PATH</a>
+          <a href="#machine">SYSTEM</a>
           <a href="#contact">CONTACT</a>
         </nav>
         <div className="chrome-tools">
           <button onClick={() => setXray((value) => !value)} className={xray ? "xray-toggle on" : "xray-toggle"} data-cursor="signal">
             XRAY <kbd>X</kbd>
           </button>
-          <Soundscape />
+          <Soundscape aura={aura} />
         </div>
       </header>
 
       <aside className="aura-switcher" aria-label="Aura mode">
         <span>STATE / AURA</span>
-        {modes.map((mode) => (
+        {auraModes.map((mode) => (
           <button key={mode.id} className={aura === mode.id ? "active" : ""} onClick={() => setAura(mode.id)} data-cursor="signal">
             <i /> <b>{mode.label}</b><small>{mode.note}</small>
           </button>
@@ -135,7 +140,7 @@ export default function Home() {
 
       <section id="origin" className="hero scene">
         <div className="hero-copy">
-          <div className="eyebrow"><span /> LIVE IDENTITY / VERSION 0.2</div>
+          <div className="eyebrow"><span /> LIVE IDENTITY / VERSION {identity.version}</div>
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}>
             <span>ADHAM</span>
             <span>MAHMOOD</span>
@@ -203,7 +208,7 @@ export default function Home() {
               data-cursor="enter"
               data-rise
             >
-              <div className="world-index">0{index + 1}</div>
+              <div className="world-index">{String(index + 1).padStart(2, "0")}</div>
               <div className="world-glow" />
               <div className="world-lines"><i /><i /><i /></div>
               <div className="world-meta"><span>{project.chapter}</span><em>{project.state.toUpperCase()}</em></div>
@@ -273,10 +278,12 @@ export default function Home() {
         </div>
       </section>
 
+      <SystemLab aura={aura} xray={xray} />
+
       <section id="contact" className="contact scene">
         <div className="contact-orbit" data-drift />
         <div className="contact-copy" data-rise>
-          <span className="section-number">06 / OPEN CHANNEL</span>
+          <span className="section-number">07 / OPEN CHANNEL</span>
           <h2>IF THE SIGNAL<br />MATCHES,<br /><em>TRANSMIT.</em></h2>
           <p>Interesting software, engineering conversations, collaboration, or just a genuinely good idea.</p>
           <div className="contact-links">
@@ -288,7 +295,7 @@ export default function Home() {
 
       <footer>
         <div><b>{identity.mark}</b><span>THE SYSTEM CHANGES WHEN THE WORK CHANGES.</span></div>
-        <div><span>AURA / {aura.toUpperCase()}</span><span>XRAY / {xray ? "ON" : "OFF"}</span><span>© 2026</span></div>
+        <div><span>AURA / {aura.toUpperCase()}</span><span>XRAY / {xray ? "ON" : "OFF"}</span><span>VERSION / {identity.version}</span><span>© 2026</span></div>
       </footer>
 
       <ProjectPortal project={portal} onClose={() => setPortal(null)} />
