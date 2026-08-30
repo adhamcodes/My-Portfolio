@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import CursorSystem from "@/components/CursorSystem";
+import InitializationSequence from "@/components/InitializationSequence";
+import PerformanceGovernor from "@/components/PerformanceGovernor";
 import ProjectPortal from "@/components/ProjectPortal";
 import SignalTicker from "@/components/SignalTicker";
 import Soundscape from "@/components/Soundscape";
@@ -102,6 +104,8 @@ export default function Home() {
 
   return (
     <main>
+      <InitializationSequence />
+      <PerformanceGovernor />
       <AuraCanvas aura={aura} />
       <CursorSystem />
       <XRay on={xray} />
