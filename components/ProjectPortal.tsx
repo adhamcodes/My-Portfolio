@@ -13,6 +13,14 @@ const entryMasks: Record<string, string> = {
   nova: "circle(3% at 72% 42%)",
 };
 
+const activeMasks: Record<string, string> = {
+  foundry180: "inset(0% 0% 0% 0% round 0px)",
+  "aura-system": "circle(150% at 50% 50%)",
+  zeroupload: "inset(0% 0% 0% 0% round 0px)",
+  windowbiome: "inset(0% 0% 0% 0% round 0px)",
+  nova: "circle(150% at 72% 42%)",
+};
+
 export default function ProjectPortal({ project, onClose }: { project: Project | null; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -103,7 +111,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
             ref={stageRef}
             className="portal-stage"
             initial={{ clipPath: entryMasks[project.id] || "inset(48% 48% 48% 48% round 40px)" }}
-            animate={{ clipPath: "inset(0% 0% 0% 0% round 0px)" }}
+            animate={{ clipPath: activeMasks[project.id] || "inset(0% 0% 0% 0% round 0px)" }}
             exit={{ clipPath: entryMasks[project.id] || "inset(48% 48% 48% 48% round 40px)" }}
             transition={{ duration: project.id === "nova" ? 1.05 : .74, ease: project.id === "foundry180" ? [0.16, 1, 0.3, 1] : [0.22, 1, 0.36, 1] }}
           >
