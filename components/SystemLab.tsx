@@ -16,6 +16,8 @@ type NavigatorExtended = Navigator & {
   deviceMemory?: number;
 };
 
+type RuntimeSignal = { quality: string; fps: number; cores: number; memory: number };
+
 function getCapabilities(): Capability[] {
   if (typeof window === "undefined") return [];
 
@@ -58,6 +60,10 @@ export default function SystemLab({ aura, xray }: { aura: AuraMode; xray: boolea
   const [testing, setTesting] = useState(false);
   const [energy, setEnergy] = useState(1);
   const [lastAction, setLastAction] = useState("SYSTEM IDLE / WAITING FOR INPUT");
+  const [quality, setQuality] = useState("CALIBRATING");
+  const [lcp, setLcp] = useState<number | null>(null);
+  const [cls, setCls] = useState(0);
+  const [longTasks, setLongTasks] = useState(0);
 
   const online = useMemo(() => capabilities.filter((item) => item.available).length, [capabilities]);
 
@@ -67,6 +73,55 @@ export default function SystemLab({ aura, xray }: { aura: AuraMode; xray: boolea
     updateViewport();
     window.addEventListener("resize", updateViewport, { passive: true });
     return () => window.removeEventListener("resize", updateViewport);
+  }, []);
+
+  useEffect(() => {
+    const onRuntime = (event: Event) => {
+      const signal = (event as CustomEvent<RuntimeSignal>).detail;
+      if (!signal) return;
+      setQuality(signal.quality.toUpperCase());
+      setLastAction(`QUALITY GOVERNOR / ${signal.quality.toUpperCase()} @ ${signal.fps} FPS SAMPLE`);
+    };
+    window.addEventListener("aura:runtime", onRuntime as EventListener);
+    const currentQuality = document.documentElement.dataset.quality;
+    if (currentQuality) setQuality(currentQuality.toUpperCase());
+    return () => window.removeEventListener("aura:runtime", onRuntime as EventListener);
+  }, []);
+
+  useEffect(() => {
+    const observers: PerformanceObserver[] = [];
+    if (!("PerformanceObserver" in window)) return;
+
+    try {
+      const largest = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const last = entries[entries.length - 1];
+        if (last) setLcp(Math.round(last.startTime));
+      });
+      largest.observe({ type: "largest-contentful-paint", buffered: true });
+      observers.push(largest);
+    } catch {}
+
+    try {
+      let total = 0;
+      const layout = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          const shift = entry as PerformanceEntry & { value?: number; hadRecentInput?: boolean };
+          if (!shift.hadRecentInput) total += shift.value || 0;
+        }
+        setCls(total);
+      });
+      layout.observe({ type: "layout-shift", buffered: true });
+      observers.push(layout);
+    } catch {}
+
+    try {
+      const tasks = new PerformanceObserver((list) => setLongTasks((value) => value + list.getEntries().length));
+      tasks.observe({ type: "longtask", buffered: true });
+      observers.push(tasks);
+    } catch {}
+
+    return () => observers.forEach((observer) => observer.disconnect());
   }, []);
 
   useEffect(() => {
@@ -132,10 +187,14 @@ export default function SystemLab({ aura, xray }: { aura: AuraMode; xray: boolea
             <span>LIVE / RUNTIME TELEMETRY</span>
             <b><i /> ONLINE</b>
           </div>
-          <div className="telemetry-grid">
+          <div className="telemetry-grid telemetry-expanded">
             <div><span>FRAME RATE</span><strong>{fps || "—"}<small> FPS</small></strong></div>
+            <div><span>QUALITY TIER</span><strong>{quality}</strong></div>
             <div><span>VIEWPORT</span><strong>{viewport}</strong></div>
             <div><span>AURA STATE</span><strong>{aura.toUpperCase()}</strong></div>
+            <div><span>LCP SAMPLE</span><strong>{lcp === null ? "—" : lcp}<small>{lcp === null ? "" : " MS"}</small></strong></div>
+            <div><span>CLS SAMPLE</span><strong>{cls.toFixed(3)}</strong></div>
+            <div><span>LONG TASKS</span><strong>{longTasks}</strong></div>
             <div><span>XRAY</span><strong>{xray ? "EXPOSED" : "SEALED"}</strong></div>
             <div><span>INPUT</span><strong>{typeof navigator !== "undefined" && navigator.maxTouchPoints > 0 ? "TOUCH + POINTER" : "POINTER"}</strong></div>
             <div><span>CAPABILITIES</span><strong>{online}/{capabilities.length || 6}</strong></div>
@@ -169,6 +228,7 @@ export default function SystemLab({ aura, xray }: { aura: AuraMode; xray: boolea
             <span>INJECT SIGNAL</span><b>BURST CORE ↗</b>
           </button>
           <div className="lab-shortcuts">
+            <span><kbd>/</kbd> operator deck</span>
             <span><kbd>A</kbd> cycle aura</span>
             <span><kbd>X</kbd> xray system</span>
             <span><kbd>ESC</kbd> close portal</span>
@@ -181,7 +241,7 @@ export default function SystemLab({ aura, xray }: { aura: AuraMode; xray: boolea
         <div className="layer-grid">
           {portfolioSystem.layers.map((layer, index) => (
             <article key={layer.id}>
-              <span>0{index + 1}</span>
+              <span>{String(index + 1).padStart(2, "0")}</span>
               <small>{layer.role}</small>
               <h3>{layer.tech}</h3>
               <p>{layer.job}</p>
