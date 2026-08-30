@@ -8,6 +8,9 @@ const messages = [
   "SYSTEMS > BADGES",
   "AURA IS A FEATURE",
   "THE SITE MUTATES WITH THE WORK",
+  "RUNTIME QUALITY NEGOTIATED PER DEVICE",
+  "PROJECT WORLDS REMEMBER VISITS",
+  "SOME PROTOCOLS ARE NOT DOCUMENTED",
 ];
 
 export default function SignalTicker() {
@@ -18,7 +21,7 @@ export default function SignalTicker() {
   }, []);
 
   return (
-    <div className="signal-ticker">
+    <div className="signal-ticker" aria-live="off">
       <span className="ticker-led" />
       <span key={index} className="ticker-message">{messages[index]}</span>
     </div>
