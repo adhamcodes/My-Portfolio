@@ -10,6 +10,7 @@ import "./monster-pass.css";
 import "./protocol-pass.css";
 import "./qa-pass.css";
 import "./ultimate-pass.css";
+import "./release-cleanup.css";
 
 export const metadata: Metadata = {
   title: {

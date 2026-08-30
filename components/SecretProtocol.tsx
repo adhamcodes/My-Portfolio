@@ -25,13 +25,13 @@ export default function SecretProtocol() {
       document.documentElement.dataset.protocol = "overdrive";
       window.dispatchEvent(new CustomEvent("aura:burst"));
       window.dispatchEvent(new CustomEvent("aura:protocol", { detail: "overdrive" }));
-      window.dispatchEvent(new CustomEvent("aura:signal", { detail: "HIDDEN LAYER FOUND · OVERDRIVE" }));
+      window.dispatchEvent(new CustomEvent("aura:signal", { detail: "HIDDEN INTERACTION · OVERDRIVE" }));
       try { localStorage.setItem("adham:protocol-aura", "unlocked"); } catch {}
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => {
         setActive(false);
         delete document.documentElement.dataset.protocol;
-      }, 5000);
+      }, 5200);
       buffer.current = "";
     };
     window.addEventListener("keydown", onKey);
@@ -49,10 +49,10 @@ export default function SecretProtocol() {
         {active && (
           <motion.div className="protocol-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} aria-live="polite">
             <div className="protocol-cross p1" /><div className="protocol-cross p2" /><div className="protocol-cross p3" /><div className="protocol-cross p4" />
-            <motion.div className="protocol-message" initial={{ scale: .92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-              <span>HIDDEN LAYER / FOUND</span>
-              <strong>OVERDRIVE<br />UNLOCKED.</strong>
-              <em>The visual field is temporarily running hot.</em>
+            <motion.div className="protocol-message" initial={{ scale: .9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+              <span>HIDDEN INTERACTION / 04</span>
+              <strong>VISUAL<br />OVERDRIVE</strong>
+              <em>FIELD PUSHED BEYOND DEFAULT</em>
             </motion.div>
           </motion.div>
         )}

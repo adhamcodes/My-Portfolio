@@ -133,13 +133,13 @@ export const projects: Project[] = [
 export const portfolioSystem = {
   version: `BUILD ${identity.version}`,
   layers: [
-    { id: "foundation", role: "APPLICATION", tech: "Next.js · React · TypeScript", job: "The page structure, project data, metadata, routing, and component architecture.", path: "app/ + data/" },
-    { id: "render", role: "3D FIELD", tech: "Three.js · React Three Fiber", job: "A responsive visual field that changes position, presence, and complexity as the page moves.", path: "components/AuraCanvas.tsx" },
-    { id: "shader", role: "SHADER", tech: "Custom GLSL", job: "The procedural surface treatment around the 3D field, driven by time, visual mode, and intensity.", path: "GPU / shaderMaterial" },
-    { id: "choreography", role: "MOTION", tech: "GSAP · Motion", job: "Scroll reveals, transitions, springs, project entrances, and interaction choreography.", path: "scroll + interaction" },
-    { id: "browser", role: "BROWSER", tech: "View Transitions · Web Audio", job: "Native browser transitions and opt-in procedural sound, with fallbacks where an API is unavailable.", path: "native capability layer" },
+    { id: "foundation", role: "APPLICATION", tech: "Next.js · React · TypeScript", job: "The page structure, project data, metadata, routing, and component architecture.", path: "application + data" },
+    { id: "render", role: "3D FIELD", tech: "Three.js · React Three Fiber", job: "A responsive visual field that changes position, presence, and complexity as the page moves.", path: "3D render layer" },
+    { id: "shader", role: "SHADER", tech: "Custom GLSL", job: "The procedural surface treatment around the 3D field, driven by time, visual mode, and intensity.", path: "GPU shader layer" },
+    { id: "choreography", role: "MOTION", tech: "GSAP · Motion", job: "Scroll reveals, transitions, springs, project entrances, and interaction choreography.", path: "motion + interaction" },
+    { id: "browser", role: "BROWSER", tech: "View Transitions · Web Audio", job: "Native browser transitions and opt-in procedural sound, with fallbacks where an API is unavailable.", path: "browser capability layer" },
     { id: "memory", role: "MEMORY", tech: "URL state · Local Storage", job: "Deep-linked projects, remembered visual mode, returning-visitor state, and locally remembered exploration.", path: "local state layer" },
-    { id: "director", role: "SCENE", tech: "Scroll state · environment direction", job: "Coordinates the visual field, background, and interface density with the part of the story currently on screen.", path: "components/CoreDirector.tsx" },
+    { id: "director", role: "SCENE", tech: "Scroll state · environment direction", job: "Coordinates the visual field, background, and interface density with the part of the story currently on screen.", path: "scene direction layer" },
     { id: "resilience", role: "PERFORMANCE", tech: "Adaptive runtime governor", job: "Samples the device, chooses a render tier, respects reduced motion, and keeps optional features from becoming requirements.", path: "runtime guards" },
   ],
 };

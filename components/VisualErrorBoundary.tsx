@@ -12,7 +12,7 @@ export default class VisualErrorBoundary extends React.Component<React.PropsWith
   }
 
   componentDidCatch(error: Error) {
-    console.warn("Aura visual layer entered fallback mode:", error.message);
+    console.warn("Portfolio visual layer entered fallback mode:", error.message);
   }
 
   render() {

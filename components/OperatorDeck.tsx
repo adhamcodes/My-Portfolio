@@ -69,10 +69,10 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
   }, [open]);
 
   const navigation = [
-    ["INTRO", "#origin"],
+    ["HOME", "#origin"],
     ["RIGHT NOW", "#state"],
-    ["SELECTED WORK", "#work"],
-    ["WHERE THIS GOES", "#trajectory"],
+    ["WORK", "#work"],
+    ["DIRECTION", "#trajectory"],
     ["UNDER THE HOOD", "#machine"],
     ["CONTACT", "#contact"],
   ] as const;
@@ -103,18 +103,18 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
               role="dialog"
               aria-modal="true"
               aria-label="Quick navigation"
-              initial={{ opacity: 0, scale: .97, y: 16 }}
+              initial={{ opacity: 0, scale: .965, y: 18 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: .985, y: 8 }}
+              exit={{ opacity: 0, scale: .98, y: 10 }}
               transition={{ duration: .24, ease: [0.22, 1, 0.36, 1] }}
             >
               <header className="deck-head">
                 <div><span>ADHAM MAHMOOD</span><b>QUICK NAVIGATION</b></div>
-                <div className="deck-status"><i /><span>{quality.toUpperCase()} RENDER</span><span>{visited.length}/{projects.length} PROJECTS SEEN</span></div>
+                <div className="deck-status"><i /><span>{quality.toUpperCase()} QUALITY</span><span>{visited.length}/{projects.length} PROJECTS SEEN</span></div>
               </header>
               <label className="deck-search">
                 <span>⌕</span>
-                <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search projects or sections…" />
+                <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search projects…" />
                 <kbd>ESC</kbd>
               </label>
 
@@ -142,14 +142,14 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
                       <span className={`deck-orb orb-${project.accent}`} />
                       <b>{project.name}</b>
                       <small>{project.kind}</small>
-                      <em>{visited.includes(project.id) ? "SEEN" : project.state === "verified" ? "LIVE" : project.state.toUpperCase()}</em>
+                      <em>{visited.includes(project.id) ? "SEEN" : project.state.toUpperCase()}</em>
                     </button>
                   ))}
-                  {filteredProjects.length === 0 && <p className="deck-empty">Nothing matched.</p>}
+                  {filteredProjects.length === 0 && <p className="deck-empty">NO MATCHES.</p>}
                 </div>
               </section>
 
-              <footer className="deck-foot"><span>/ opens this</span><span>A changes visual mode</span><span>X toggles XRAY</span><span>Everything here is keyboard reachable.</span></footer>
+              <footer className="deck-foot"><span>/ opens deck</span><span>A changes visual mode</span><span>X toggles XRAY</span><span>Keyboard friendly.</span></footer>
             </motion.div>
           </motion.div>
         )}
