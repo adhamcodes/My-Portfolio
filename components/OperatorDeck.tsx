@@ -17,6 +17,8 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const quality = typeof document !== "undefined" ? document.documentElement.dataset.quality || "CALIBRATING" : "CALIBRATING";
 
   useEffect(() => {
@@ -39,8 +41,31 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
 
   useEffect(() => {
     if (!open) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    document.body.classList.add("deck-open");
     const timer = window.setTimeout(() => inputRef.current?.focus(), 60);
-    return () => window.clearTimeout(timer);
+    const trap = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || !panelRef.current) return;
+      const focusable = Array.from(panelRef.current.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])'));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", trap);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("keydown", trap);
+      document.body.classList.remove("deck-open");
+      if (previousFocus && document.contains(previousFocus)) previousFocus.focus();
+      else triggerRef.current?.focus();
+    };
   }, [open]);
 
   const navigation = [
@@ -65,7 +90,7 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
 
   return (
     <>
-      <button className="deck-trigger" onClick={() => setOpen(true)} data-cursor="signal" aria-label="Open operator deck">
+      <button ref={triggerRef} className="deck-trigger" onClick={() => setOpen(true)} data-cursor="signal" aria-label="Open operator deck">
         <span>DECK</span><kbd>⌘K</kbd>
       </button>
       <AnimatePresence>
@@ -73,6 +98,7 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
           <motion.div className="operator-deck" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <button className="deck-backdrop" onClick={() => setOpen(false)} aria-label="Close operator deck" />
             <motion.div
+              ref={panelRef}
               className="deck-panel"
               role="dialog"
               aria-modal="true"
