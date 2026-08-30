@@ -20,7 +20,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
     <AnimatePresence>
       {project && (
         <motion.div
-          className={`project-portal portal-${project.accent}`}
+          className={`project-portal portal-${project.accent} portal-${project.id}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -39,6 +39,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
             <div className="portal-grid" />
             <div className="portal-orbit orbit-a" />
             <div className="portal-orbit orbit-b" />
+            <div className="portal-signature" aria-hidden="true"><span>{project.chapter}</span><i /></div>
 
             <header className="portal-nav">
               <span>{project.chapter}</span>
