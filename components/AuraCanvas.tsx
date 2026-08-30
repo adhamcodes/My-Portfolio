@@ -32,7 +32,7 @@ function ReactiveCore({ reduced }: { reduced: boolean }) {
   const ringB = useRef<THREE.Mesh>(null);
   const { pointer, viewport } = useThree();
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (!group.current) return;
     const scroll = typeof window === "undefined" ? 0 : window.scrollY / Math.max(window.innerHeight, 1);
     const tx = pointer.x * Math.min(viewport.width * 0.16, 1.15);
@@ -51,7 +51,7 @@ function ReactiveCore({ reduced }: { reduced: boolean }) {
     <group ref={group} position={[1.7, 0.2, 0]}>
       <Float speed={reduced ? 0 : 1.35} rotationIntensity={reduced ? 0 : 0.35} floatIntensity={reduced ? 0 : 0.6}>
         <mesh>
-          <icosahedronGeometry args={[1.28, 12]} />
+          <icosahedronGeometry args={[1.28, 5]} />
           <MeshDistortMaterial
             color="#12131c"
             emissive="#241334"
@@ -69,14 +69,14 @@ function ReactiveCore({ reduced }: { reduced: boolean }) {
       </Float>
 
       <mesh ref={ringA} rotation={[1.2, 0.1, 0.2]}>
-        <torusGeometry args={[1.86, 0.012, 8, 240]} />
+        <torusGeometry args={[1.86, 0.012, 8, 160]} />
         <meshBasicMaterial color="#66d9ff" transparent opacity={0.5} />
       </mesh>
       <mesh ref={ringB} rotation={[0.2, 0.9, 1.1]}>
-        <torusGeometry args={[2.22, 0.008, 8, 240]} />
+        <torusGeometry args={[2.22, 0.008, 8, 160]} />
         <meshBasicMaterial color="#ffbf69" transparent opacity={0.34} />
       </mesh>
-      <Sparkles count={reduced ? 20 : 70} scale={5} size={1.8} speed={reduced ? 0 : 0.24} opacity={0.45} color="#caa7ff" />
+      <Sparkles count={reduced ? 20 : 56} scale={5} size={1.8} speed={reduced ? 0 : 0.24} opacity={0.45} color="#caa7ff" />
     </group>
   );
 }
@@ -110,7 +110,7 @@ export default function AuraCanvas() {
 
   return (
     <div className="aura-canvas" aria-hidden="true">
-      <Canvas dpr={[1, 1.45]} camera={{ position: [0, 0, 7.4], fov: 44 }} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}>
+      <Canvas dpr={[1, 1.35]} camera={{ position: [0, 0, 7.4], fov: 44 }} gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}>
         <LightRig />
         <SignalCloud />
         <ReactiveCore reduced={reduced} />
