@@ -2,7 +2,16 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import WorldEngine from "@/components/WorldEngine";
 import type { Project } from "@/data/site";
+
+const entryMasks: Record<string, string> = {
+  foundry180: "inset(47% 6% 47% 6% round 26px)",
+  "aura-system": "circle(4% at 50% 50%)",
+  zeroupload: "inset(0% 49% 0% 49% round 32px)",
+  windowbiome: "inset(16% 28% 16% 28% round 18px)",
+  nova: "circle(3% at 72% 42%)",
+};
 
 export default function ProjectPortal({ project, onClose }: { project: Project | null; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -14,6 +23,8 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
     if (!project) return;
     const previousFocus = document.activeElement as HTMLElement | null;
     document.body.classList.add("portal-open");
+    document.documentElement.dataset.portal = project.id;
+    window.dispatchEvent(new CustomEvent("aura:signal", { detail: `ENTER / ${project.name.toUpperCase()} / WORLD LOCK` }));
     const focusTimer = window.setTimeout(() => closeRef.current?.focus(), 80);
 
     const onKey = (event: KeyboardEvent) => {
@@ -25,7 +36,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
       if (event.key !== "Tab" || !stageRef.current) return;
       const focusable = Array.from(
         stageRef.current.querySelectorAll<HTMLElement>(
-          'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])',
+          'a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])',
         ),
       ).filter((element) => !element.hasAttribute("disabled"));
       if (focusable.length === 0) return;
@@ -44,6 +55,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
     return () => {
       window.clearTimeout(focusTimer);
       document.body.classList.remove("portal-open");
+      delete document.documentElement.dataset.portal;
       window.removeEventListener("keydown", onKey);
       previousFocus?.focus?.();
     };
@@ -82,7 +94,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.28 }}
+          transition={{ duration: 0.24 }}
           role="dialog"
           aria-modal="true"
           aria-label={`${project.name} case study`}
@@ -90,10 +102,10 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
           <motion.div
             ref={stageRef}
             className="portal-stage"
-            initial={{ clipPath: "inset(48% 48% 48% 48% round 40px)" }}
+            initial={{ clipPath: entryMasks[project.id] || "inset(48% 48% 48% 48% round 40px)" }}
             animate={{ clipPath: "inset(0% 0% 0% 0% round 0px)" }}
-            exit={{ clipPath: "inset(48% 48% 48% 48% round 40px)" }}
-            transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ clipPath: entryMasks[project.id] || "inset(48% 48% 48% 48% round 40px)" }}
+            transition={{ duration: project.id === "nova" ? 1.05 : .74, ease: project.id === "foundry180" ? [0.16, 1, 0.3, 1] : [0.22, 1, 0.36, 1] }}
           >
             <div className="portal-grid" />
             <div className="portal-orbit orbit-a" />
@@ -117,6 +129,11 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
                   {project.live && <a href={project.live} target="_blank" rel="noreferrer">LIVE SYSTEM ↗</a>}
                   {project.repo && <a href={project.repo} target="_blank" rel="noreferrer">SOURCE ↗</a>}
                 </div>
+              </section>
+
+              <section className="portal-world-lab">
+                <div className="portal-section-label">WORLD / INTERACTIVE MODEL</div>
+                <WorldEngine project={project} />
               </section>
 
               <section className="portal-dossier">
