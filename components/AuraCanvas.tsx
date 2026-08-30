@@ -114,7 +114,7 @@ function SignalMembrane({ color, energy, reduced, detail }: { color: string; ene
   );
 }
 
-function ReactiveCore({ reduced, aura, energy, quality }: { reduced: boolean; aura: AuraMode; energy: number; quality: AuraQuality }) {
+function ReactiveCore({ reduced, aura, energy, quality, kinetic }: { reduced: boolean; aura: AuraMode; energy: number; quality: AuraQuality; kinetic: { current: number } }) {
   const group = useRef<THREE.Group>(null);
   const ringA = useRef<THREE.Mesh>(null);
   const ringB = useRef<THREE.Mesh>(null);
@@ -127,13 +127,17 @@ function ReactiveCore({ reduced, aura, energy, quality }: { reduced: boolean; au
     const scroll = typeof window === "undefined" ? 0 : window.scrollY / Math.max(window.innerHeight, 1);
     const tx = pointer.x * Math.min(viewport.width * 0.16, 1.15);
     const ty = pointer.y * Math.min(viewport.height * 0.12, 0.85);
+    const kineticEnergy = reduced ? 0 : kinetic.current;
+    const effective = energy + kineticEnergy * 0.72;
     group.current.position.x = THREE.MathUtils.damp(group.current.position.x, tx, 2.6, delta);
     group.current.position.y = THREE.MathUtils.damp(group.current.position.y, ty - Math.min(scroll * 0.14, 0.9), 2.4, delta);
+    const scale = 1 + kineticEnergy * 0.035;
+    group.current.scale.setScalar(THREE.MathUtils.damp(group.current.scale.x, scale, 5, delta));
     if (!reduced) {
-      group.current.rotation.y += delta * (0.055 + energy * 0.025);
+      group.current.rotation.y += delta * (0.055 + effective * 0.025);
       group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, pointer.y * 0.18, 2, delta);
-      if (ringA.current) ringA.current.rotation.z += delta * (0.11 + energy * 0.07);
-      if (ringB.current) ringB.current.rotation.x -= delta * (0.08 + energy * 0.05);
+      if (ringA.current) ringA.current.rotation.z += delta * (0.11 + effective * 0.07);
+      if (ringB.current) ringB.current.rotation.x -= delta * (0.08 + effective * 0.05);
     }
   });
 
@@ -190,6 +194,7 @@ export default function AuraCanvas({ aura }: { aura: AuraMode }) {
   const [energy, setEnergy] = useState(1);
   const [quality, setQuality] = useState<AuraQuality>("high");
   const burstTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const kinetic = useRef(0);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -218,13 +223,19 @@ export default function AuraCanvas({ aura }: { aura: AuraMode }) {
       const value = (event as CustomEvent<AuraQuality>).detail;
       if (value === "high" || value === "balanced" || value === "low") setQuality(value);
     };
+    const onKinetic = (event: Event) => {
+      const value = (event as CustomEvent<number>).detail;
+      if (Number.isFinite(value)) kinetic.current = THREE.MathUtils.clamp(value, 0, 1);
+    };
     window.addEventListener("aura:energy", onEnergy as EventListener);
     window.addEventListener("aura:burst", onBurst);
     window.addEventListener("aura:quality", onQuality as EventListener);
+    window.addEventListener("aura:kinetic", onKinetic as EventListener);
     return () => {
       window.removeEventListener("aura:energy", onEnergy as EventListener);
       window.removeEventListener("aura:burst", onBurst);
       window.removeEventListener("aura:quality", onQuality as EventListener);
+      window.removeEventListener("aura:kinetic", onKinetic as EventListener);
       if (burstTimer.current) clearTimeout(burstTimer.current);
     };
   }, []);
@@ -239,7 +250,7 @@ export default function AuraCanvas({ aura }: { aura: AuraMode }) {
         <AdaptiveDpr />
         <LightRig aura={aura} energy={energy} />
         <SignalCloud color={palettes[aura].tertiary} energy={energy} count={config.points} />
-        <ReactiveCore reduced={reduced} aura={aura} energy={energy} quality={quality} />
+        <ReactiveCore reduced={reduced} aura={aura} energy={energy} quality={quality} kinetic={kinetic} />
       </Canvas>
     </div>
   );
