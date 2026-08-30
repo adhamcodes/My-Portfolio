@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { identity } from "@/data/site";
 
 export const alt = "Adham Mahmood — Aura System";
 export const size = { width: 1200, height: 630 };
@@ -28,7 +29,7 @@ export default function Image() {
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: "100%", zIndex: 2 }}>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 17, letterSpacing: 3, color: "#87909f" }}>
             <span>ADHAM / AURA SYSTEM</span>
-            <span>LIVE IDENTITY / 0.3</span>
+            <span>LIVE IDENTITY / {identity.version}</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 104, lineHeight: .82, letterSpacing: -8, fontWeight: 700 }}>ADHAM</div>
