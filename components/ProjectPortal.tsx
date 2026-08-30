@@ -2,15 +2,16 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import ProjectStory from "@/components/ProjectStory";
 import WorldEngine from "@/components/WorldEngine";
 import type { Project, StageState } from "@/data/site";
 
 const entryMasks: Record<string, string> = {
-  foundry180: "inset(47% 6% 47% 6% round 26px)",
-  "aura-system": "circle(4% at 50% 50%)",
-  zeroupload: "inset(0% 49% 0% 49% round 32px)",
-  windowbiome: "inset(16% 28% 16% 28% round 18px)",
-  nova: "circle(3% at 72% 42%)",
+  foundry180: "inset(44% 4% 44% 4% round 28px)",
+  "aura-system": "circle(5% at 58% 48%)",
+  zeroupload: "inset(0% 48% 0% 48% round 28px)",
+  windowbiome: "inset(14% 25% 14% 25% round 22px)",
+  nova: "circle(4% at 72% 42%)",
 };
 
 function statusLabel(state: StageState) {
@@ -100,7 +101,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: .24 }}
+          transition={{ duration: .2 }}
           role="dialog"
           aria-modal="true"
           aria-label={`${project.name} project`}
@@ -111,7 +112,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
             initial={{ clipPath: entryMasks[project.id] || "inset(48% 48% 48% 48% round 40px)" }}
             animate={{ clipPath: "inset(0% 0% 0% 0% round 0px)" }}
             exit={{ clipPath: entryMasks[project.id] || "inset(48% 48% 48% 48% round 40px)" }}
-            transition={{ duration: project.id === "nova" ? .92 : .68, ease: project.id === "foundry180" ? [0.16, 1, 0.3, 1] : [0.22, 1, 0.36, 1] }}
+            transition={{ duration: project.id === "nova" ? .78 : .58, ease: project.id === "foundry180" ? [0.16, 1, 0.3, 1] : [0.22, 1, 0.36, 1] }}
           >
             <div className="portal-grid" />
             <div className="portal-orbit orbit-a" />
@@ -142,52 +143,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
                 <WorldEngine project={project} />
               </section>
 
-              <section className="portal-dossier">
-                <div><span>THE PROBLEM</span><p>{project.problem}</p></div>
-                <div><span>THE CONSTRAINT</span><p>{project.constraint}</p></div>
-                <div><span>THE DECISION</span><p>{project.decision}</p></div>
-              </section>
-
-              <section className="portal-architecture">
-                <div className="portal-section-label">HOW IT&apos;S BUILT</div>
-                <div className="architecture-chain">
-                  {project.architecture.map((item, index) => (
-                    <div className="architecture-node" key={item}>
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <strong>{item}</strong>
-                      {index < project.architecture.length - 1 && <i />}
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="portal-field-notes">
-                <article>
-                  <span>WHAT I LEARNED</span>
-                  <p>{project.principle}</p>
-                </article>
-                <article>
-                  <span>WHAT&apos;S NEXT</span>
-                  <p>{project.next}</p>
-                </article>
-              </section>
-
-              <section className="portal-proof">
-                <div className="portal-section-label">WHAT EXISTS</div>
-                <div className="proof-cloud">
-                  {project.proof.map((item, index) => (
-                    <motion.div
-                      key={item}
-                      initial={{ opacity: 0, y: 24 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-10%" }}
-                      transition={{ delay: index * .05 }}
-                    >
-                      <span>0{index + 1}</span>{item}
-                    </motion.div>
-                  ))}
-                </div>
-              </section>
+              <ProjectStory project={project} />
             </div>
           </motion.div>
         </motion.div>

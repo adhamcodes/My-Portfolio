@@ -39,6 +39,12 @@ const qualityConfig: Record<AuraQuality, { points: number; segments: number; rin
   low: { points: 150, segments: 38, ringSegments: 72, sparkles: 16, dpr: [0.72, 1] },
 };
 
+function artifactDetail(segments: number) {
+  if (segments >= 70) return 4;
+  if (segments >= 50) return 3;
+  return 2;
+}
+
 function seededUnit(index: number, salt: number) {
   let value = (index * 1664525 + 1013904223 + salt * 374761393) >>> 0;
   value ^= value >>> 13;
@@ -146,8 +152,8 @@ function FieldShell({ palette, energy, warp, reduced, segments, opacity }: { pal
   });
 
   return (
-    <mesh scale={1.07}>
-      <sphereGeometry args={[1.16, segments, Math.max(24, Math.round(segments * .7))]} />
+    <mesh scale={[1.11, .94, 1.04]} rotation={[-.08, .2, -.11]}>
+      <icosahedronGeometry args={[1.16, artifactDetail(segments)]} />
       <shaderMaterial ref={material} uniforms={uniforms} vertexShader={vertexShader} fragmentShader={fragmentShader} transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} />
     </mesh>
   );
@@ -157,6 +163,8 @@ function ReactiveField({ reduced, aura, energy, quality, kinetic, scene }: { red
   const group = useRef<THREE.Group>(null);
   const body = useRef<THREE.MeshPhysicalMaterial>(null);
   const wire = useRef<THREE.MeshBasicMaterial>(null);
+  const spine = useRef<THREE.Mesh>(null);
+  const spineMat = useRef<THREE.MeshBasicMaterial>(null);
   const ringA = useRef<THREE.Mesh>(null);
   const ringB = useRef<THREE.Mesh>(null);
   const ringMatA = useRef<THREE.MeshBasicMaterial>(null);
@@ -185,14 +193,19 @@ function ReactiveField({ reduced, aura, energy, quality, kinetic, scene }: { red
     group.current.scale.setScalar(scale);
     presence.current = THREE.MathUtils.damp(presence.current, sceneState.opacity, 2.65, delta);
 
-    if (body.current) body.current.opacity = presence.current * .78;
-    if (wire.current) wire.current.opacity = presence.current * (aura === "void" ? .025 : .055);
-    if (ringMatA.current) ringMatA.current.opacity = presence.current * sceneState.ring * (aura === "void" ? .11 : .22);
-    if (ringMatB.current) ringMatB.current.opacity = presence.current * sceneState.ring * (aura === "void" ? .08 : .16);
+    if (body.current) body.current.opacity = presence.current * .72;
+    if (wire.current) wire.current.opacity = presence.current * (aura === "void" ? .035 : .075);
+    if (spineMat.current) spineMat.current.opacity = presence.current * sceneState.ring * (aura === "void" ? .075 : aura === "forge" ? .19 : .23);
+    if (ringMatA.current) ringMatA.current.opacity = presence.current * sceneState.ring * (aura === "void" ? .075 : .15);
+    if (ringMatB.current) ringMatB.current.opacity = presence.current * sceneState.ring * (aura === "void" ? .055 : .1);
 
     if (!reduced) {
       group.current.rotation.y += delta * (personality.spin + effective * .006);
       group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, pointer.y * .08 * sceneState.pointer, 1.8, delta);
+      if (spine.current) {
+        spine.current.rotation.y += delta * (personality.ring * .44 + effective * .01);
+        spine.current.rotation.z -= delta * (personality.ring * .26 + effective * .006);
+      }
       if (ringA.current) ringA.current.rotation.z += delta * (personality.ring + effective * .016);
       if (ringB.current) ringB.current.rotation.x -= delta * (personality.ring * .68 + effective * .012);
     }
@@ -201,22 +214,26 @@ function ReactiveField({ reduced, aura, energy, quality, kinetic, scene }: { red
   return (
     <group ref={group} position={[sceneState.x * xFactor, sceneState.y, sceneState.z]} scale={.001}>
       <Float speed={reduced ? 0 : personality.float + energy * .08} rotationIntensity={reduced ? 0 : personality.rotation} floatIntensity={reduced ? 0 : aura === "void" ? .08 : aura === "forge" ? .16 : .24}>
-        <mesh>
-          <sphereGeometry args={[1.13, config.segments, Math.max(24, Math.round(config.segments * .7))]} />
+        <mesh scale={[1.04, .9, 1.08]} rotation={[.08, -.16, .13]}>
+          <icosahedronGeometry args={[1.13, artifactDetail(config.segments)]} />
           <meshPhysicalMaterial ref={body} transparent opacity={0} depthWrite={false} color={palette.base} emissive={palette.emissive} emissiveIntensity={aura === "forge" ? .54 + energy * .08 : .28 + energy * .06} roughness={aura === "void" ? .5 : .34} metalness={aura === "forge" ? .34 : .24} clearcoat={.82} clearcoatRoughness={.32} />
         </mesh>
-        <mesh scale={1.006}>
-          <sphereGeometry args={[1.13, Math.max(30, Math.round(config.segments * .62)), Math.max(20, Math.round(config.segments * .45))]} />
+        <mesh scale={[1.055, .915, 1.095]} rotation={[.08, -.16, .13]}>
+          <icosahedronGeometry args={[1.13, Math.max(2, artifactDetail(config.segments) - 1)]} />
           <meshBasicMaterial ref={wire} color={palette.primary} wireframe transparent opacity={0} depthWrite={false} />
         </mesh>
         <FieldShell palette={palette} energy={energy} warp={personality.warp} reduced={reduced} segments={config.segments} opacity={sceneState.opacity * (aura === "void" ? .58 : aura === "forge" ? .9 : .78)} />
       </Float>
+      <mesh ref={spine} rotation={[.56, -.24, .7]}>
+        <torusKnotGeometry args={[1.4, .014, quality === "high" ? 128 : quality === "balanced" ? 96 : 64, 5, 3, 7]} />
+        <meshBasicMaterial ref={spineMat} color={palette.secondary} transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
       <mesh ref={ringA} rotation={[1.18, .08, .22]}>
-        <torusGeometry args={[1.62, .0065, 6, config.ringSegments]} />
+        <torusGeometry args={[1.67, .0055, 6, config.ringSegments]} />
         <meshBasicMaterial ref={ringMatA} color={palette.secondary} transparent opacity={0} depthWrite={false} />
       </mesh>
       <mesh ref={ringB} rotation={[.22, .9, 1.08]}>
-        <torusGeometry args={[1.92, .0045, 6, config.ringSegments]} />
+        <torusGeometry args={[2.02, .0035, 6, config.ringSegments]} />
         <meshBasicMaterial ref={ringMatB} color={palette.tertiary} transparent opacity={0} depthWrite={false} />
       </mesh>
       <Sparkles count={reduced ? 8 : Math.round(config.sparkles * personality.sparkle)} scale={aura === "void" ? 7 : 5.2} size={aura === "forge" ? 1.6 : 1.05} speed={reduced ? 0 : aura === "forge" ? .16 : aura === "void" ? .025 : .09} opacity={sceneState.cloud * (aura === "void" ? .08 : .2)} color={palette.tertiary} />

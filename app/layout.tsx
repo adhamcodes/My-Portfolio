@@ -11,6 +11,7 @@ import "./protocol-pass.css";
 import "./qa-pass.css";
 import "./ultimate-pass.css";
 import "./release-cleanup.css";
+import "./ruthless-pass.css";
 
 export const metadata: Metadata = {
   title: {
