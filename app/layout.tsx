@@ -8,6 +8,7 @@ import "./resilience.css";
 import "./final-polish.css";
 import "./monster-pass.css";
 import "./protocol-pass.css";
+import "./qa-pass.css";
 
 export const metadata: Metadata = {
   title: {
