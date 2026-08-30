@@ -7,6 +7,8 @@ import { projects } from "@/data/site";
 export default function DiscoveryProtocol() {
   const [active, setActive] = useState(false);
   const unlocked = useRef(false);
+  const dismissTimer = useRef<number | null>(null);
+  const probeTimer = useRef<number | null>(null);
 
   useEffect(() => {
     const unlock = () => {
@@ -26,16 +28,23 @@ export default function DiscoveryProtocol() {
       setActive(true);
       window.dispatchEvent(new CustomEvent("aura:signal", { detail: "SYSTEM FAMILIARITY / 100% / ALL WORLDS MAPPED" }));
       window.dispatchEvent(new CustomEvent("aura:burst"));
-      window.setTimeout(() => setActive(false), 4200);
+      if (dismissTimer.current !== null) window.clearTimeout(dismissTimer.current);
+      dismissTimer.current = window.setTimeout(() => setActive(false), 4200);
     };
 
     unlock();
     const onSignal = (event: Event) => {
       const value = (event as CustomEvent<string>).detail || "";
-      if (value.startsWith("MEMORY /")) window.setTimeout(unlock, 0);
+      if (!value.startsWith("MEMORY /")) return;
+      if (probeTimer.current !== null) window.clearTimeout(probeTimer.current);
+      probeTimer.current = window.setTimeout(unlock, 0);
     };
     window.addEventListener("aura:signal", onSignal as EventListener);
-    return () => window.removeEventListener("aura:signal", onSignal as EventListener);
+    return () => {
+      window.removeEventListener("aura:signal", onSignal as EventListener);
+      if (dismissTimer.current !== null) window.clearTimeout(dismissTimer.current);
+      if (probeTimer.current !== null) window.clearTimeout(probeTimer.current);
+    };
   }, []);
 
   return (
