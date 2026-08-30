@@ -1,18 +1,49 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { Project } from "@/data/site";
 
 export default function ProjectPortal({ project, onClose }: { project: Project | null; onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!project) return;
-    const onKey = (event: KeyboardEvent) => event.key === "Escape" && onClose();
+    const previousFocus = document.activeElement as HTMLElement | null;
     document.body.classList.add("portal-open");
+    const focusTimer = window.setTimeout(() => closeRef.current?.focus(), 80);
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab" || !stageRef.current) return;
+      const focusable = Array.from(
+        stageRef.current.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => !element.hasAttribute("disabled"));
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
     window.addEventListener("keydown", onKey);
     return () => {
+      window.clearTimeout(focusTimer);
       document.body.classList.remove("portal-open");
       window.removeEventListener("keydown", onKey);
+      previousFocus?.focus?.();
     };
   }, [project, onClose]);
 
@@ -30,6 +61,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
           aria-label={`${project.name} case study`}
         >
           <motion.div
+            ref={stageRef}
             className="portal-stage"
             initial={{ clipPath: "inset(48% 48% 48% 48% round 40px)" }}
             animate={{ clipPath: "inset(0% 0% 0% 0% round 0px)" }}
@@ -43,7 +75,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
 
             <header className="portal-nav">
               <span>{project.chapter}</span>
-              <button onClick={onClose} data-cursor="open">CLOSE <b>×</b></button>
+              <button ref={closeRef} onClick={onClose} data-cursor="open">CLOSE <b>×</b></button>
             </header>
 
             <div className="portal-scroll">
