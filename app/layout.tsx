@@ -7,6 +7,7 @@ import "./release-candidate.css";
 import "./resilience.css";
 import "./final-polish.css";
 import "./monster-pass.css";
+import "./protocol-pass.css";
 
 export const metadata: Metadata = {
   title: {
