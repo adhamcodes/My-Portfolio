@@ -1,14 +1,16 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Project } from "@/data/site";
 
 export default function ProjectPortal({ project, onClose }: { project: Project | null; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const [shareState, setShareState] = useState("SHARE SYSTEM");
 
   useEffect(() => {
+    setShareState("SHARE SYSTEM");
     if (!project) return;
     const previousFocus = document.activeElement as HTMLElement | null;
     document.body.classList.add("portal-open");
@@ -47,6 +49,31 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
     };
   }, [project, onClose]);
 
+  const share = async () => {
+    if (!project) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("system", project.id);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `${project.name} — Adham Mahmood`, text: project.oneLine, url: url.toString() });
+        setShareState("SHARED");
+      } else {
+        await navigator.clipboard.writeText(url.toString());
+        setShareState("LINK COPIED");
+      }
+    } catch (error) {
+      if ((error as Error)?.name !== "AbortError") {
+        try {
+          await navigator.clipboard.writeText(url.toString());
+          setShareState("LINK COPIED");
+        } catch {
+          setShareState("COPY FAILED");
+        }
+      }
+    }
+    window.setTimeout(() => setShareState("SHARE SYSTEM"), 1700);
+  };
+
   return (
     <AnimatePresence>
       {project && (
@@ -75,7 +102,10 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
 
             <header className="portal-nav">
               <span>{project.chapter}</span>
-              <button ref={closeRef} onClick={onClose} data-cursor="open">CLOSE <b>×</b></button>
+              <div className="portal-nav-actions">
+                <button onClick={share} data-cursor="signal">{shareState} <b>↗</b></button>
+                <button ref={closeRef} onClick={onClose} data-cursor="open">CLOSE <b>×</b></button>
+              </div>
             </header>
 
             <div className="portal-scroll">
@@ -106,6 +136,17 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
                     </div>
                   ))}
                 </div>
+              </section>
+
+              <section className="portal-field-notes">
+                <article>
+                  <span>ENGINEERING PRINCIPLE</span>
+                  <p>{project.principle}</p>
+                </article>
+                <article>
+                  <span>NEXT VECTOR</span>
+                  <p>{project.next}</p>
+                </article>
               </section>
 
               <section className="portal-proof">
