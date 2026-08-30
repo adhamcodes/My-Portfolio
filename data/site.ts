@@ -24,24 +24,24 @@ export type Project = {
 export const identity = {
   name: "Adham Mahmood",
   mark: "ADHAM / 26",
-  version: "0.5-RC",
-  thesis: "I am building myself into the kind of engineer who can move from first principles to systems to intelligent software — and I want the work to show the transformation in real time.",
+  version: "0.9-RC",
+  thesis: "I build software to understand the machinery underneath it — turning fundamentals into systems, experiments and the long road toward intelligent software. This interface keeps the evidence trail alive.",
   short: "software → systems → intelligence",
   email: "adhammahmood83@gmail.com",
   github: "https://github.com/adhamcodes",
 };
 
 export const auraModes: Array<{ id: AuraMode; label: string; note: string }> = [
-  { id: "pulse", label: "PULSE", note: "default / alive" },
-  { id: "forge", label: "FORGE", note: "heat / current build" },
-  { id: "void", label: "VOID", note: "quiet / depth" },
+  { id: "pulse", label: "PULSE", note: "kinetic / responsive" },
+  { id: "forge", label: "FORGE", note: "heavy / unstable" },
+  { id: "void", label: "VOID", note: "sparse / gravitational" },
 ];
 
 export const stages: Array<{ id: string; label: string; state: StageState; note: string }> = [
-  { id: "foundations", label: "Software foundations", state: "active", note: "Learning the machinery, not memorizing syntax." },
-  { id: "systems", label: "Systems & backend", state: "next", note: "Building toward deeper software architecture and infrastructure thinking." },
-  { id: "ml", label: "Machine learning", state: "future", note: "Earned after the software base is strong enough to support it." },
-  { id: "ai", label: "Intelligent systems", state: "future", note: "Long-term destination: useful systems that can reason, adapt and act." },
+  { id: "foundations", label: "Software foundations", state: "active", note: "First principles, deliberate practice and working systems." },
+  { id: "systems", label: "Systems & backend", state: "next", note: "The next pressure: architecture, infrastructure and deeper software behavior." },
+  { id: "ml", label: "Machine learning", state: "future", note: "A future layer built on top of a software base strong enough to carry it." },
+  { id: "ai", label: "Intelligent systems", state: "future", note: "Long vector: useful systems that can reason, adapt and act." },
 ];
 
 export const projects: Project[] = [
@@ -72,9 +72,9 @@ export const projects: Project[] = [
     constraint: "Push interaction and visual density hard without making the site unreadable, fragile or dependent on one high-end device.",
     decision: "Treat identity as structured data, render a responsive GPU-driven atmosphere, expose real runtime systems, and progressively degrade optional browser features.",
     principle: "Maximum perceived craft; progressive enhancement underneath. Every sci-fi-looking behavior should have a real system behind it.",
-    next: "Cross-device visual QA, ruthless performance profiling, content truth-checking and production release after owner review.",
+    next: "Owner visual review, cross-device torture testing and one surgical polish pass before the production 1.0 release.",
     architecture: ["Next.js + React", "R3F / Three.js", "custom GLSL field", "GSAP + Motion", "runtime capability layer", "Web Audio"],
-    proof: ["custom shader-driven signal membrane", "aura-aware 3D core", "native View Transition project portals", "generative Web Audio layer", "XRAY developer view", "live browser self-test + performance telemetry"],
+    proof: ["custom shader-driven signal membrane", "scene-directed evolving 3D core", "bespoke interactive project worlds", "generative aura-specific Web Audio", "XRAY developer view", "live browser self-test + performance telemetry"],
     repo: "https://github.com/adhamcodes/My-Portfolio/tree/aura-rebuild-v2",
     chapter: "THE AURA",
   },
@@ -117,7 +117,7 @@ export const projects: Project[] = [
     kind: "Visual web experiment",
     state: "verified",
     accent: "rose",
-    oneLine: "A cinematic marketing-site experiment from the period where I was learning how far visual polish and motion could push a page.",
+    oneLine: "A cinematic marketing-site experiment from the period where visual polish and motion were the primary material.",
     problem: "Static marketing pages are easy to make forgettable.",
     constraint: "Make motion feel intentional enough that it supports hierarchy rather than becoming pure decoration.",
     decision: "Use layered motion, glow and depth to test visual direction before moving toward deeper engineering work.",
@@ -131,21 +131,22 @@ export const projects: Project[] = [
 ];
 
 export const portfolioSystem = {
-  version: "AURA / 0.5-RC",
+  version: `AURA / ${identity.version}`,
   layers: [
     { id: "foundation", role: "APPLICATION", tech: "Next.js · React · TypeScript", job: "Server-rendered shell, structured identity data, metadata and component architecture.", path: "app/ + data/" },
     { id: "render", role: "GPU FIELD", tech: "Three.js · React Three Fiber", job: "Reactive 3D core, particles, lighting, aura-state rendering and device-aware fallback.", path: "components/AuraCanvas.tsx" },
-    { id: "shader", role: "SIGNAL", tech: "Custom GLSL", job: "A procedural membrane around the core that reacts to time, energy and aura state.", path: "GPU / shaderMaterial" },
+    { id: "shader", role: "SIGNAL", tech: "Custom GLSL", job: "A procedural membrane around the core that reacts to time, energy, scene and aura state.", path: "GPU / shaderMaterial" },
     { id: "choreography", role: "MOTION", tech: "GSAP · Motion", job: "Scroll choreography, springs, portals, component transitions and deliberate movement hierarchy.", path: "scroll + interaction engine" },
     { id: "browser", role: "NATIVE WEB", tech: "View Transitions · Web Audio", job: "Browser-native portal transitions and opt-in procedural ambient audio without media files.", path: "native capability layer" },
-    { id: "memory", role: "STATE", tech: "URL state · Local Storage", job: "Deep-linkable project worlds, persistent aura preference and remembered exploration across visits.", path: "identity memory layer" },
+    { id: "memory", role: "STATE", tech: "URL state · Local Storage", job: "Deep-linkable project worlds, persistent aura preference, returning-visitor memory and remembered exploration.", path: "identity memory layer" },
+    { id: "director", role: "SCENE DIRECTOR", tech: "Scroll state · interaction density", job: "Moves and transforms the GPU core by narrative scene while letting global chrome retreat when attention should move to content.", path: "components/CoreDirector.tsx" },
     { id: "resilience", role: "RESILIENCE", tech: "Adaptive governor", job: "Reduced-motion behavior, device profiling, automatic quality tiers and optional API fallbacks.", path: "runtime guards" },
   ],
 };
 
 export const transmissions = [
   "I care about the machinery under the abstraction.",
-  "I would rather show the unfinished trajectory than fake the final title.",
-  "I like software that feels engineered and designed at the same time.",
-  "This site is allowed to mutate as I do.",
+  "Claims expire. Working systems do not.",
+  "Engineering and design are stronger when neither is treated as decoration.",
+  "The system changes when the work changes.",
 ];
