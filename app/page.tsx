@@ -14,6 +14,7 @@ import SecretProtocol from "@/components/SecretProtocol";
 import SignalTicker from "@/components/SignalTicker";
 import Soundscape from "@/components/Soundscape";
 import SystemLab from "@/components/SystemLab";
+import VisualErrorBoundary from "@/components/VisualErrorBoundary";
 import XRay from "@/components/XRay";
 import { auraModes, identity, projects, stages, transmissions, type AuraMode, type Project } from "@/data/site";
 
@@ -157,7 +158,7 @@ export default function Home() {
       <PerformanceGovernor />
       <KineticField />
       <SecretProtocol />
-      <AuraCanvas aura={aura} />
+      <VisualErrorBoundary><AuraCanvas aura={aura} /></VisualErrorBoundary>
       <CursorSystem />
       <XRay on={xray} />
       <OperatorDeck
@@ -228,8 +229,8 @@ export default function Home() {
           <IdentityGlyph aura={aura} />
           <div className="instrument-copy top"><span>CORE</span><b>UNSTABLE / EVOLVING</b></div>
           <div className="instrument-copy bottom"><span>VECTOR</span><b>INTELLIGENT SYSTEMS</b></div>
-          <div className="coordinate c1">+23.8103</div>
-          <div className="coordinate c2">90.4125</div>
+          <div className="coordinate c1">NODE / LIVE</div>
+          <div className="coordinate c2">STATE / {aura.toUpperCase()}</div>
         </div>
 
         <SignalTicker />
