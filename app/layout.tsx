@@ -5,6 +5,7 @@ import "./accessibility.css";
 import "./initialization.css";
 import "./release-candidate.css";
 import "./resilience.css";
+import "./final-polish.css";
 
 export const metadata: Metadata = {
   title: {
