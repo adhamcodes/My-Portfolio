@@ -16,11 +16,11 @@ function probeSystem(): Probe[] {
   const gpu = "gpu" in navigator;
   const cores = navigator.hardwareConcurrency || 0;
   return [
-    { label: "RENDERER", value: webgl2 ? "WEBGL2 / ONLINE" : "FALLBACK / READY", ok: true },
-    { label: "TRANSITIONS", value: viewTransitions ? "NATIVE / READY" : "MOTION / FALLBACK", ok: true },
-    { label: "AUDIO", value: audio ? "SYNTH / AVAILABLE" : "SILENT MODE", ok: true },
-    { label: "STATE", value: storage ? "LOCAL / PERSISTENT" : "SESSION / EPHEMERAL", ok: true },
-    { label: "COMPUTE", value: `${cores || "?"} THREADS / ${gpu ? "WEBGPU SIGNAL" : "WEBGL PATH"}`, ok: true },
+    { label: "3D", value: webgl2 ? "WEBGL 2 READY" : "STATIC FALLBACK", ok: true },
+    { label: "TRANSITIONS", value: viewTransitions ? "NATIVE API" : "MOTION FALLBACK", ok: true },
+    { label: "SOUND", value: audio ? "WEB AUDIO AVAILABLE" : "SILENT MODE", ok: true },
+    { label: "MEMORY", value: storage ? "LOCAL STORAGE READY" : "SESSION ONLY", ok: true },
+    { label: "DEVICE", value: `${cores || "?"} THREADS · ${gpu ? "WEBGPU DETECTED" : "WEBGL PATH"}`, ok: true },
   ];
 }
 
@@ -47,11 +47,11 @@ export default function InitializationSequence() {
 
     setVisible(true);
     setProbes(probeSystem());
-    const done = window.setTimeout(() => setComplete(true), reduced ? 0 : 300);
+    const done = window.setTimeout(() => setComplete(true), reduced ? 0 : 280);
     const close = window.setTimeout(() => {
       setVisible(false);
       try { sessionStorage.setItem("adham:init-seen", "1"); } catch {}
-    }, reduced ? 120 : 1480);
+    }, reduced ? 120 : 1380);
     return () => { window.clearTimeout(done); window.clearTimeout(close); };
   }, [reduced]);
 
@@ -74,24 +74,24 @@ export default function InitializationSequence() {
           <div className="init-grid" aria-hidden="true" />
           <div className="init-core" aria-hidden="true"><i /><i /><i /></div>
           <div className="init-shell">
-            <div className="init-head"><span>ADHAM / AURA SYSTEM</span><b>{complete ? memory.returning ? "MEMORY RESTORED" : "SYSTEM COHERENT" : "NEGOTIATING CAPABILITIES"}</b></div>
-            <div className="init-title">{memory.returning ? <>SIGNAL<br /><em>RECONNECTED</em></> : <>LIVE IDENTITY<br /><em>BOOT VECTOR</em></>}</div>
+            <div className="init-head"><span>ADHAM MAHMOOD / INTERACTIVE PORTFOLIO</span><b>{complete ? memory.returning ? "WELCOME BACK" : "READY" : "CHECKING YOUR BROWSER"}</b></div>
+            <div className="init-title">{memory.returning ? <>WELCOME<br /><em>BACK.</em></> : <>SETTING<br /><em>THE STAGE.</em></>}</div>
             {memory.returning && (
               <div className="init-memory">
                 <div><span>VISIT</span><b>{String(memory.visits).padStart(2, "0")}</b></div>
-                <div><span>WORLDS REMEMBERED</span><b>{memory.worlds}</b></div>
-                <div><span>LAST AURA</span><b>{memory.aura}</b></div>
-                <div><span>HIDDEN PROTOCOL</span><b>{memory.protocol ? "KNOWN" : "SEALED"}</b></div>
+                <div><span>PROJECTS SEEN</span><b>{memory.worlds}</b></div>
+                <div><span>VISUAL MODE</span><b>{memory.aura}</b></div>
+                <div><span>HIDDEN LAYER</span><b>{memory.protocol ? "FOUND" : "NOT YET"}</b></div>
               </div>
             )}
             <div className="init-probes">
               {probes.map((probe, index) => (
-                <motion.div key={probe.label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: reduced ? 0 : index * .055, duration: .24 }}>
+                <motion.div key={probe.label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: reduced ? 0 : index * .05, duration: .22 }}>
                   <span>{probe.label}</span><strong>{probe.value}</strong><i className={probe.ok ? "ok" : ""} />
                 </motion.div>
               ))}
             </div>
-            <div className="init-foot"><span>{complete ? memory.returning ? "RESTORING LAST KNOWN IDENTITY STATE" : "ENTERING BUILD STATE" : "REAL RUNTIME PROBES / LOCAL MEMORY"}</span><em>CLICK / ENTER TO SKIP</em></div>
+            <div className="init-foot"><span>{memory.returning ? "LOCAL MEMORY RESTORED ON THIS BROWSER" : "REAL CAPABILITY CHECKS · NO FAKE LOADER"}</span><em>CLICK / ENTER TO SKIP</em></div>
           </div>
         </motion.div>
       )}

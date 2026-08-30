@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 
 const messages = [
-  "WORKING SYSTEMS > CLAIMS",
-  "CURRENT SIGNAL / FOUNDRY180",
-  "CORE DIRECTOR / SCENE AWARE",
-  "AURA / PERSONALITY NOT PALETTE",
-  "RUNTIME QUALITY / DEVICE NEGOTIATED",
-  "PROJECT WORLDS / MEMORY ENABLED",
-  "THE SYSTEM CHANGES WITH THE WORK",
-  "SOME PROTOCOLS REMAIN SEALED",
+  "BUILDING FOUNDRY180",
+  "THIS SITE ADAPTS TO YOUR DEVICE",
+  "PROJECTS REMEMBER WHAT YOU OPEN",
+  "PRESS X TO SEE THE WIRES",
+  "THE VISUAL FIELD CHANGES WITH THE PAGE",
+  "SOUND IS PROCEDURAL, NOT A LOOPED TRACK",
+  "THIS PORTFOLIO CHANGES WITH THE WORK",
+  "SOME DETAILS ARE STILL HIDING",
 ];
 
 export default function SignalTicker() {
@@ -22,7 +22,7 @@ export default function SignalTicker() {
     const rotate = window.setInterval(() => {
       index.current = (index.current + 1) % messages.length;
       setMessage(messages[index.current]);
-    }, 3600);
+    }, 4100);
     const onSignal = (event: Event) => {
       const value = (event as CustomEvent<string>).detail;
       if (!value) return;
@@ -31,7 +31,7 @@ export default function SignalTicker() {
       liveTimer.current = window.setTimeout(() => {
         index.current = (index.current + 1) % messages.length;
         setMessage(messages[index.current]);
-      }, 2600);
+      }, 2800);
     };
     window.addEventListener("aura:signal", onSignal as EventListener);
     return () => {

@@ -9,30 +9,31 @@ import "./final-polish.css";
 import "./monster-pass.css";
 import "./protocol-pass.css";
 import "./qa-pass.css";
+import "./ultimate-pass.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Adham Mahmood — Aura System",
+    default: "Adham Mahmood — Interactive Portfolio",
     template: "%s — Adham Mahmood",
   },
-  description: "A living engineering identity and interactive browser system: software, systems, experiments, WebGL, motion and the road toward intelligent software.",
+  description: "Software projects, experiments, and an interactive portfolio that behaves like one of them.",
   metadataBase: new URL("https://portfolio-adham-mu.vercel.app"),
   alternates: { canonical: "/" },
-  applicationName: "Adham / Aura System",
+  applicationName: "Adham Mahmood",
   authors: [{ name: "Adham Mahmood", url: "https://github.com/adhamcodes" }],
   creator: "Adham Mahmood",
   keywords: ["Adham Mahmood", "software engineering", "interactive portfolio", "WebGL", "Three.js", "Foundry180"],
   openGraph: {
-    title: "Adham Mahmood — Aura System",
-    description: "Portfolio, flagship browser experiment, and living engineering identity.",
+    title: "Adham Mahmood — Interactive Portfolio",
+    description: "Software projects, experiments, and a portfolio built as a browser experience in its own right.",
     type: "website",
     url: "/",
-    siteName: "Adham / Aura System",
+    siteName: "Adham Mahmood",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Adham Mahmood — Aura System",
-    description: "Portfolio, flagship browser experiment, and living engineering identity.",
+    title: "Adham Mahmood — Interactive Portfolio",
+    description: "Software projects, experiments, and a portfolio built as a browser experience in its own right.",
   },
   robots: { index: true, follow: true },
   icons: { icon: "/icon.svg" },
@@ -60,8 +61,8 @@ const structuredData = {
       "@type": "WebSite",
       "@id": "https://portfolio-adham-mu.vercel.app/#website",
       url: "https://portfolio-adham-mu.vercel.app/",
-      name: "Adham / Aura System",
-      description: "A living engineering identity and interactive browser system.",
+      name: "Adham Mahmood — Interactive Portfolio",
+      description: "Software projects, experiments, and an interactive portfolio that behaves like one of them.",
       author: { "@id": "https://portfolio-adham-mu.vercel.app/#person" },
     },
   ],

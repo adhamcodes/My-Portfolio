@@ -1,6 +1,6 @@
 {
-  "name": "adham-aura-system",
-  "version": "2.0.0",
+  "name": "adham-interactive-portfolio",
+  "version": "1.0.0-rc.1",
   "private": true,
   "scripts": {
     "dev": "next dev",

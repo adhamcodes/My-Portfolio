@@ -1,132 +1,118 @@
-# ADHAM / AURA SYSTEM
+# ADHAM MAHMOOD — INTERACTIVE PORTFOLIO
 
-A portfolio that behaves like a project instead of a static wrapper around projects.
+A portfolio that behaves like one of the projects instead of acting as a static wrapper around them.
 
-**Aura System** is a living engineering identity built with Next.js, React, TypeScript, React Three Fiber, Three.js, custom GLSL, GSAP, Motion, native browser APIs and a device-aware runtime layer.
+The public experience is intentionally human and editorial; the technical machinery stays underneath it. The site combines Next.js, React, TypeScript, React Three Fiber, Three.js, custom GLSL, GSAP, Motion, native browser APIs, procedural Web Audio, local state and a device-aware runtime layer.
 
-The core idea is simple: the interface should change when the person, work and current engineering pressure change.
+## Design rule
+
+The goal is not to display the largest possible number of effects. It is to make different parts of the portfolio feel deliberately different while still belonging to the same person.
+
+Large typography carries the narrative. The 3D field appears when it matters and retreats when reading should win. Project pages use interactive models specific to the ideas they represent. Technical UI is reserved for places where there is real technical information to inspect.
 
 ## What is real
 
-- GPU-rendered 3D identity field
-- custom GLSL signal membrane
-- scene-directed Core Evolution across the narrative
-- three persistent Aura personalities with distinct motion, particles, rendering behavior and generative audio profiles
-- scroll-velocity and pointer-driven kinetic response
-- bespoke interactive project worlds instead of one shared case-study template
-- Foundry180 interactive curriculum / phase / mastery-gate system model
-- Aura System peelable architecture model
-- ZeroUpload local-first pipeline simulation
-- WindowBiome active-window / reactive-overlay simulation
-- Nova cinematic motion/depth/hierarchy study
-- project deep links, browser-history behavior and shareable state
-- deterministic identity glyph generated from current project/stage state
+- scene-aware WebGL visual field with custom GLSL deformation
+- deterministic particle layout and adaptive render quality
+- three persistent visual modes with different motion, lighting and procedural-audio behavior
+- scroll and pointer response
+- project-specific interactive models rather than a repeated case-study template
+- Foundry180 curriculum / phase / mastery-check model
+- portfolio architecture explorer
+- ZeroUpload local-first flow model
+- WindowBiome focus-aware desktop model
+- Nova motion / depth / hierarchy study
+- project deep links, browser history and shareable state
+- deterministic build signature derived from current portfolio state
 - remembered project exploration using local storage
-- returning-visitor reconnect boot with local-only memory
-- system-familiarity completion state after all worlds are mapped
-- attention-aware HUD that retreats while reading and scrolling
-- live signal feed driven by actual system interactions
+- returning-visitor memory stored only in the browser
+- completion moment after all projects are explored
+- attention-aware navigation that retreats during reading and scrolling
 - native View Transition enhancement with Motion fallback
-- opt-in generative Web Audio soundscape
-- XRAY developer layer
-- operator deck (`/` or `Ctrl/Cmd + K`)
-- browser capability self-test
+- opt-in procedural Web Audio
+- XRAY inspection layer
+- quick navigation (`/` or `Ctrl/Cmd + K`)
+- real browser capability checks
 - live FPS, LCP, CLS and long-task telemetry
-- adaptive quality governor for high / balanced / low render tiers
-- mobile-aware GPU composition
+- high / balanced / low render tiers
+- mobile-aware 3D composition
 - reduced-motion, high-contrast, coarse-pointer and low-device fallbacks
 - visual-layer and application error boundaries
-- metadata, sitemap, robots, manifest, OG image and structured data
+- metadata, sitemap, robots, manifest, social artwork and structured data
 - production security headers
-- print-safe fallback presentation
-- an undocumented protocol layer
+- print fallback
+- one hidden interaction
 
-## System layers
+## Architecture
 
 ```text
-IDENTITY DATA
+PORTFOLIO DATA
     ↓
-NEXT.JS / REACT APPLICATION
+NEXT.JS / REACT / TYPESCRIPT
     ↓
-STATE + MEMORY
-    ├── URL project state
-    ├── local Aura preference
-    ├── exploration memory
-    └── returning-visitor state
+URL + LOCAL MEMORY
     ↓
-SCENE DIRECTOR
-    ├── narrative scene detection
-    ├── attention-aware HUD
-    └── Core Evolution commands
+SCENE DIRECTION
+    ├── narrative section detection
+    ├── background changes
+    ├── attention-aware interface density
+    └── 3D-field presence / composition
     ↓
-MOTION + INTERACTION BUS
+MOTION + INTERACTION
     ├── GSAP scroll choreography
     ├── Motion transitions
-    ├── kinetic pointer/scroll signal
-    └── operator controls
+    ├── pointer / scroll response
+    └── quick controls
     ↓
-GPU FIELD
+3D FIELD
     ├── React Three Fiber
     ├── Three.js
-    ├── custom GLSL membrane
-    ├── Aura-specific behavior
-    └── adaptive render quality
+    ├── custom GLSL
+    └── adaptive quality
     ↓
-NATIVE WEB
+BROWSER FEATURES
     ├── View Transitions
     ├── Web Audio
     ├── PerformanceObserver
     └── capability detection
 ```
 
-## Project-world rule
+## Project rule
 
-A project world is allowed to be visually related to the global identity, but it must not be only a differently colored copy of another project.
+Each project gets an interactive model that explains something specific about it:
 
-Each flagship world gets a miniature interaction that explains something specific about the project:
+- **Foundry180** — curriculum structure and proof-gated progression.
+- **This Portfolio** — the architecture of the site itself.
+- **ZeroUpload** — the local-first browser flow.
+- **WindowBiome** — active-window-aware desktop behavior.
+- **Nova** — motion, depth and hierarchy experimentation.
 
-- **Foundry180** exposes curriculum, phase and mastery-loop structure.
-- **Aura System** lets the visitor peel through the portfolio architecture itself.
-- **ZeroUpload** expresses the local-first browser pipeline.
-- **WindowBiome** expresses focus-aware desktop behavior.
-- **Nova** preserves the motion-heavy visual experimentation of that project honestly.
-
-These are explanatory interactive models; they do not pretend to be live telemetry from the underlying products.
+These are explanatory models. They do not pretend to be live telemetry from the underlying products.
 
 ## Controls
 
 | Control | Action |
 | --- | --- |
-| `A` | Cycle Aura personality |
+| `A` | Change visual mode |
 | `X` | Toggle XRAY |
-| `/` | Open Operator Deck |
-| `Ctrl/Cmd + K` | Open Operator Deck |
-| `Esc` | Close project world / deck |
+| `/` | Open quick navigation |
+| `Ctrl/Cmd + K` | Open quick navigation |
+| `Esc` | Close an open project / navigation |
 
-The Machine section contains additional live controls for field energy, browser probes and signal injection.
-
-## Evolution model
-
-Content and identity state live in `data/site.ts`.
-
-Changing a project from `building` to `verified`, moving the active stage, or adding a new system changes more than text: those values feed the living identity surface, deterministic glyph, project atlas and system narrative.
-
-The intended workflow is to update state rather than redesign the portfolio every few months.
+The **Under the Hood** section also exposes real runtime measurements, browser capability checks and a visual-field intensity control.
 
 ## Runtime resilience
 
-Aura System is deliberately maximalist, but the implementation is not allowed to assume a high-end machine.
-
-The runtime samples the visitor's device and frame rate, then chooses a render tier. The scene-directed core also adapts its horizontal composition to narrower GPU viewports. Optional browser APIs degrade to fallbacks. Reduced-motion preferences remove nonessential movement. If the GPU presentation layer fails, the portfolio remains usable.
+The experience is visually ambitious but does not assume a high-end machine. It starts conservatively, samples real frame timing after the initial reveal, considers available hardware signals when they exist, and selects a render tier. Optional browser APIs degrade to fallbacks. Reduced-motion preferences remove nonessential movement. If the 3D layer fails, the portfolio remains usable.
 
 ## Truth contract
 
 Visual ambition is not permission to fabricate engineering evidence.
 
-- Foundry180 remains marked **BUILDING** while its final curriculum-quality audit is pending.
-- Project-world simulations are labeled as interactive models/simulations.
-- Future trajectory stages remain visibly future work.
-- Runtime telemetry comes from the current browser rather than invented numbers.
+- Foundry180 remains **BUILDING**. Its curriculum quality audit is complete: 180 authored days, 130 exercises and 603 automated tests passing, but the full browser product is still being built.
+- Project simulations are explanatory interactive models.
+- Future trajectory stages remain future work.
+- Runtime telemetry comes from the current browser.
 
 ## Local development
 
@@ -143,6 +129,6 @@ npm run build
 
 ## Status
 
-`0.9-RC` — monster-pass release candidate for owner desktop/mobile visual and interaction review.
+`1.0-RC` — final owner-review release candidate.
 
-The production branch remains unchanged until the release candidate is explicitly approved.
+The production branch remains unchanged until explicit approval.

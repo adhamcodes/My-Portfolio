@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Adham Mahmood — Aura System",
-    short_name: "Aura System",
-    description: "A living engineering identity and interactive browser system.",
+    name: "Adham Mahmood — Interactive Portfolio",
+    short_name: "Adham Mahmood",
+    description: "Software projects, experiments, and an interactive portfolio built as a browser experience in its own right.",
     start_url: "/",
     display: "standalone",
     background_color: "#05070b",

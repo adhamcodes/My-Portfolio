@@ -22,22 +22,13 @@ function unit(seed: number, index: number) {
 
 export default function IdentityGlyph({ aura }: { aura: AuraMode }) {
   const geometry = useMemo(() => {
-    const signature = [
-      identity.name,
-      identity.version,
-      ...stages.map((stage) => `${stage.id}:${stage.state}`),
-      ...projects.map((project) => `${project.id}:${project.state}`),
-    ].join("|");
+    const signature = [identity.name, identity.version, ...stages.map((stage) => `${stage.id}:${stage.state}`), ...projects.map((project) => `${project.id}:${project.state}`)].join("|");
     const seed = hash(signature);
     const center = 100;
     const points = Array.from({ length: 14 }, (_, index) => {
       const angle = (Math.PI * 2 * index) / 14 - Math.PI / 2;
       const radius = 42 + unit(seed, index) * 37;
-      return {
-        x: center + Math.cos(angle) * radius,
-        y: center + Math.sin(angle) * radius,
-        radius: 1.4 + unit(seed, index + 40) * 2.5,
-      };
+      return { x: center + Math.cos(angle) * radius, y: center + Math.sin(angle) * radius, radius: 1.4 + unit(seed, index + 40) * 2.5 };
     });
     return { seed: seed.toString(16).toUpperCase().padStart(8, "0"), points };
   }, []);
@@ -45,7 +36,7 @@ export default function IdentityGlyph({ aura }: { aura: AuraMode }) {
   const path = `${geometry.points.map((point) => `${point.x.toFixed(2)},${point.y.toFixed(2)}`).join(" ")} ${geometry.points[0].x.toFixed(2)},${geometry.points[0].y.toFixed(2)}`;
 
   return (
-    <div className={`identity-glyph glyph-${aura}`} aria-label={`Living identity signature ${geometry.seed}`}>
+    <div className={`identity-glyph glyph-${aura}`} aria-label={`Build signature ${geometry.seed}`}>
       <svg viewBox="0 0 200 200" role="img" aria-hidden="true">
         <circle className="glyph-ring outer" cx="100" cy="100" r="89" />
         <circle className="glyph-ring inner" cx="100" cy="100" r="31" />
@@ -59,9 +50,9 @@ export default function IdentityGlyph({ aura }: { aura: AuraMode }) {
         <circle className="glyph-core" cx="100" cy="100" r="6" />
       </svg>
       <div className="glyph-meta">
-        <span>IDENTITY HASH</span>
+        <span>BUILD SIGNATURE</span>
         <b>{geometry.seed}</b>
-        <em>MUTATES WITH BUILD STATE</em>
+        <em>changes with portfolio state</em>
       </div>
     </div>
   );

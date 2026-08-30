@@ -69,12 +69,12 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
   }, [open]);
 
   const navigation = [
-    ["ORIGIN", "#origin"],
-    ["BUILD STATE", "#state"],
-    ["PROJECT WORLDS", "#work"],
-    ["TRAJECTORY", "#trajectory"],
-    ["THE MACHINE", "#machine"],
-    ["OPEN CHANNEL", "#contact"],
+    ["INTRO", "#origin"],
+    ["RIGHT NOW", "#state"],
+    ["SELECTED WORK", "#work"],
+    ["WHERE THIS GOES", "#trajectory"],
+    ["UNDER THE HOOD", "#machine"],
+    ["CONTACT", "#contact"],
   ] as const;
 
   const filteredProjects = useMemo(() => {
@@ -90,66 +90,66 @@ export default function OperatorDeck({ aura, xray, visited, onAura, onXray, onPr
 
   return (
     <>
-      <button ref={triggerRef} className="deck-trigger" onClick={() => setOpen(true)} data-cursor="signal" aria-label="Open operator deck">
+      <button ref={triggerRef} className="deck-trigger" onClick={() => setOpen(true)} data-cursor="signal" aria-label="Open quick navigation">
         <span>DECK</span><kbd>⌘K</kbd>
       </button>
       <AnimatePresence>
         {open && (
           <motion.div className="operator-deck" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <button className="deck-backdrop" onClick={() => setOpen(false)} aria-label="Close operator deck" />
+            <button className="deck-backdrop" onClick={() => setOpen(false)} aria-label="Close quick navigation" />
             <motion.div
               ref={panelRef}
               className="deck-panel"
               role="dialog"
               aria-modal="true"
-              aria-label="Aura System operator deck"
-              initial={{ opacity: 0, scale: .965, y: 18 }}
+              aria-label="Quick navigation"
+              initial={{ opacity: 0, scale: .97, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: .98, y: 10 }}
+              exit={{ opacity: 0, scale: .985, y: 8 }}
               transition={{ duration: .24, ease: [0.22, 1, 0.36, 1] }}
             >
               <header className="deck-head">
-                <div><span>ADHAM / AURA SYSTEM</span><b>OPERATOR DECK</b></div>
-                <div className="deck-status"><i /><span>{quality.toUpperCase()} QUALITY</span><span>{visited.length}/{projects.length} WORLDS SEEN</span></div>
+                <div><span>ADHAM MAHMOOD</span><b>QUICK NAVIGATION</b></div>
+                <div className="deck-status"><i /><span>{quality.toUpperCase()} RENDER</span><span>{visited.length}/{projects.length} PROJECTS SEEN</span></div>
               </header>
               <label className="deck-search">
                 <span>⌕</span>
-                <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search systems…" />
+                <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search projects or sections…" />
                 <kbd>ESC</kbd>
               </label>
 
               <div className="deck-grid">
                 <section>
-                  <div className="deck-label">NAVIGATE</div>
+                  <div className="deck-label">GO TO</div>
                   {navigation.map(([label, selector], index) => (
                     <button key={selector} onClick={() => go(selector)}><span>{String(index + 1).padStart(2, "0")}</span><b>{label}</b><em>↘</em></button>
                   ))}
                 </section>
                 <section>
-                  <div className="deck-label">AURA STATE</div>
+                  <div className="deck-label">VISUAL MODE</div>
                   {auraModes.map((mode) => (
                     <button key={mode.id} className={aura === mode.id ? "active" : ""} onClick={() => onAura(mode.id)}><span>●</span><b>{mode.label}</b><em>{mode.note}</em></button>
                   ))}
-                  <button className={xray ? "active" : ""} onClick={onXray}><span>⌁</span><b>XRAY</b><em>{xray ? "EXPOSED" : "SEALED"}</em></button>
+                  <button className={xray ? "active" : ""} onClick={onXray}><span>⌁</span><b>XRAY</b><em>{xray ? "ON" : "OFF"}</em></button>
                 </section>
               </div>
 
               <section className="deck-projects">
-                <div className="deck-label">SYSTEMS / PROJECT WORLDS</div>
+                <div className="deck-label">PROJECTS</div>
                 <div>
                   {filteredProjects.map((project) => (
                     <button key={project.id} onClick={() => { setOpen(false); onProject(project); }}>
                       <span className={`deck-orb orb-${project.accent}`} />
                       <b>{project.name}</b>
                       <small>{project.kind}</small>
-                      <em>{visited.includes(project.id) ? "SEEN" : project.state.toUpperCase()}</em>
+                      <em>{visited.includes(project.id) ? "SEEN" : project.state === "verified" ? "LIVE" : project.state.toUpperCase()}</em>
                     </button>
                   ))}
-                  {filteredProjects.length === 0 && <p className="deck-empty">NO SIGNAL MATCHED.</p>}
+                  {filteredProjects.length === 0 && <p className="deck-empty">Nothing matched.</p>}
                 </div>
               </section>
 
-              <footer className="deck-foot"><span>/ opens deck</span><span>A cycles aura</span><span>X toggles XRAY</span><span>Everything here is keyboard reachable.</span></footer>
+              <footer className="deck-foot"><span>/ opens this</span><span>A changes visual mode</span><span>X toggles XRAY</span><span>Everything here is keyboard reachable.</span></footer>
             </motion.div>
           </motion.div>
         )}

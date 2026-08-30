@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import type { AuraMode } from "@/data/site";
 
 const soundProfiles: Record<AuraMode, { frequencies: number[]; types: OscillatorType[]; filter: number; q: number; lfo: number; lfoDepth: number; gain: number }> = {
-  pulse: { frequencies: [55, 82.41, 110], types: ["sine", "triangle", "sine"], filter: 480, q: .7, lfo: .12, lfoDepth: 42, gain: .016 },
-  forge: { frequencies: [48.99, 73.42, 98], types: ["triangle", "sawtooth", "sine"], filter: 360, q: 1.4, lfo: .2, lfoDepth: 88, gain: .014 },
-  void: { frequencies: [41.2, 61.74, 82.41], types: ["sine", "sine", "triangle"], filter: 220, q: .45, lfo: .045, lfoDepth: 24, gain: .008 },
+  pulse: { frequencies: [55, 82.41, 110], types: ["sine", "triangle", "sine"], filter: 430, q: .62, lfo: .09, lfoDepth: 30, gain: .012 },
+  forge: { frequencies: [48.99, 73.42, 98], types: ["triangle", "sine", "sine"], filter: 330, q: 1.08, lfo: .13, lfoDepth: 54, gain: .011 },
+  void: { frequencies: [41.2, 61.74, 82.41], types: ["sine", "sine", "triangle"], filter: 210, q: .4, lfo: .035, lfoDepth: 18, gain: .006 },
 };
 
 export default function Soundscape({ aura }: { aura: AuraMode }) {
@@ -31,17 +31,17 @@ export default function Soundscape({ aura }: { aura: AuraMode }) {
     nodesRef.current.forEach((node, index) => {
       node.type = profile.types[index];
       node.frequency.cancelScheduledValues(ctx.currentTime);
-      node.frequency.exponentialRampToValueAtTime(profile.frequencies[index], ctx.currentTime + 1.35);
+      node.frequency.exponentialRampToValueAtTime(profile.frequencies[index], ctx.currentTime + 1.5);
     });
     if (filterRef.current) {
       filterRef.current.frequency.cancelScheduledValues(ctx.currentTime);
-      filterRef.current.frequency.exponentialRampToValueAtTime(profile.filter, ctx.currentTime + 1.2);
-      filterRef.current.Q.setTargetAtTime(profile.q, ctx.currentTime, .5);
+      filterRef.current.frequency.exponentialRampToValueAtTime(profile.filter, ctx.currentTime + 1.35);
+      filterRef.current.Q.setTargetAtTime(profile.q, ctx.currentTime, .6);
     }
-    if (lfoRef.current) lfoRef.current.frequency.setTargetAtTime(profile.lfo, ctx.currentTime, .45);
-    if (lfoGainRef.current) lfoGainRef.current.gain.setTargetAtTime(profile.lfoDepth, ctx.currentTime, .45);
-    if (on && gainRef.current) gainRef.current.gain.exponentialRampToValueAtTime(profile.gain, ctx.currentTime + .9);
-    window.dispatchEvent(new CustomEvent("aura:signal", { detail: `AUDIO / ${aura.toUpperCase()} / PROFILE MORPHED` }));
+    if (lfoRef.current) lfoRef.current.frequency.setTargetAtTime(profile.lfo, ctx.currentTime, .55);
+    if (lfoGainRef.current) lfoGainRef.current.gain.setTargetAtTime(profile.lfoDepth, ctx.currentTime, .55);
+    if (on && gainRef.current) gainRef.current.gain.exponentialRampToValueAtTime(profile.gain, ctx.currentTime + 1.1);
+    window.dispatchEvent(new CustomEvent("aura:signal", { detail: `SOUND CHANGED · ${aura.toUpperCase()}` }));
   }, [aura, on]);
 
   const toggle = async () => {
@@ -67,7 +67,7 @@ export default function Soundscape({ aura }: { aura: AuraMode }) {
         const localGain = ctx.createGain();
         osc.type = profile.types[index];
         osc.frequency.value = frequency;
-        localGain.gain.value = index === 0 ? .34 : index === 1 ? .11 : .08;
+        localGain.gain.value = index === 0 ? .32 : index === 1 ? .1 : .07;
         osc.connect(localGain).connect(gain);
         osc.start();
         return osc;
@@ -85,15 +85,15 @@ export default function Soundscape({ aura }: { aura: AuraMode }) {
     const gain = gainRef.current;
     if (gain && ctxRef.current) {
       gain.gain.cancelScheduledValues(ctxRef.current.currentTime);
-      gain.gain.exponentialRampToValueAtTime(next ? soundProfiles[aura].gain : .0001, ctxRef.current.currentTime + .8);
+      gain.gain.exponentialRampToValueAtTime(next ? soundProfiles[aura].gain : .0001, ctxRef.current.currentTime + .9);
     }
-    window.dispatchEvent(new CustomEvent("aura:signal", { detail: next ? `AUDIO / ${aura.toUpperCase()} / ONLINE` : "AUDIO / MUTED" }));
+    window.dispatchEvent(new CustomEvent("aura:signal", { detail: next ? `SOUND ON · ${aura.toUpperCase()}` : "SOUND OFF" }));
   };
 
   return (
     <button className={on ? "sound-toggle sound-on" : "sound-toggle"} onClick={toggle} aria-pressed={on} data-cursor="signal">
       <span className="sound-bars"><i /><i /><i /><i /></span>
-      {on ? `AUDIO / ${aura.toUpperCase()}` : "AURA AUDIO OFF"}
+      {on ? `SOUND · ${aura.toUpperCase()}` : "SOUND OFF"}
     </button>
   );
 }

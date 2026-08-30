@@ -1,9 +1,9 @@
 "use client";
 
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import WorldEngine from "@/components/WorldEngine";
-import type { Project } from "@/data/site";
+import type { Project, StageState } from "@/data/site";
 
 const entryMasks: Record<string, string> = {
   foundry180: "inset(47% 6% 47% 6% round 26px)",
@@ -13,26 +13,26 @@ const entryMasks: Record<string, string> = {
   nova: "circle(3% at 72% 42%)",
 };
 
-const activeMasks: Record<string, string> = {
-  foundry180: "inset(0% 0% 0% 0% round 0px)",
-  "aura-system": "circle(150% at 50% 50%)",
-  zeroupload: "inset(0% 0% 0% 0% round 0px)",
-  windowbiome: "inset(0% 0% 0% 0% round 0px)",
-  nova: "circle(150% at 72% 42%)",
-};
+function statusLabel(state: StageState) {
+  if (state === "verified") return "LIVE";
+  if (state === "active") return "IN PROGRESS";
+  if (state === "building") return "BUILDING";
+  if (state === "next") return "NEXT";
+  return "FUTURE";
+}
 
 export default function ProjectPortal({ project, onClose }: { project: Project | null; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const [shareState, setShareState] = useState("SHARE SYSTEM");
+  const [shareState, setShareState] = useState("SHARE");
 
   useEffect(() => {
-    setShareState("SHARE SYSTEM");
+    setShareState("SHARE");
     if (!project) return;
     const previousFocus = document.activeElement as HTMLElement | null;
     document.body.classList.add("portal-open");
     document.documentElement.dataset.portal = project.id;
-    window.dispatchEvent(new CustomEvent("aura:signal", { detail: `ENTER / ${project.name.toUpperCase()} / WORLD LOCK` }));
+    window.dispatchEvent(new CustomEvent("aura:signal", { detail: `OPENED · ${project.name.toUpperCase()}` }));
     const focusTimer = window.setTimeout(() => closeRef.current?.focus(), 80);
 
     const onKey = (event: KeyboardEvent) => {
@@ -43,9 +43,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
       }
       if (event.key !== "Tab" || !stageRef.current) return;
       const focusable = Array.from(
-        stageRef.current.querySelectorAll<HTMLElement>(
-          'a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])',
-        ),
+        stageRef.current.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])'),
       ).filter((element) => !element.hasAttribute("disabled"));
       if (focusable.length === 0) return;
       const first = focusable[0];
@@ -91,7 +89,7 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
         }
       }
     }
-    window.setTimeout(() => setShareState("SHARE SYSTEM"), 1700);
+    window.setTimeout(() => setShareState("SHARE"), 1700);
   };
 
   return (
@@ -102,18 +100,18 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.24 }}
+          transition={{ duration: .24 }}
           role="dialog"
           aria-modal="true"
-          aria-label={`${project.name} case study`}
+          aria-label={`${project.name} project`}
         >
           <motion.div
             ref={stageRef}
             className="portal-stage"
             initial={{ clipPath: entryMasks[project.id] || "inset(48% 48% 48% 48% round 40px)" }}
-            animate={{ clipPath: activeMasks[project.id] || "inset(0% 0% 0% 0% round 0px)" }}
+            animate={{ clipPath: "inset(0% 0% 0% 0% round 0px)" }}
             exit={{ clipPath: entryMasks[project.id] || "inset(48% 48% 48% 48% round 40px)" }}
-            transition={{ duration: project.id === "nova" ? 1.05 : .74, ease: project.id === "foundry180" ? [0.16, 1, 0.3, 1] : [0.22, 1, 0.36, 1] }}
+            transition={{ duration: project.id === "nova" ? .92 : .68, ease: project.id === "foundry180" ? [0.16, 1, 0.3, 1] : [0.22, 1, 0.36, 1] }}
           >
             <div className="portal-grid" />
             <div className="portal-orbit orbit-a" />
@@ -123,35 +121,35 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
             <header className="portal-nav">
               <span>{project.chapter}</span>
               <div className="portal-nav-actions">
-                <button onClick={share} data-cursor="signal">{shareState} <b>↗</b></button>
+                <button onClick={share} data-cursor="signal">{shareState}</button>
                 <button ref={closeRef} onClick={onClose} data-cursor="open">CLOSE <b>×</b></button>
               </div>
             </header>
 
             <div className="portal-scroll">
               <section className="portal-hero">
-                <span className="portal-kicker">{project.kind} / {project.state.toUpperCase()}</span>
+                <span className="portal-kicker">{project.kind} · {statusLabel(project.state)}</span>
                 <h2>{project.name}</h2>
                 <p>{project.oneLine}</p>
                 <div className="portal-actions">
-                  {project.live && <a href={project.live} target="_blank" rel="noreferrer">LIVE SYSTEM ↗</a>}
-                  {project.repo && <a href={project.repo} target="_blank" rel="noreferrer">SOURCE ↗</a>}
+                  {project.live && <a href={project.live} target="_blank" rel="noreferrer">OPEN LIVE ↗</a>}
+                  {project.repo && <a href={project.repo} target="_blank" rel="noreferrer">VIEW SOURCE ↗</a>}
                 </div>
               </section>
 
               <section className="portal-world-lab">
-                <div className="portal-section-label">WORLD / INTERACTIVE MODEL</div>
+                <div className="portal-section-label">INTERACTIVE MODEL</div>
                 <WorldEngine project={project} />
               </section>
 
               <section className="portal-dossier">
-                <div><span>01 / PROBLEM</span><p>{project.problem}</p></div>
-                <div><span>02 / CONSTRAINT</span><p>{project.constraint}</p></div>
-                <div><span>03 / DECISION</span><p>{project.decision}</p></div>
+                <div><span>THE PROBLEM</span><p>{project.problem}</p></div>
+                <div><span>THE CONSTRAINT</span><p>{project.constraint}</p></div>
+                <div><span>THE DECISION</span><p>{project.decision}</p></div>
               </section>
 
               <section className="portal-architecture">
-                <div className="portal-section-label">SYSTEM / ARCHITECTURE</div>
+                <div className="portal-section-label">HOW IT&apos;S BUILT</div>
                 <div className="architecture-chain">
                   {project.architecture.map((item, index) => (
                     <div className="architecture-node" key={item}>
@@ -165,25 +163,25 @@ export default function ProjectPortal({ project, onClose }: { project: Project |
 
               <section className="portal-field-notes">
                 <article>
-                  <span>ENGINEERING PRINCIPLE</span>
+                  <span>WHAT I LEARNED</span>
                   <p>{project.principle}</p>
                 </article>
                 <article>
-                  <span>NEXT VECTOR</span>
+                  <span>WHAT&apos;S NEXT</span>
                   <p>{project.next}</p>
                 </article>
               </section>
 
               <section className="portal-proof">
-                <div className="portal-section-label">PROOF / WHAT EXISTS</div>
+                <div className="portal-section-label">WHAT EXISTS</div>
                 <div className="proof-cloud">
                   {project.proof.map((item, index) => (
                     <motion.div
                       key={item}
-                      initial={{ opacity: 0, y: 30 }}
+                      initial={{ opacity: 0, y: 24 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-10%" }}
-                      transition={{ delay: index * 0.06 }}
+                      transition={{ delay: index * .05 }}
                     >
                       <span>0{index + 1}</span>{item}
                     </motion.div>
