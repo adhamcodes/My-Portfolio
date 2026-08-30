@@ -1,23 +1,42 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { projects } from "@/data/site";
 
-export default function DiscoveryProtocol({ mapped, total }: { mapped: number; total: number }) {
+export default function DiscoveryProtocol() {
   const [active, setActive] = useState(false);
+  const unlocked = useRef(false);
 
   useEffect(() => {
-    if (!total || mapped < total) return;
-    try {
-      if (localStorage.getItem("adham:familiarity-complete") === "1") return;
-      localStorage.setItem("adham:familiarity-complete", "1");
-    } catch {}
-    setActive(true);
-    window.dispatchEvent(new CustomEvent("aura:signal", { detail: "SYSTEM FAMILIARITY / 100% / ALL WORLDS MAPPED" }));
-    window.dispatchEvent(new CustomEvent("aura:burst"));
-    const timer = window.setTimeout(() => setActive(false), 4200);
-    return () => window.clearTimeout(timer);
-  }, [mapped, total]);
+    const unlock = () => {
+      if (unlocked.current) return;
+      try {
+        if (localStorage.getItem("adham:familiarity-complete") === "1") {
+          unlocked.current = true;
+          return;
+        }
+        const seen = JSON.parse(localStorage.getItem("adham:visited-worlds") || "[]") as unknown;
+        if (!Array.isArray(seen) || seen.length < projects.length) return;
+        localStorage.setItem("adham:familiarity-complete", "1");
+      } catch {
+        return;
+      }
+      unlocked.current = true;
+      setActive(true);
+      window.dispatchEvent(new CustomEvent("aura:signal", { detail: "SYSTEM FAMILIARITY / 100% / ALL WORLDS MAPPED" }));
+      window.dispatchEvent(new CustomEvent("aura:burst"));
+      window.setTimeout(() => setActive(false), 4200);
+    };
+
+    unlock();
+    const onSignal = (event: Event) => {
+      const value = (event as CustomEvent<string>).detail || "";
+      if (value.startsWith("MEMORY /")) window.setTimeout(unlock, 0);
+    };
+    window.addEventListener("aura:signal", onSignal as EventListener);
+    return () => window.removeEventListener("aura:signal", onSignal as EventListener);
+  }, []);
 
   return (
     <AnimatePresence>
