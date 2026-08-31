@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 const destinations = [
   { id: "now", label: "NOW", detail: "Current frame" },
   { id: "work", label: "WORK", detail: "Featured work" },
-  { id: "growth", label: "GROWTH", detail: "Software engineering · AI/ML · Automation" },
+  { id: "growth", label: "GROWTH", detail: "Learning and direction" },
   { id: "history", label: "HISTORY", detail: "Earlier work and preserved change" },
   { id: "present", label: "CONTACT", detail: "The present frame" },
 ] as const;
@@ -26,6 +26,12 @@ function focusableWithin(node: HTMLElement | null) {
   ));
 }
 
+function mapChapter(chapter: string | undefined) {
+  if (chapter === "human") return "now";
+  if (chapter === "present") return "present";
+  return destinations.some((item) => item.id === chapter) ? chapter : "now";
+}
+
 export default function Index() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("now");
@@ -34,10 +40,11 @@ export default function Index() {
   const hasOpened = useRef(false);
 
   useEffect(() => {
+    setCurrent(mapChapter(document.documentElement.dataset.chapter));
+
     const onChapter = (event: Event) => {
       const chapter = (event as CustomEvent<string>).detail;
-      const mapped = chapter === "human" ? "now" : chapter === "present" ? "present" : chapter;
-      if (destinations.some((item) => item.id === mapped)) setCurrent(mapped);
+      setCurrent(mapChapter(chapter));
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -99,10 +106,11 @@ export default function Index() {
   }, [open]);
 
   const travel = (id: string) => {
+    const reduced = document.documentElement.dataset.motionMode === "reduced";
     setOpen(false);
-    requestAnimationFrame(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    }));
   };
 
   return (
@@ -120,9 +128,13 @@ export default function Index() {
       </button>
 
       {open && (
-        <div className="index-layer" role="presentation" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) setOpen(false);
-        }}>
+        <div
+          className="index-layer"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setOpen(false);
+          }}
+        >
           <div
             ref={dialogRef}
             id="world-index"
@@ -132,8 +144,10 @@ export default function Index() {
             aria-label="Portfolio index"
           >
             <div className="index-heading">
-              <p>THE WORLD / CURRENT STRUCTURE</p>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close index">CLOSE <span aria-hidden="true">ESC</span></button>
+              <p>INDEX</p>
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close index">
+                CLOSE <span aria-hidden="true">ESC</span>
+              </button>
             </div>
 
             <nav className="index-map" aria-label="Portfolio destinations">
@@ -156,8 +170,6 @@ export default function Index() {
                 </a>
               ))}
             </nav>
-
-            <p className="index-footnote">The map stays simple. The world around it can be strange.</p>
           </div>
         </div>
       )}
