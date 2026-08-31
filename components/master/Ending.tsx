@@ -23,7 +23,7 @@ export default function Ending() {
         <i />
       </div>
 
-      <div className="ending-contact">
+      <div id="contact" className="ending-contact">
         <div>
           <p>ADHAM MAHMOOD</p>
           <span>Software engineering → AI/ML engineering</span>
