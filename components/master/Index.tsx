@@ -26,10 +26,11 @@ function focusableWithin(node: HTMLElement | null) {
   ));
 }
 
-function mapChapter(chapter: string | undefined) {
+function mapChapter(chapter: string | undefined): string {
   if (chapter === "human") return "now";
   if (chapter === "present") return "present";
-  return destinations.some((item) => item.id === chapter) ? chapter : "now";
+  if (chapter && destinations.some((item) => item.id === chapter)) return chapter;
+  return "now";
 }
 
 export default function Index() {
