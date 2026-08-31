@@ -8,7 +8,7 @@ const destinations = [
   { id: "work", label: "WORK", detail: "Featured work" },
   { id: "growth", label: "GROWTH", detail: "Learning and direction" },
   { id: "history", label: "HISTORY", detail: "Earlier work and preserved change" },
-  { id: "present", label: "CONTACT", detail: "The present frame" },
+  { id: "contact", label: "CONTACT", detail: "Professional contact" },
 ] as const;
 
 function isTypingTarget(target: EventTarget | null) {
@@ -29,7 +29,7 @@ function focusableWithin(node: HTMLElement | null) {
 
 function mapChapter(chapter: string | undefined): string {
   if (chapter === "human") return "now";
-  if (chapter === "present") return "present";
+  if (chapter === "present") return "contact";
   if (chapter && destinations.some((item) => item.id === chapter)) return chapter;
   return "now";
 }
