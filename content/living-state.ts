@@ -1,5 +1,5 @@
 import type { GrowthTrack, PublicLivingState } from "@/core/contracts";
-import { featuredWork, growthTracks } from "./master";
+import { allPublicWork, growthTracks } from "./master";
 
 const growth: GrowthTrack[] = growthTracks.map((track) => ({
   id: track.id,
@@ -17,6 +17,7 @@ const growth: GrowthTrack[] = growthTracks.map((track) => ({
 /**
  * Current public truth used by Master 2.0 before external event sources are connected.
  * Nothing here implies learning progress that has not actually happened.
+ * Undated archive material lives in work state; dated history events remain empty until verified.
  */
 export function createCurrentLivingState(now: string): PublicLivingState {
   return {
@@ -30,7 +31,7 @@ export function createCurrentLivingState(now: string): PublicLivingState {
       },
     ],
     growth,
-    work: featuredWork,
+    work: allPublicWork,
     history: [],
   };
 }
