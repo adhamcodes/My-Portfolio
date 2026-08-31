@@ -9,6 +9,7 @@ export default function WorkEncounter() {
     <section
       id="work"
       data-chapter="work"
+      data-world="zeroupload"
       className="master-scene work-encounter"
       aria-labelledby="work-title"
     >
