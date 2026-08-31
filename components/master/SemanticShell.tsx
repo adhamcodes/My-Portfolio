@@ -1,4 +1,5 @@
 import Hero from "@/components/master/Hero";
+import HumanStory from "@/components/master/HumanStory";
 import Index from "@/components/master/Index";
 import LivingTrace from "@/components/master/LivingTrace";
 import { featuredWork, growthTracks, historyEntries, masterIdentity } from "@/content/master";
@@ -26,14 +27,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
       <Hero />
 
       <div id="main-story">
-        <section id="now" data-chapter="human" className="master-scene master-human" aria-labelledby="now-title">
-          <p className="master-number">01 / NOW</p>
-          <h2 id="now-title">NOT A STATIC PERSON.</h2>
-          <div className="master-reading">
-            <p>I am rebuilding deliberately: software foundations first, then deeper systems work, with AI/ML as the long-term engineering direction.</p>
-            <p>{masterIdentity.currentFrame}</p>
-          </div>
-        </section>
+        <HumanStory />
 
         <section id="work" data-chapter="work" className="master-scene" aria-labelledby="work-title">
           <p className="master-number">02 / WORK</p>
