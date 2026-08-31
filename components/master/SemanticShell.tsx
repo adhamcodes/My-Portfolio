@@ -6,6 +6,7 @@ import HumanStory from "@/components/master/HumanStory";
 import Index from "@/components/master/Index";
 import QuietEncounter from "@/components/master/QuietEncounter";
 import WorkEncounter from "@/components/master/WorkEncounter";
+import { launchGates } from "@/content/master";
 
 type SemanticShellProps = {
   preview?: boolean;
@@ -31,7 +32,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
       <div id="main-story" tabIndex={-1}>
         <HumanStory />
         <WorkEncounter />
-        <QuietEncounter />
+        {launchGates.quiet && <QuietEncounter />}
         <GrowthChapter />
         <HistoryChapter />
         <Ending />
