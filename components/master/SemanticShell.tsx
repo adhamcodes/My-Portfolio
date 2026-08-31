@@ -4,7 +4,6 @@ import Hero from "@/components/master/Hero";
 import HistoryChapter from "@/components/master/HistoryChapter";
 import HumanStory from "@/components/master/HumanStory";
 import Index from "@/components/master/Index";
-import LivingTrace from "@/components/master/LivingTrace";
 import WorkEncounter from "@/components/master/WorkEncounter";
 
 type SemanticShellProps = {
@@ -14,7 +13,6 @@ type SemanticShellProps = {
 export default function SemanticShell({ preview = false }: SemanticShellProps) {
   return (
     <main className="master-shell">
-      <LivingTrace />
       <a className="master-skip" href="#main-story">Skip to story</a>
 
       <header className="master-header">
