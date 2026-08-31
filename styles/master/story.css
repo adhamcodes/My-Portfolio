@@ -1,0 +1,115 @@
+.human-story {
+  position: relative;
+  min-height: 128svh;
+  padding-top: clamp(7rem, 15vw, 14rem);
+  padding-bottom: clamp(7rem, 15vw, 14rem);
+  border-top-color: rgba(242,239,233,.07);
+}
+
+.human-story-monument {
+  position: relative;
+  z-index: 2;
+  width: min(78rem, 92%);
+}
+
+.human-story-monument h2 {
+  margin: 0;
+  font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+  font-size: clamp(4.6rem, 10.4vw, 10.5rem);
+  font-weight: 680;
+  line-height: .75;
+  letter-spacing: -.082em;
+}
+
+.human-story-monument h2 span {
+  display: block;
+  width: max-content;
+}
+
+.human-story-monument h2 span:nth-child(2) {
+  margin-left: clamp(2.5rem, 12vw, 12rem);
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(242,239,233,.34);
+}
+
+.human-story-monument h2 span:nth-child(3) {
+  margin-left: clamp(.8rem, 4vw, 4rem);
+}
+
+.human-story-beats {
+  position: relative;
+  z-index: 3;
+  width: min(56rem, 64vw);
+  margin: clamp(6rem, 13vw, 13rem) 0 0 auto;
+}
+
+.human-story-beats article {
+  display: grid;
+  grid-template-columns: minmax(5rem, .28fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(1.5rem, 3vw, 2.8rem) 0;
+  border-top: 1px solid rgba(242,239,233,.12);
+}
+
+.human-story-beats article:last-child {
+  border-bottom: 1px solid rgba(242,239,233,.08);
+}
+
+.human-story-beats span {
+  padding-top: .22rem;
+  color: var(--adham-ink-muted);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: .7rem;
+  letter-spacing: .14em;
+}
+
+.human-story-beats p {
+  max-width: 34ch;
+  margin: 0;
+  color: rgba(225,220,213,.82);
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: clamp(1.35rem, 2.2vw, 2.15rem);
+  line-height: 1.24;
+  letter-spacing: -.024em;
+}
+
+@media (max-width: 820px) {
+  .human-story {
+    min-height: auto;
+    padding-top: 8rem;
+    padding-bottom: 9rem;
+  }
+
+  .human-story-monument {
+    width: 100%;
+  }
+
+  .human-story-monument h2 {
+    font-size: clamp(4rem, 18vw, 7rem);
+    line-height: .78;
+  }
+
+  .human-story-monument h2 span:nth-child(2) {
+    margin-left: 8vw;
+  }
+
+  .human-story-monument h2 span:nth-child(3) {
+    margin-left: 0;
+  }
+
+  .human-story-beats {
+    width: 100%;
+    margin-top: 7rem;
+  }
+
+  .human-story-beats article {
+    grid-template-columns: 1fr;
+    gap: .75rem;
+    padding: 1.7rem 0;
+  }
+
+  .human-story-beats p {
+    max-width: 27ch;
+    font-size: clamp(1.35rem, 6vw, 1.75rem);
+  }
+}
