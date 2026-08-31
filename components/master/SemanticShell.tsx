@@ -1,3 +1,4 @@
+import Ending from "@/components/master/Ending";
 import GrowthChapter from "@/components/master/GrowthChapter";
 import Hero from "@/components/master/Hero";
 import HistoryChapter from "@/components/master/HistoryChapter";
@@ -5,7 +6,6 @@ import HumanStory from "@/components/master/HumanStory";
 import Index from "@/components/master/Index";
 import LivingTrace from "@/components/master/LivingTrace";
 import WorkEncounter from "@/components/master/WorkEncounter";
-import { masterIdentity } from "@/content/master";
 
 type SemanticShellProps = {
   preview?: boolean;
@@ -34,16 +34,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
         <WorkEncounter />
         <GrowthChapter />
         <HistoryChapter />
-
-        <section id="present" data-chapter="present" className="master-scene master-present" aria-labelledby="present-title">
-          <p className="master-number">05 / PRESENT</p>
-          <h2 id="present-title">THIS IS THE CURRENT FRAME.</h2>
-          <p>The structure continues beyond what exists today. Future work and growth should enter because reality changed, not because the layout needs filling.</p>
-          <div className="master-contact">
-            <a href={masterIdentity.github}>GitHub <span aria-hidden="true">↗</span></a>
-            {preview && <span>Work email connects at the final contact pass.</span>}
-          </div>
-        </section>
+        <Ending />
       </div>
     </main>
   );
