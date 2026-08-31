@@ -5,6 +5,7 @@ import ExperienceDirector from "@/components/master/ExperienceDirector";
 import LivingTrace from "@/components/master/LivingTrace";
 import SoundDirector from "@/components/master/SoundDirector";
 import TravelDirector from "@/components/master/TravelDirector";
+import { masterIdentity } from "@/content/master";
 import "@/styles/master/tokens.css";
 import "@/styles/master/base.css";
 import "@/styles/master/shell.css";
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
   applicationName: "Adham Mahmood",
-  authors: [{ name: "Adham Mahmood", url: "https://github.com/adhamcodes" }],
+  authors: [{ name: "Adham Mahmood", url: masterIdentity.github }],
   creator: "Adham Mahmood",
   openGraph: {
     title: "Adham Mahmood — Current Frame",
@@ -90,9 +91,10 @@ const structuredData = {
     {
       "@type": "Person",
       "@id": `${siteUrl}/#person`,
-      name: "Adham Mahmood",
+      name: masterIdentity.name,
       url: `${siteUrl}/`,
-      sameAs: ["https://github.com/adhamcodes"],
+      email: `mailto:${masterIdentity.workEmail}`,
+      sameAs: [masterIdentity.github],
     },
     {
       "@type": "WebSite",
