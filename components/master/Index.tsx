@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { masterIdentity } from "@/content/master";
 
 const destinations = [
   { id: "now", label: "NOW", detail: "Current frame" },
@@ -171,6 +172,16 @@ export default function Index() {
                 </a>
               ))}
             </nav>
+
+            <a
+              className="index-external"
+              href={masterIdentity.github}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span>GITHUB ↗</span>
+              <small>Workshop / archive</small>
+            </a>
           </div>
         </div>
       )}
