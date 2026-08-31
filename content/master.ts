@@ -9,6 +9,14 @@ export const masterIdentity = {
   github: "https://github.com/adhamcodes",
 } as const;
 
+/**
+ * Launch gates are explicit truth controls, not design toggles.
+ * A gated item can be fully built without being presented as public featured evidence.
+ */
+export const launchGates = {
+  quiet: false,
+} as const;
+
 export const featuredWork: WorkEntry[] = [
   {
     id: "zeroupload",
@@ -32,6 +40,11 @@ export const featuredWork: WorkEntry[] = [
   },
 ];
 
+export const publicFeaturedWork = featuredWork.filter((work) => {
+  if (work.id === "quiet") return launchGates.quiet;
+  return true;
+});
+
 export const historicalWork: WorkEntry[] = [
   {
     id: "nova",
@@ -44,7 +57,7 @@ export const historicalWork: WorkEntry[] = [
   },
 ];
 
-export const allPublicWork: WorkEntry[] = [...featuredWork, ...historicalWork];
+export const allPublicWork: WorkEntry[] = [...publicFeaturedWork, ...historicalWork];
 
 export const growthTracks = [
   {
