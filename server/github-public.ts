@@ -15,6 +15,7 @@ type GitHubPublicEvent = {
 };
 
 const PUBLIC_EVENTS_URL = "https://api.github.com/users/adhamcodes/events/public?per_page=30";
+const PUBLIC_EVENTS_TIMEOUT_MS = 2200;
 
 function repositoryLabel(name?: string) {
   if (!name) return undefined;
@@ -80,8 +81,8 @@ function normalize(event: GitHubPublicEvent): LivingEvent[] {
 }
 
 /**
- * Public GitHub is enrichment, never canonical identity storage. Failure here must
- * leave the portfolio truthful and usable rather than inventing or retaining stale facts.
+ * Public GitHub is enrichment, never canonical identity storage. Failure or latency
+ * here must leave the portfolio truthful and usable rather than block the core page.
  */
 export async function getPublicGitHubCodeEvents(): Promise<LivingEvent[]> {
   try {
@@ -91,6 +92,7 @@ export async function getPublicGitHubCodeEvents(): Promise<LivingEvent[]> {
         "User-Agent": "adham-portfolio-living-state",
         "X-GitHub-Api-Version": "2022-11-28",
       },
+      signal: AbortSignal.timeout(PUBLIC_EVENTS_TIMEOUT_MS),
       next: { revalidate: 900 },
     });
 
