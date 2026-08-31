@@ -27,7 +27,12 @@
     radial-gradient(circle at 65% 42%, rgba(210,79,130,.11), transparent 28%),
     radial-gradient(circle at 71% 55%, rgba(127,168,183,.055), transparent 25%);
   filter: blur(24px);
+  transform: scale(1);
   pointer-events: none;
+  transition:
+    filter 1.2s var(--adham-ease-response),
+    transform 1.4s var(--adham-ease-transform),
+    opacity 1.2s linear;
 }
 
 .living-trace::after {
@@ -49,13 +54,13 @@
 }
 
 .living-trace-static {
-  opacity: 0.34;
+  opacity: .34;
   filter: drop-shadow(0 0 12px rgba(210,79,130,.08));
   transition: opacity var(--adham-duration-settle) var(--adham-ease-response);
 }
 
 .living-trace[data-ready="true"] .living-trace-static {
-  opacity: 0.035;
+  opacity: .035;
 }
 
 .living-trace-canvas {
@@ -72,23 +77,33 @@
 }
 
 .trace-static-main {
-  stroke: rgba(228, 201, 212, 0.78);
+  stroke: rgba(228,201,212,.78);
   stroke-width: 2.2;
 }
 
 .trace-static-work {
-  stroke: rgba(152, 184, 191, 0.5);
+  stroke: rgba(152,184,191,.5);
   stroke-width: 1.45;
 }
 
 .trace-static-growth {
-  stroke: rgba(192, 145, 87, 0.32);
+  stroke: rgba(192,145,87,.32);
   stroke-width: 1.1;
   stroke-dasharray: 8 9;
 }
 
 html[data-render-tier="static-low"] .living-trace-static {
-  opacity: 0.52;
+  opacity: .52;
+}
+
+html[data-activity-energy="active"] .living-trace::before {
+  filter: blur(23px) saturate(1.06) brightness(1.04);
+  transform: scale(1.012);
+}
+
+html[data-activity-energy="energized"] .living-trace::before {
+  filter: blur(22px) saturate(1.13) brightness(1.08);
+  transform: scale(1.028);
 }
 
 html[data-chapter="growth"] .living-trace::before {
@@ -107,7 +122,7 @@ html[data-chapter="work"] .living-trace::before {
   from {
     opacity: 0;
     filter: blur(10px);
-    transform: scale(0.975);
+    transform: scale(.975);
   }
   to {
     opacity: 1;
@@ -136,6 +151,7 @@ html[data-chapter="work"] .living-trace::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .living-trace::before,
   .living-trace-static {
     transition: none;
   }
