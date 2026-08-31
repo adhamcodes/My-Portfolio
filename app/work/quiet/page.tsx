@@ -5,6 +5,7 @@ import QuietSoundscape from "@/components/worlds/QuietSoundscape";
 export const metadata: Metadata = {
   title: "Quiet",
   description: "A focus space built around generated ambient sound and a distraction-free Sanctuary.",
+  robots: { index: false, follow: false },
 };
 
 export default function QuietWorldPage() {
