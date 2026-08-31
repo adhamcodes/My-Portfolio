@@ -26,6 +26,8 @@ import "@/styles/master/mobile.css";
 import "@/styles/master/accessibility.css";
 import "@/styles/master/system.css";
 
+const siteUrl = "https://portfolio-adham-mu.vercel.app";
+
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-instrument",
@@ -45,28 +47,30 @@ const spaceMono = Space_Mono({
   display: "swap",
 });
 
+const description = "Software work, learning, and history — a living record that changes as the person does.";
+
 export const metadata: Metadata = {
   title: {
-    default: "Adham Mahmood — Evolving Portfolio",
+    default: "Adham Mahmood — Current Frame",
     template: "%s — Adham Mahmood",
   },
-  description: "An evolving record of software work, learning, and history.",
-  metadataBase: new URL("https://portfolio-adham-mu.vercel.app"),
+  description,
+  metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
   applicationName: "Adham Mahmood",
   authors: [{ name: "Adham Mahmood", url: "https://github.com/adhamcodes" }],
   creator: "Adham Mahmood",
   openGraph: {
-    title: "Adham Mahmood — Evolving Portfolio",
-    description: "An evolving record of software work, learning, and history.",
+    title: "Adham Mahmood — Current Frame",
+    description,
     type: "website",
     url: "/",
     siteName: "Adham Mahmood",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Adham Mahmood — Evolving Portfolio",
-    description: "An evolving record of software work, learning, and history.",
+    title: "Adham Mahmood — Current Frame",
+    description,
   },
   robots: { index: true, follow: true },
   icons: { icon: "/icon.svg" },
@@ -85,18 +89,18 @@ const structuredData = {
   "@graph": [
     {
       "@type": "Person",
-      "@id": "https://portfolio-adham-mu.vercel.app/#person",
+      "@id": `${siteUrl}/#person`,
       name: "Adham Mahmood",
-      url: "https://portfolio-adham-mu.vercel.app/",
+      url: `${siteUrl}/`,
       sameAs: ["https://github.com/adhamcodes"],
     },
     {
       "@type": "WebSite",
-      "@id": "https://portfolio-adham-mu.vercel.app/#website",
-      url: "https://portfolio-adham-mu.vercel.app/",
-      name: "Adham Mahmood — Evolving Portfolio",
-      description: "An evolving record of software work, learning, and history.",
-      author: { "@id": "https://portfolio-adham-mu.vercel.app/#person" },
+      "@id": `${siteUrl}/#website`,
+      url: `${siteUrl}/`,
+      name: "Adham Mahmood — Current Frame",
+      description,
+      author: { "@id": `${siteUrl}/#person` },
     },
   ],
 };
