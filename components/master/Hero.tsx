@@ -14,7 +14,7 @@ export default function Hero() {
       </div>
 
       <p className="hero-v2-thought">
-        I&apos;m rebuilding from the foundations, shipping what I learn, and letting the record change with me.
+        I&apos;m rebuilding from the foundations, turning what I learn into shipped work, and letting the record change with me.
       </p>
     </section>
   );
