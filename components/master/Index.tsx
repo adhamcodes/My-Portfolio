@@ -77,7 +77,13 @@ export default function Index() {
 
     hasOpened.current = true;
     const previousOverflow = document.body.style.overflow;
+    const background = [
+      document.querySelector<HTMLElement>(".hero-v2"),
+      document.getElementById("main-story"),
+    ].filter((node): node is HTMLElement => Boolean(node));
+
     document.body.style.overflow = "hidden";
+    for (const node of background) node.setAttribute("inert", "");
     requestAnimationFrame(() => focusableWithin(dialogRef.current)[0]?.focus());
 
     const onDialogKey = (event: KeyboardEvent) => {
@@ -103,6 +109,7 @@ export default function Index() {
     window.addEventListener("keydown", onDialogKey);
     return () => {
       document.body.style.overflow = previousOverflow;
+      for (const node of background) node.removeAttribute("inert");
       window.removeEventListener("keydown", onDialogKey);
     };
   }, [open]);
