@@ -1,0 +1,112 @@
+.master-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--adham-z-navigation);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 1rem;
+  min-height: 0;
+  padding: max(1.25rem, env(safe-area-inset-top)) var(--adham-page-gutter) 0;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+  pointer-events: none;
+  transition:
+    opacity var(--adham-duration-settle) var(--adham-ease-response),
+    transform var(--adham-duration-settle) var(--adham-ease-response);
+}
+
+.master-wordmark,
+.master-header-actions {
+  pointer-events: auto;
+}
+
+.master-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .42rem;
+  width: max-content;
+  padding: .45rem 0;
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: .68rem;
+  line-height: 1;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 18px rgba(5,5,6,.9);
+}
+
+.master-wordmark strong {
+  font-weight: 700;
+}
+
+.master-wordmark span {
+  color: rgba(183,179,173,.55);
+}
+
+.master-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .8rem;
+  text-shadow: 0 1px 18px rgba(5,5,6,.9);
+}
+
+.master-preview-tag {
+  color: rgba(124,121,117,.55);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: .58rem;
+  letter-spacing: .12em;
+}
+
+html[data-nav="retreat"] .master-header {
+  opacity: .24;
+  transform: translate3d(0, -45%, 0);
+}
+
+html[data-nav="retreat"] .master-header:hover,
+html[data-nav="retreat"] .master-header:focus-within,
+html[data-index-open="true"] .master-header {
+  opacity: 1;
+  transform: none;
+}
+
+html[data-world-travel="depart"] .master-header {
+  opacity: 0;
+  transform: translate3d(0, -35%, 0);
+}
+
+@media (max-width: 760px) {
+  .master-header {
+    padding-top: max(.9rem, env(safe-area-inset-top));
+  }
+
+  .master-wordmark {
+    font-size: .61rem;
+  }
+
+  .master-wordmark span {
+    display: none;
+  }
+
+  .master-preview-tag {
+    display: none;
+  }
+
+  html[data-nav="retreat"] .master-header {
+    opacity: .14;
+    transform: translate3d(0, -55%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .master-header {
+    transition: opacity 80ms linear;
+  }
+
+  html[data-nav="retreat"] .master-header {
+    transform: none;
+  }
+}
