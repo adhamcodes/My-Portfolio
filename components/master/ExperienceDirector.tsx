@@ -12,6 +12,7 @@ export default function ExperienceDirector() {
     const root = document.documentElement;
     const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-chapter]"));
     let currentChapter: ChapterId = "origin";
+    let currentWorld = "";
     let scrollRaf = 0;
     let settleTimer = 0;
     let lastY = window.scrollY;
@@ -25,9 +26,18 @@ export default function ExperienceDirector() {
       window.dispatchEvent(new CustomEvent<ChapterId>("adham:chapter", { detail: chapter }));
     };
 
+    const publishWorld = (world?: string) => {
+      const next = world ?? "";
+      if (next === currentWorld && (root.dataset.sceneWorld ?? "") === next) return;
+      currentWorld = next;
+      if (next) root.dataset.sceneWorld = next;
+      else delete root.dataset.sceneWorld;
+      window.dispatchEvent(new CustomEvent("adham:scene", { detail: { world: next || null } }));
+    };
+
     const resolveChapter = () => {
       const center = window.innerHeight * 0.5;
-      let best: { chapter: ChapterId; distance: number } | null = null;
+      let best: { chapter: ChapterId; distance: number; world?: string } | null = null;
 
       for (const section of sections) {
         const chapter = section.dataset.chapter;
@@ -35,10 +45,15 @@ export default function ExperienceDirector() {
         const rect = section.getBoundingClientRect();
         if (rect.bottom < -window.innerHeight * 0.35 || rect.top > window.innerHeight * 1.35) continue;
         const distance = Math.abs(rect.top + rect.height * 0.5 - center);
-        if (!best || distance < best.distance) best = { chapter, distance };
+        if (!best || distance < best.distance) {
+          best = { chapter, distance, world: section.dataset.world };
+        }
       }
 
-      if (best) publishChapter(best.chapter);
+      if (best) {
+        publishChapter(best.chapter);
+        publishWorld(best.world);
+      }
     };
 
     const publishVelocity = (value: number) => {
