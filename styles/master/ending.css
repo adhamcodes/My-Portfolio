@@ -122,12 +122,24 @@
   border-top: 1px solid rgba(242,239,233,.1);
 }
 
-.ending-contact > p {
+.ending-contact > div {
+  display: grid;
+  gap: .55rem;
+}
+
+.ending-contact > div > p {
   margin: 0;
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: .68rem;
   letter-spacing: .14em;
   color: var(--adham-ink-muted);
+}
+
+.ending-contact > div > span {
+  color: rgba(224,219,212,.54);
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: .96rem;
+  letter-spacing: -.01em;
 }
 
 .ending-contact nav {
@@ -138,9 +150,19 @@
 }
 
 .ending-contact a {
-  padding-bottom: .4rem;
+  position: relative;
+  padding-bottom: .45rem;
   border-bottom: 1px solid rgba(242,239,233,.3);
   font-size: .82rem;
+  transition:
+    color var(--adham-duration-response) linear,
+    border-color var(--adham-duration-response) linear;
+}
+
+.ending-contact a:hover,
+.ending-contact a:focus-visible {
+  color: var(--adham-paper);
+  border-bottom-color: rgba(210,79,130,.7);
 }
 
 @media (max-width: 820px) {
