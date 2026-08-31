@@ -117,7 +117,7 @@ jobs:
           done
 
           mkdir -p artifacts/visual-review
-          FLAGS=(--headless=new --no-sandbox --disable-gpu --hide-scrollbars --run-all-compositor-stages-before-draw --virtual-time-budget=5000)
+          FLAGS=(--headless=new --no-sandbox --hide-scrollbars --run-all-compositor-stages-before-draw --virtual-time-budget=6500 --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader)
 
           "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/home-desktop.png http://127.0.0.1:3000/
           "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/index-desktop.png 'http://127.0.0.1:3000/?review=index'
