@@ -64,6 +64,12 @@ html[data-chapter="origin"] .sound-control {
   pointer-events: none;
 }
 
+html[data-chapter="origin"] .sound-control:focus-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
 html[data-world-travel="depart"] .sound-control {
   opacity: 0;
   transform: translate3d(0, .5rem, 0);
