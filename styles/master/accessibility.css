@@ -1,0 +1,86 @@
+.world-skip {
+  position: fixed;
+  left: var(--adham-page-gutter);
+  top: 1rem;
+  z-index: calc(var(--adham-z-overlay) + 20);
+  transform: translateY(-180%);
+  padding: .75rem 1rem;
+  background: var(--adham-paper);
+  color: var(--adham-void);
+  font-family: var(--font-instrument), sans-serif;
+  font-size: .88rem;
+  text-decoration: none;
+}
+
+.world-skip:focus {
+  transform: translateY(0);
+}
+
+#main-story:focus,
+#project-content:focus {
+  outline: none;
+}
+
+.zu-world a:focus-visible,
+.zu-world button:focus-visible,
+.quiet-world a:focus-visible,
+.quiet-world button:focus-visible {
+  outline: 1px solid rgba(242,239,233,.68);
+  outline-offset: 6px;
+}
+
+.zu-input:focus-visible + * {
+  outline: 1px solid rgba(242,239,233,.68);
+  outline-offset: 6px;
+}
+
+@media (prefers-contrast: more) {
+  .master-number,
+  .quiet-world-kicker,
+  .zu-world-kicker,
+  .growth-path-meta,
+  .history-time,
+  .sound-control {
+    color: rgba(242,239,233,.82);
+  }
+
+  .living-trace {
+    opacity: .72;
+  }
+
+  .master-shell a:focus-visible,
+  .zu-world a:focus-visible,
+  .zu-world button:focus-visible,
+  .quiet-world a:focus-visible,
+  .quiet-world button:focus-visible,
+  .sound-control:focus-visible {
+    outline-width: 2px;
+  }
+}
+
+@media (forced-colors: active) {
+  .living-trace,
+  .quiet-encounter-space,
+  .work-boundary,
+  .ending-unresolved,
+  .history-fossil-mark,
+  .quiet-atmosphere {
+    display: none;
+  }
+
+  .master-shell,
+  .zu-world,
+  .quiet-world {
+    forced-color-adjust: auto;
+  }
+
+  .master-shell a,
+  .master-shell button,
+  .zu-world a,
+  .zu-world button,
+  .quiet-world a,
+  .quiet-world button,
+  .sound-control {
+    forced-color-adjust: auto;
+  }
+}
