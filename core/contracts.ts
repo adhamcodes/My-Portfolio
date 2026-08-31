@@ -88,9 +88,20 @@ export type GrowthEvent = {
   occurredAt: IsoDateTime;
   /** Human-meaningful public label. Never generated from vanity telemetry. */
   label?: string;
+  /** Optional source unit when the source system knows the unit identity. */
+  unitId?: EntityId;
   /** Optional numeric value with explicit semantics, e.g. duration minutes. */
   value?: number;
   unit?: string;
+  /**
+   * Authoritative progress-after-event snapshot. This makes unit events idempotent:
+   * the reducer never guesses completedUnits by counting event rows.
+   */
+  progress?: {
+    completedUnits: number;
+    totalUnits?: number;
+    currentUnit?: string;
+  };
   source: "foundry" | "academy" | "manual" | "import";
 };
 
@@ -112,6 +123,21 @@ export type WorkEvent = {
   source: "repository" | "deployment" | "manual" | "import";
 };
 
+export type CodeEventType =
+  | "commit_recorded"
+  | "pull_request_opened"
+  | "pull_request_merged"
+  | "tag_published";
+
+export type CodeEvent = {
+  id: EntityId;
+  type: CodeEventType;
+  occurredAt: IsoDateTime;
+  repositoryId?: EntityId;
+  label?: string;
+  source: "github" | "import";
+};
+
 export type CareerEventType =
   | "direction_changed"
   | "focus_changed"
@@ -130,6 +156,7 @@ export type CareerEvent = {
 export type LivingEvent =
   | ({ domain: "growth" } & GrowthEvent)
   | ({ domain: "work" } & WorkEvent)
+  | ({ domain: "code" } & CodeEvent)
   | ({ domain: "career" } & CareerEvent);
 
 export type PublicLivingState = {
@@ -138,7 +165,30 @@ export type PublicLivingState = {
   focus: FocusState[];
   growth: GrowthTrack[];
   work: WorkEntry[];
-  history: LivingEvent[];
+  /** Append-only public event projection. History and Pulse are derived from this. */
+  events: LivingEvent[];
+};
+
+// -----------------------------------------------------------------------------
+// PULSE — activity over time, deliberately not a mastery score
+// -----------------------------------------------------------------------------
+
+export type PulseDomain = "learning" | "code" | "work" | "career";
+
+export type PulseSignal = {
+  id: EntityId;
+  domain: PulseDomain;
+  occurredAt: IsoDateTime;
+  /** Relative visual weight within its own event semantics, never a skill score. */
+  intensity: number;
+  label?: string;
+  sourceId?: EntityId;
+};
+
+export type PulseSnapshot = {
+  generatedAt: IsoDateTime;
+  signals: PulseSignal[];
+  counts: Record<PulseDomain, number>;
 };
 
 // -----------------------------------------------------------------------------
@@ -204,4 +254,6 @@ export type WorldProjection = {
  * 4. Public state is a curated projection. Private learning detail does not leak by default.
  * 5. Curriculum-unit progress and calendar time are separate concepts.
  * 6. Completion changes state; it never deletes the historical record.
+ * 7. Coding activity is not learning activity, and neither is a mastery score.
+ * 8. Event IDs are idempotency keys. Reducers never count duplicate rows as progress.
  */
