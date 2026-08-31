@@ -3,6 +3,7 @@ import { Instrument_Sans, Newsreader, Space_Mono } from "next/font/google";
 import CapabilityDirector from "@/components/master/CapabilityDirector";
 import ExperienceDirector from "@/components/master/ExperienceDirector";
 import LivingTrace from "@/components/master/LivingTrace";
+import SoundDirector from "@/components/master/SoundDirector";
 import TravelDirector from "@/components/master/TravelDirector";
 import "@/styles/master/tokens.css";
 import "@/styles/master/base.css";
@@ -19,6 +20,7 @@ import "@/styles/master/ending.css";
 import "@/styles/master/worlds.css";
 import "@/styles/master/index.css";
 import "@/styles/master/travel.css";
+import "@/styles/master/sound.css";
 import "@/styles/master/mobile.css";
 import "@/styles/master/system.css";
 
@@ -104,6 +106,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <CapabilityDirector />
         <ExperienceDirector />
         <TravelDirector />
+        <SoundDirector />
         <LivingTrace />
         {children}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
