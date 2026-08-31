@@ -23,7 +23,7 @@ export default function HumanStory() {
         <article>
           <p>RESET</p>
           <h3>Start where the truth is.</h3>
-          <p>I left university before finishing my degree. The reset is deliberate: rebuild from software foundations and let the work carry the proof.</p>
+          <p>I left university before finishing my degree. What comes next is deliberate: rebuild from software foundations and let the work carry the proof.</p>
         </article>
         <article>
           <p>WORK</p>
