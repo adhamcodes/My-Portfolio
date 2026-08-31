@@ -126,6 +126,7 @@ jobs:
           "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/growth-desktop.png 'http://127.0.0.1:3000/#growth'
           "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/history-desktop.png 'http://127.0.0.1:3000/#history'
           "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/present-desktop.png 'http://127.0.0.1:3000/#present'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/contact-desktop.png 'http://127.0.0.1:3000/#contact'
           "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/zeroupload-desktop.png http://127.0.0.1:3000/work/zeroupload
 
           "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/home-mobile.png http://127.0.0.1:3000/
@@ -135,6 +136,7 @@ jobs:
           "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/growth-mobile.png 'http://127.0.0.1:3000/#growth'
           "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/history-mobile.png 'http://127.0.0.1:3000/#history'
           "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/present-mobile.png 'http://127.0.0.1:3000/#present'
+          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/contact-mobile.png 'http://127.0.0.1:3000/#contact'
           "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/zeroupload-mobile.png http://127.0.0.1:3000/work/zeroupload
 
       - name: Upload visual review surfaces
