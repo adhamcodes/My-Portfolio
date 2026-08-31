@@ -3,6 +3,7 @@ import { Instrument_Sans, Newsreader, Space_Mono } from "next/font/google";
 import CapabilityDirector from "@/components/master/CapabilityDirector";
 import ExperienceDirector from "@/components/master/ExperienceDirector";
 import LivingTrace from "@/components/master/LivingTrace";
+import TravelDirector from "@/components/master/TravelDirector";
 import "@/styles/master/tokens.css";
 import "@/styles/master/base.css";
 import "@/styles/master/shell.css";
@@ -98,6 +99,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <CapabilityDirector />
         <ExperienceDirector />
+        <TravelDirector />
         <LivingTrace />
         {children}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
