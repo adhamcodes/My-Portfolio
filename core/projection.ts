@@ -11,32 +11,31 @@ import type {
 
 function projectWork(work: WorkEntry): Pick<TraceRegion, "energy" | "maturity" | "emphasis"> {
   switch (work.maturity) {
-    case "active":
-      return { energy: "active", maturity: "forming", emphasis: work.featured ? 0.9 : 0.58 };
-    case "maintained":
-      return { energy: "quiet", maturity: "stable", emphasis: work.featured ? 0.78 : 0.5 };
-    case "completed":
-      return { energy: "quiet", maturity: "historical", emphasis: work.featured ? 0.65 : 0.42 };
-    case "archived":
-      return { energy: "dormant", maturity: "historical", emphasis: 0.28 };
-    default:
-      return { energy: "quiet", maturity: "forming", emphasis: work.featured ? 0.66 : 0.4 };
+    case "active": return { energy: "active", maturity: "forming", emphasis: work.featured ? 0.9 : 0.58 };
+    case "maintained": return { energy: "quiet", maturity: "stable", emphasis: work.featured ? 0.78 : 0.5 };
+    case "completed": return { energy: "quiet", maturity: "historical", emphasis: work.featured ? 0.65 : 0.42 };
+    case "archived": return { energy: "dormant", maturity: "historical", emphasis: 0.28 };
+    default: return { energy: "quiet", maturity: "forming", emphasis: work.featured ? 0.66 : 0.4 };
   }
 }
 
 function projectGrowth(track: GrowthTrack): Pick<TraceRegion, "energy" | "maturity" | "emphasis"> {
   switch (track.status) {
-    case "active":
-      return { energy: "active", maturity: "forming", emphasis: 0.78 };
-    case "paused":
-      return { energy: "quiet", maturity: "forming", emphasis: 0.46 };
-    case "completed":
-      return { energy: "quiet", maturity: "historical", emphasis: 0.62 };
-    case "archived":
-      return { energy: "dormant", maturity: "historical", emphasis: 0.3 };
-    default:
-      return { energy: "dormant", maturity: "forming", emphasis: 0.2 };
+    case "active": return { energy: "active", maturity: "forming", emphasis: 0.78 };
+    case "paused": return { energy: "quiet", maturity: "forming", emphasis: 0.46 };
+    case "completed": return { energy: "quiet", maturity: "historical", emphasis: 0.62 };
+    case "archived": return { energy: "dormant", maturity: "historical", emphasis: 0.3 };
+    default: return { energy: "dormant", maturity: "forming", emphasis: 0.2 };
   }
+}
+
+function chapterWeight(chapter: ChapterId, domain: TraceRegion["domain"]) {
+  if (chapter === "work") return domain === "work" ? 1.5 : domain === "self" ? 0.9 : 0.55;
+  if (chapter === "growth") return domain === "growth" ? 2.15 : domain === "self" ? 0.86 : 0.5;
+  if (chapter === "history") return domain === "history" ? 1.9 : domain === "self" ? 0.72 : 0.48;
+  if (chapter === "human") return domain === "self" ? 1.25 : 0.7;
+  if (chapter === "present") return domain === "self" ? 1.1 : 0.82;
+  return domain === "self" ? 1.12 : 0.74;
 }
 
 export function createWorldProjection(state: PublicLivingState, chapter: ChapterId): WorldProjection {
@@ -54,23 +53,11 @@ export function createWorldProjection(state: PublicLivingState, chapter: Chapter
   }
 
   for (const work of state.work) {
-    const visual = projectWork(work);
-    regions.push({
-      id: `work:${work.id}`,
-      domain: "work",
-      sourceId: work.id,
-      ...visual,
-    });
+    regions.push({ id: `work:${work.id}`, domain: "work", sourceId: work.id, ...projectWork(work) });
   }
 
   for (const track of state.growth) {
-    const visual = projectGrowth(track);
-    regions.push({
-      id: `growth:${track.id}`,
-      domain: "growth",
-      sourceId: track.id,
-      ...visual,
-    });
+    regions.push({ id: `growth:${track.id}`, domain: "growth", sourceId: track.id, ...projectGrowth(track) });
   }
 
   for (const event of state.history) {
@@ -87,6 +74,9 @@ export function createWorldProjection(state: PublicLivingState, chapter: Chapter
   return {
     generatedAt: state.generatedAt,
     chapter,
-    regions,
+    regions: regions.map((region) => ({
+      ...region,
+      emphasis: Math.min(1.35, Math.max(0.08, region.emphasis * chapterWeight(chapter, region.domain))),
+    })),
   };
 }
