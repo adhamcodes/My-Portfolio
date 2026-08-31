@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Typecheck and production build
+    name: Typecheck, build, and smoke test
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -37,3 +37,47 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+      - name: Smoke test production routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run start -- -p 3000 > /tmp/adham-portfolio-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          READY=0
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ > /dev/null; then
+              READY=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$READY" -ne 1 ]; then
+            cat /tmp/adham-portfolio-server.log
+            exit 1
+          fi
+
+          curl --fail --silent --show-error http://127.0.0.1:3000/ > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:3000/work/zeroupload > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:3000/work/quiet > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:3000/api/living-state > /tmp/living-state.json
+
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const state = JSON.parse(fs.readFileSync('/tmp/living-state.json', 'utf8'));
+          const valid = state
+            && Number.isFinite(state.schemaVersion)
+            && typeof state.generatedAt === 'string'
+            && Array.isArray(state.focus)
+            && Array.isArray(state.growth)
+            && Array.isArray(state.work)
+            && Array.isArray(state.events);
+          if (!valid) {
+            console.error('Living-state API returned an invalid public schema.');
+            process.exit(1);
+          }
+          console.log(`Living-state schema ${state.schemaVersion}: ${state.events.length} public events`);
+          NODE
