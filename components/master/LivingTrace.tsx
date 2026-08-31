@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import type { MotionMode, RenderTier } from "@/core/contracts";
+import type { MotionMode, PublicLivingState, RenderTier } from "@/core/contracts";
 import type { CapabilityDecision } from "@/core/capability";
 
 const LivingTraceCanvas = dynamic(() => import("./LivingTraceCanvas"), { ssr: false });
@@ -22,6 +22,20 @@ function StaticTrace() {
       <path className="trace-static-growth" d="M703 290 C815 238 879 125 1010 70" />
     </svg>
   );
+}
+
+function activityEnergy(state: PublicLivingState) {
+  const times = state.events
+    .filter((event) => event.domain === "code")
+    .map((event) => new Date(event.occurredAt).getTime())
+    .filter(Number.isFinite);
+
+  if (times.length === 0) return null;
+  const newest = Math.max(...times);
+  const ageHours = Math.max(0, (Date.now() - newest) / 3_600_000);
+  if (ageHours <= 36) return "energized";
+  if (ageHours <= 24 * 7) return "active";
+  return "quiet";
 }
 
 export default function LivingTrace() {
@@ -45,6 +59,35 @@ export default function LivingTrace() {
 
     window.addEventListener("adham:capability", onCapability);
     return () => window.removeEventListener("adham:capability", onCapability);
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const controller = new AbortController();
+
+    const sync = async () => {
+      try {
+        const response = await fetch("/api/living-state", { signal: controller.signal });
+        if (!response.ok) return;
+        const state = await response.json() as PublicLivingState;
+        if (!state || !Array.isArray(state.events)) return;
+
+        const energy = activityEnergy(state);
+        if (energy) root.dataset.activityEnergy = energy;
+        else delete root.dataset.activityEnergy;
+        window.dispatchEvent(new CustomEvent("adham:living-state", { detail: state }));
+      } catch (cause) {
+        if (!(cause instanceof DOMException && cause.name === "AbortError")) {
+          delete root.dataset.activityEnergy;
+        }
+      }
+    };
+
+    void sync();
+    return () => {
+      controller.abort();
+      delete root.dataset.activityEnergy;
+    };
   }, []);
 
   return (
