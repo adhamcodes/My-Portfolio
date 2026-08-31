@@ -1,3 +1,4 @@
+import Hero from "@/components/master/Hero";
 import Index from "@/components/master/Index";
 import LivingTrace from "@/components/master/LivingTrace";
 import { featuredWork, growthTracks, historyEntries, masterIdentity } from "@/content/master";
@@ -22,11 +23,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
         </div>
       </header>
 
-      <section id="origin" data-chapter="origin" className="master-scene master-origin" aria-labelledby="origin-title">
-        <div className="master-kicker">CURRENT FRAME</div>
-        <h1 id="origin-title"><span>ADHAM</span><span>MAHMOOD</span></h1>
-        <p className="master-thesis">{masterIdentity.thesis}</p>
-      </section>
+      <Hero />
 
       <div id="main-story">
         <section id="now" data-chapter="human" className="master-scene master-human" aria-labelledby="now-title">
