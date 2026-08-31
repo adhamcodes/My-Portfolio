@@ -10,7 +10,7 @@
   padding: .4rem 0;
   border: 0;
   background: transparent;
-  color: rgba(183,179,173,.52);
+  color: rgba(183,179,173,.7);
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: .65rem;
   letter-spacing: .12em;
@@ -30,7 +30,7 @@
 }
 
 .sound-control:focus-visible {
-  outline: 1px solid rgba(242,239,233,.58);
+  outline: 1px solid rgba(242,239,233,.68);
   outline-offset: 6px;
 }
 
@@ -47,7 +47,7 @@
   width: 1px;
   height: 3px;
   background: currentColor;
-  opacity: .62;
+  opacity: .72;
   transition: height var(--adham-duration-settle) var(--adham-ease-response);
 }
 
@@ -72,12 +72,12 @@ html[data-world-travel="depart"] .sound-control {
 
 html[data-scene-world="quiet"] .sound-control,
 html[data-route="/work/quiet"] .sound-control {
-  color: rgba(183,179,173,.32);
+  color: rgba(183,179,173,.66);
 }
 
 html[data-scene-world="quiet"] .sound-control[aria-pressed="true"],
 html[data-route="/work/quiet"] .sound-control[aria-pressed="true"] {
-  color: rgba(242,239,233,.52);
+  color: rgba(242,239,233,.72);
 }
 
 @media (max-width: 760px) {
