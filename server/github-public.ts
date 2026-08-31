@@ -25,29 +25,18 @@ function repositoryLabel(name?: string) {
 function pushEvents(event: GitHubPublicEvent): LivingEvent[] {
   if (!event.id || !event.created_at) return [];
   const repositoryId = event.repo?.name;
-  const commits = event.payload?.commits?.filter((commit) => commit.sha) ?? [];
 
-  if (commits.length === 0) {
-    return [{
-      domain: "code",
-      id: `github:push:${event.id}`,
-      type: "commit_recorded",
-      occurredAt: event.created_at,
-      ...(repositoryId ? { repositoryId } : {}),
-      ...(repositoryLabel(repositoryId) ? { label: repositoryLabel(repositoryId) } : {}),
-      source: "github",
-    }];
-  }
-
-  return commits.map((commit, index) => ({
-    domain: "code" as const,
-    id: `github:commit:${commit.sha ?? `${event.id}:${index}`}`,
-    type: "commit_recorded" as const,
-    occurredAt: event.created_at as string,
+  // A public push is one factual activity moment. Individual commit counts are not
+  // projected because Pulse is not a productivity scoreboard.
+  return [{
+    domain: "code",
+    id: `github:push:${event.id}`,
+    type: "commit_recorded",
+    occurredAt: event.created_at,
     ...(repositoryId ? { repositoryId } : {}),
     ...(repositoryLabel(repositoryId) ? { label: repositoryLabel(repositoryId) } : {}),
-    source: "github" as const,
-  }));
+    source: "github",
+  }];
 }
 
 function pullRequestEvents(event: GitHubPublicEvent): LivingEvent[] {
