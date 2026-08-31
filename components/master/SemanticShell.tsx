@@ -1,3 +1,4 @@
+import LivingTrace from "@/components/master/LivingTrace";
 import { featuredWork, growthTracks, historyEntries, masterIdentity } from "@/content/master";
 
 type SemanticShellProps = {
@@ -15,6 +16,7 @@ const navItems = [
 export default function SemanticShell({ preview = false }: SemanticShellProps) {
   return (
     <main className="master-shell">
+      <LivingTrace />
       <a className="master-skip" href="#main-story">Skip to story</a>
 
       <header className="master-header">
