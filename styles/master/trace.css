@@ -63,6 +63,14 @@
   opacity: .035;
 }
 
+.living-trace[data-failed="true"] .living-trace-static {
+  opacity: .52;
+}
+
+.living-trace[data-failed="true"] .living-trace-canvas {
+  display: none;
+}
+
 .living-trace-canvas {
   opacity: 0;
   animation: living-trace-resolve 1050ms var(--adham-ease-reveal) 60ms forwards;
@@ -106,16 +114,36 @@ html[data-activity-energy="energized"] .living-trace::before {
   transform: scale(1.028);
 }
 
+html[data-chapter="human"] .living-trace::before {
+  background:
+    radial-gradient(circle at 66% 44%, rgba(210,79,130,.12), transparent 28%),
+    radial-gradient(circle at 55% 59%, rgba(171,129,148,.055), transparent 24%);
+}
+
 html[data-chapter="growth"] .living-trace::before {
   background:
     radial-gradient(circle at 60% 42%, rgba(196,147,74,.11), transparent 29%),
     radial-gradient(circle at 72% 58%, rgba(210,79,130,.06), transparent 24%);
 }
 
-html[data-chapter="work"] .living-trace::before {
+html[data-chapter="work"] .living-trace::before,
+html[data-scene-world="zeroupload"] .living-trace::before {
   background:
-    radial-gradient(circle at 58% 46%, rgba(127,168,183,.11), transparent 30%),
-    radial-gradient(circle at 74% 34%, rgba(210,79,130,.055), transparent 23%);
+    radial-gradient(circle at 58% 46%, rgba(127,168,183,.12), transparent 30%),
+    radial-gradient(circle at 74% 34%, rgba(210,79,130,.05), transparent 23%);
+}
+
+html[data-chapter="history"] .living-trace::before {
+  background:
+    radial-gradient(circle at 67% 47%, rgba(140,144,153,.09), transparent 31%),
+    radial-gradient(circle at 56% 62%, rgba(196,147,74,.032), transparent 22%);
+  filter: blur(26px) saturate(.74) brightness(.94);
+}
+
+html[data-chapter="present"] .living-trace::before {
+  background:
+    radial-gradient(circle at 62% 48%, rgba(210,79,130,.085), transparent 30%),
+    radial-gradient(circle at 74% 56%, rgba(127,168,183,.045), transparent 23%);
 }
 
 @keyframes living-trace-resolve {
