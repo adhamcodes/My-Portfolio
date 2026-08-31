@@ -302,15 +302,25 @@ html[data-index-open="true"] .living-trace::before {
 
   .index-heading {
     padding-top: .25rem;
-    padding-right: 3.8rem;
+    padding-right: 5.75rem;
   }
 
   .index-heading button {
     position: fixed;
-    top: max(1.25rem, env(safe-area-inset-top));
-    right: 1rem;
+    top: max(1rem, env(safe-area-inset-top));
+    right: max(1rem, env(safe-area-inset-right));
+    left: auto;
     z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    min-width: 4.75rem;
+    min-height: 44px;
+    margin: 0;
+    padding: 0 .4rem;
     white-space: nowrap;
+    transform: none;
   }
 
   .index-heading button span {
