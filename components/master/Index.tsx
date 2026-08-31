@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 const destinations = [
   { id: "now", label: "NOW", detail: "Current frame" },
-  { id: "work", label: "WORK", detail: "ZeroUpload · Quiet later, when cleared" },
+  { id: "work", label: "WORK", detail: "Featured work" },
   { id: "growth", label: "GROWTH", detail: "Software engineering · AI/ML · Automation" },
   { id: "history", label: "HISTORY", detail: "Earlier work and preserved change" },
   { id: "present", label: "CONTACT", detail: "The present frame" },
@@ -19,14 +19,21 @@ function isTypingTarget(target: EventTarget | null) {
   );
 }
 
+function focusableWithin(node: HTMLElement | null) {
+  if (!node) return [] as HTMLElement[];
+  return Array.from(node.querySelectorAll<HTMLElement>(
+    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  ));
+}
+
 export default function Index() {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState("now");
   const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const hasOpened = useRef(false);
 
   useEffect(() => {
-    const root = document.documentElement;
     const onChapter = (event: Event) => {
       const chapter = (event as CustomEvent<string>).detail;
       const mapped = chapter === "human" ? "now" : chapter === "present" ? "present" : chapter;
@@ -34,11 +41,6 @@ export default function Index() {
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && open) {
-        event.preventDefault();
-        setOpen(false);
-        return;
-      }
       if (!open && event.key.toLowerCase() === "i" && !event.metaKey && !event.ctrlKey && !event.altKey && !isTypingTarget(event.target)) {
         event.preventDefault();
         setOpen(true);
@@ -47,24 +49,52 @@ export default function Index() {
 
     window.addEventListener("adham:chapter", onChapter);
     window.addEventListener("keydown", onKeyDown);
-    root.dataset.indexOpen = open ? "true" : "false";
-    window.dispatchEvent(new CustomEvent("adham:index", { detail: { open } }));
-
-    if (open) {
-      const previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      requestAnimationFrame(() => dialogRef.current?.querySelector<HTMLElement>("a, button")?.focus());
-      return () => {
-        document.body.style.overflow = previousOverflow;
-        window.removeEventListener("adham:chapter", onChapter);
-        window.removeEventListener("keydown", onKeyDown);
-      };
-    }
-
-    triggerRef.current?.focus({ preventScroll: true });
     return () => {
       window.removeEventListener("adham:chapter", onChapter);
       window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.indexOpen = open ? "true" : "false";
+    window.dispatchEvent(new CustomEvent("adham:index", { detail: { open } }));
+
+    if (!open) {
+      document.body.style.removeProperty("overflow");
+      if (hasOpened.current) triggerRef.current?.focus({ preventScroll: true });
+      return;
+    }
+
+    hasOpened.current = true;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    requestAnimationFrame(() => focusableWithin(dialogRef.current)[0]?.focus());
+
+    const onDialogKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = focusableWithin(dialogRef.current);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onDialogKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onDialogKey);
     };
   }, [open]);
 
