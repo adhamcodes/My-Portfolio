@@ -54,6 +54,12 @@ export default function CapabilityDirector() {
       window.dispatchEvent(new CustomEvent<CapabilityDecision>("adham:capability", { detail: decision }));
     };
 
+    const publishVisibility = () => {
+      const visible = document.visibilityState === "visible";
+      root.dataset.visibility = visible ? "visible" : "hidden";
+      window.dispatchEvent(new CustomEvent("adham:visibility", { detail: { visible } }));
+    };
+
     const resolveAndPublish = (input: CapabilityInput, neverUpgrade = false) => {
       const next = resolveCapability(input);
       if (neverUpgrade && current) {
@@ -63,6 +69,7 @@ export default function CapabilityDirector() {
     };
 
     resolveAndPublish(baseInput);
+    publishVisibility();
 
     const handleMotionPreference = () => {
       baseInput = { ...baseInput, reducedMotion: reducedQuery.matches };
@@ -121,8 +128,12 @@ export default function CapabilityDirector() {
     };
 
     const handleVisibility = () => {
+      publishVisibility();
       if (document.visibilityState === "visible" && current?.renderTier !== "static-low") {
         scheduleFrameSample(1200);
+      } else {
+        cancelAnimationFrame(raf);
+        window.clearTimeout(sampleTimer);
       }
     };
 
@@ -144,6 +155,7 @@ export default function CapabilityDirector() {
       delete root.dataset.renderTier;
       delete root.dataset.motionMode;
       delete root.dataset.inputMode;
+      delete root.dataset.visibility;
     };
   }, []);
 
