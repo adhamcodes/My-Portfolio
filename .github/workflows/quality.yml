@@ -95,7 +95,7 @@ jobs:
             exit 1
           fi
 
-      - name: Capture production review surfaces
+      - name: Capture and certify production review surfaces
         shell: bash
         run: |
           set -euo pipefail
@@ -107,7 +107,12 @@ jobs:
 
           npm run start -- -p 3000 > /tmp/adham-portfolio-visual-server.log 2>&1 &
           SERVER_PID=$!
-          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          CHROME_PID=''
+          cleanup() {
+            if [ -n "$CHROME_PID" ]; then kill "$CHROME_PID" 2>/dev/null || true; fi
+            kill "$SERVER_PID" 2>/dev/null || true
+          }
+          trap cleanup EXIT
 
           for attempt in {1..30}; do
             if curl --fail --silent http://127.0.0.1:3000/ > /dev/null 2>&1; then
@@ -117,27 +122,176 @@ jobs:
           done
 
           mkdir -p artifacts/visual-review
-          FLAGS=(--headless=new --no-sandbox --hide-scrollbars --run-all-compositor-stages-before-draw --disable-background-timer-throttling --virtual-time-budget=6500 --enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader)
+          "$BROWSER" \
+            --headless=new \
+            --no-sandbox \
+            --hide-scrollbars \
+            --disable-background-timer-throttling \
+            --disable-renderer-backgrounding \
+            --enable-unsafe-swiftshader \
+            --use-gl=angle \
+            --use-angle=swiftshader \
+            --remote-debugging-port=9222 \
+            --user-data-dir=/tmp/adham-portfolio-chrome \
+            about:blank > /tmp/adham-portfolio-chrome.log 2>&1 &
+          CHROME_PID=$!
 
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/home-desktop.png http://127.0.0.1:3000/
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/index-desktop.png 'http://127.0.0.1:3000/?review=index'
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/now-desktop.png 'http://127.0.0.1:3000/#now'
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/work-desktop.png 'http://127.0.0.1:3000/#work'
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/growth-desktop.png 'http://127.0.0.1:3000/#growth'
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/history-desktop.png 'http://127.0.0.1:3000/#history'
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/present-desktop.png 'http://127.0.0.1:3000/#present'
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/contact-desktop.png 'http://127.0.0.1:3000/#contact'
-          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/zeroupload-desktop.png http://127.0.0.1:3000/work/zeroupload
+          DEBUG_READY=0
+          for attempt in {1..40}; do
+            if curl --fail --silent http://127.0.0.1:9222/json/version > /dev/null 2>&1; then
+              DEBUG_READY=1
+              break
+            fi
+            sleep .25
+          done
+          if [ "$DEBUG_READY" -ne 1 ]; then
+            cat /tmp/adham-portfolio-chrome.log
+            exit 1
+          fi
 
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/home-mobile.png http://127.0.0.1:3000/
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/index-mobile.png 'http://127.0.0.1:3000/?review=index'
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/now-mobile.png 'http://127.0.0.1:3000/#now'
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/work-mobile.png 'http://127.0.0.1:3000/#work'
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/growth-mobile.png 'http://127.0.0.1:3000/#growth'
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/history-mobile.png 'http://127.0.0.1:3000/#history'
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/present-mobile.png 'http://127.0.0.1:3000/#present'
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/contact-mobile.png 'http://127.0.0.1:3000/#contact'
-          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/zeroupload-mobile.png http://127.0.0.1:3000/work/zeroupload
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const origin = 'http://127.0.0.1:3000';
+          const output = path.resolve('artifacts/visual-review');
+          let nextId = 0;
+          const pending = new Map();
+
+          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+          async function newTarget() {
+            const response = await fetch('http://127.0.0.1:9222/json/new?about:blank', { method: 'PUT' });
+            if (!response.ok) throw new Error(`Could not create Chrome target: ${response.status}`);
+            return response.json();
+          }
+
+          function connect(url) {
+            return new Promise((resolve, reject) => {
+              const socket = new WebSocket(url);
+              socket.addEventListener('open', () => resolve(socket), { once: true });
+              socket.addEventListener('error', () => reject(new Error('Chrome DevTools websocket failed to open.')), { once: true });
+            });
+          }
+
+          function installProtocol(socket) {
+            socket.addEventListener('message', (event) => {
+              const message = JSON.parse(String(event.data));
+              if (!message.id) return;
+              const entry = pending.get(message.id);
+              if (!entry) return;
+              pending.delete(message.id);
+              if (message.error) entry.reject(new Error(message.error.message));
+              else entry.resolve(message.result ?? {});
+            });
+
+            return (method, params = {}) => new Promise((resolve, reject) => {
+              const id = ++nextId;
+              pending.set(id, { resolve, reject });
+              socket.send(JSON.stringify({ id, method, params }));
+            });
+          }
+
+          async function ready(send) {
+            await send('Runtime.evaluate', {
+              expression: `Promise.all([document.fonts?.ready, new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))])`,
+              awaitPromise: true,
+              returnByValue: true,
+            });
+            await sleep(1150);
+          }
+
+          async function certify(send, selector, label) {
+            const result = await send('Runtime.evaluate', {
+              expression: `(() => {
+                const node = document.querySelector(${JSON.stringify(selector)});
+                if (!node) return { found: false };
+                const subject = node.matches('h1,h2,h3,a,button') ? node : (node.querySelector('h1,h2,h3,a,button') || node);
+                const rect = subject.getBoundingClientRect();
+                const style = getComputedStyle(subject);
+                return {
+                  found: true,
+                  text: (subject.textContent || '').trim().slice(0, 180),
+                  top: rect.top,
+                  bottom: rect.bottom,
+                  left: rect.left,
+                  right: rect.right,
+                  opacity: Number(style.opacity || 1),
+                  visibility: style.visibility,
+                  display: style.display,
+                  viewportWidth: innerWidth,
+                  viewportHeight: innerHeight,
+                };
+              })()`,
+              returnByValue: true,
+            });
+            const view = result.result?.value;
+            const intersects = view?.bottom > 0 && view?.top < view?.viewportHeight && view?.right > 0 && view?.left < view?.viewportWidth;
+            const visible = view?.found && intersects && view.opacity > 0.01 && view.visibility !== 'hidden' && view.display !== 'none' && view.text;
+            if (!visible) throw new Error(`${label} failed visual DOM certification: ${JSON.stringify(view)}`);
+            console.log(`${label}: ${view.text.replace(/\s+/g, ' ')} @ ${Math.round(view.top)}..${Math.round(view.bottom)}`);
+          }
+
+          async function capture(send, name, url, viewport, selector) {
+            await send('Emulation.setDeviceMetricsOverride', {
+              width: viewport.width,
+              height: viewport.height,
+              deviceScaleFactor: 1,
+              mobile: viewport.mobile,
+              screenWidth: viewport.width,
+              screenHeight: viewport.height,
+            });
+            await send('Page.navigate', { url });
+            await ready(send);
+            await certify(send, selector, name);
+            const shot = await send('Page.captureScreenshot', {
+              format: 'png',
+              fromSurface: true,
+              captureBeyondViewport: false,
+            });
+            const file = path.join(output, `${name}.png`);
+            fs.writeFileSync(file, Buffer.from(shot.data, 'base64'));
+            const size = fs.statSync(file).size;
+            if (size < 12000) throw new Error(`${name} screenshot is suspiciously small (${size} bytes).`);
+            console.log(`${name}: ${size} bytes`);
+          }
+
+          async function main() {
+            const target = await newTarget();
+            const socket = await connect(target.webSocketDebuggerUrl);
+            const send = installProtocol(socket);
+            await send('Page.enable');
+            await send('Runtime.enable');
+
+            const desktop = { width: 1600, height: 1000, mobile: false };
+            const mobile = { width: 390, height: 844, mobile: true };
+            const surfaces = [
+              ['home', `${origin}/`, '.hero-v2-name'],
+              ['index', `${origin}/?review=index`, '.index-world'],
+              ['now', `${origin}/?review=now`, '#now'],
+              ['work', `${origin}/?review=work`, '#work'],
+              ['growth', `${origin}/?review=growth`, '#growth'],
+              ['history', `${origin}/?review=history`, '#history'],
+              ['present', `${origin}/?review=present`, '#present'],
+              ['contact', `${origin}/?review=contact`, '#contact'],
+              ['zeroupload', `${origin}/work/zeroupload`, '.zu-world-hero'],
+            ];
+
+            for (const [name, url, selector] of surfaces) {
+              await capture(send, `${name}-desktop`, url, desktop, selector);
+            }
+            for (const [name, url, selector] of surfaces) {
+              await capture(send, `${name}-mobile`, url, mobile, selector);
+            }
+
+            socket.close();
+          }
+
+          main().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
 
       - name: Upload visual review surfaces
         uses: actions/upload-artifact@v4
