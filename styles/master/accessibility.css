@@ -34,6 +34,30 @@
   outline-offset: 6px;
 }
 
+/* Small text that carries meaning stays subdued without becoming illegible. */
+.index-detail,
+.pulse-live-copy > span,
+.pulse-zero span {
+  color: rgba(183,179,173,.72);
+}
+
+.history-time {
+  color: rgba(242,239,233,.5);
+}
+
+.history-note {
+  color: var(--adham-ink-muted);
+}
+
+.growth-path-meta strong {
+  color: rgba(196,147,74,.82);
+}
+
+.pulse-lane text,
+.pulse-time-label {
+  fill: rgba(183,179,173,.72);
+}
+
 @media (prefers-contrast: more) {
   .master-number,
   .quiet-world-kicker,
@@ -42,6 +66,17 @@
   .history-time,
   .sound-control {
     color: rgba(242,239,233,.82);
+  }
+
+  .index-detail,
+  .pulse-live-copy > span,
+  .pulse-zero span {
+    color: rgba(242,239,233,.86);
+  }
+
+  .pulse-lane text,
+  .pulse-time-label {
+    fill: rgba(242,239,233,.86);
   }
 
   .living-trace {
