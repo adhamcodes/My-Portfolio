@@ -1,134 +1,97 @@
-# ADHAM MAHMOOD — INTERACTIVE PORTFOLIO
+# ADHAM — MASTER 2.0
 
-A portfolio that behaves like one of the projects instead of acting as a static wrapper around them.
+A living portfolio for Adham Mahmood: software work, learning, history, and current direction projected into one evolving experience.
 
-The public experience is intentionally human and editorial; the technical machinery stays underneath it. The site combines Next.js, React, TypeScript, React Three Fiber, Three.js, custom GLSL, GSAP, Motion, native browser APIs, procedural Web Audio, local state and a device-aware runtime layer.
+The canonical design contract is [`docs/PORTFOLIO-MASTER-SPEC.md`](docs/PORTFOLIO-MASTER-SPEC.md).
 
-## Design rule
+## Product idea
 
-The goal is not to display the largest possible number of effects. It is to make different parts of the portfolio feel deliberately different while still belonging to the same person.
+The portfolio is not a dashboard, résumé skin, or collection of interchangeable project cards. Its core model is:
 
-Large typography carries the narrative. The 3D field appears when it matters and retreats when reading should win. Project pages use interactive models specific to the ideas they represent. Technical UI is reserved for places where there is real technical information to inspect.
+```text
+CONTENT / EVENTS → STATE → EXPERIENCE → WORLD
+```
 
-## What is real
+Human-readable content and typed events produce a canonical public state. The visual system projects that state without inventing meaning, progress, expertise, or activity.
 
-- scene-aware WebGL visual field with custom GLSL deformation
-- deterministic particle layout and adaptive render quality
-- three persistent visual modes with different motion, lighting and procedural-audio behavior
-- scroll and pointer response
-- project-specific interactive models rather than a repeated case-study template
-- Foundry180 curriculum / phase / mastery-check model
-- portfolio architecture explorer
-- ZeroUpload local-first flow model
-- WindowBiome focus-aware desktop model
-- Nova motion / depth / hierarchy study
-- project deep links, browser history and shareable state
-- deterministic build signature derived from current portfolio state
-- remembered project exploration using local storage
-- returning-visitor memory stored only in the browser
-- completion moment after all projects are explored
-- attention-aware navigation that retreats during reading and scrolling
-- native View Transition enhancement with Motion fallback
-- opt-in procedural Web Audio
-- XRAY inspection layer
-- quick navigation (`/` or `Ctrl/Cmd + K`)
-- real browser capability checks
-- live FPS, LCP, CLS and long-task telemetry
-- high / balanced / low render tiers
-- mobile-aware 3D composition
-- reduced-motion, high-contrast, coarse-pointer and low-device fallbacks
-- visual-layer and application error boundaries
-- metadata, sitemap, robots, manifest, social artwork and structured data
-- production security headers
-- print fallback
-- one hidden interaction
+## Current experience
+
+- name-first cinematic arrival
+- persistent **Living Trace** generated from current public state
+- **Index** navigation instead of a command palette or control deck
+- human story centered on rebuilding, work, direction, and evidence
+- **ZeroUpload / Boundary** project world with a genuine browser-local image operation
+- **Growth Engine** with truthful zero states for Foundry180, AI/ML, and automation
+- **Pulse** time field that keeps code, learning, work, and career events categorically separate
+- **History** as preserved matter rather than a résumé timeline
+- restrained opt-in global sound; silence is the default
+- adaptive rendering, reduced-motion behavior, touch-native mobile choreography, focus continuity, and resilient fallbacks
+
+A completed Quiet / Absence world also exists in the rebuild branch, but Quiet is launch-gated until its separate public credibility cleanup is complete. The portfolio does not force symmetry by publishing evidence that has not passed its truth gate.
+
+## Living-state rules
+
+Public GitHub activity may enrich the public state as **code activity only**. It cannot become learning progress, mastery, project completion, or career evidence.
+
+Foundry180 personal learning progress remains **0 / 180** until the learning journey actually begins.
+
+The long-term event model keeps these domains separate:
+
+```text
+learning ≠ code ≠ work milestones ≠ career milestones
+```
+
+The public site is a projection. Future private learning/work systems may write to a canonical event store; the portfolio itself should remain read-only.
 
 ## Architecture
 
+The rebuild uses Next.js + React + TypeScript for the semantic application layer and React Three Fiber / Three.js for the Living Trace. Browser audio is procedural and opt-in. Capability and experience directors keep rendering tier, motion preference, input modality, chapter state, route state, and world travel separate from content truth.
+
+The central rendering rule is simple:
+
+> Rendering receives meaning from state. It does not invent meaning.
+
+## Quality gate
+
+The branch carries an independent GitHub Actions gate that performs:
+
 ```text
-PORTFOLIO DATA
-    ↓
-NEXT.JS / REACT / TYPESCRIPT
-    ↓
-URL + LOCAL MEMORY
-    ↓
-SCENE DIRECTION
-    ├── narrative section detection
-    ├── background changes
-    ├── attention-aware interface density
-    └── 3D-field presence / composition
-    ↓
-MOTION + INTERACTION
-    ├── GSAP scroll choreography
-    ├── Motion transitions
-    ├── pointer / scroll response
-    └── quick controls
-    ↓
-3D FIELD
-    ├── React Three Fiber
-    ├── Three.js
-    ├── custom GLSL
-    └── adaptive quality
-    ↓
-BROWSER FEATURES
-    ├── View Transitions
-    ├── Web Audio
-    ├── PerformanceObserver
-    └── capability detection
+npm ci
+→ TypeScript check
+→ optimized production build
+→ production-server smoke tests
+→ home + project-route checks
+→ public Living State schema validation
 ```
 
-## Project rule
-
-Each project gets an interactive model that explains something specific about it:
-
-- **Foundry180** — curriculum structure and proof-gated progression.
-- **This Portfolio** — the architecture of the site itself.
-- **ZeroUpload** — the local-first browser flow.
-- **WindowBiome** — active-window-aware desktop behavior.
-- **Nova** — motion, depth and hierarchy experimentation.
-
-These are explanatory models. They do not pretend to be live telemetry from the underlying products.
-
-## Controls
-
-| Control | Action |
-| --- | --- |
-| `A` | Change visual mode |
-| `X` | Toggle XRAY |
-| `/` | Open quick navigation |
-| `Ctrl/Cmd + K` | Open quick navigation |
-| `Esc` | Close an open project / navigation |
-
-The **Under the Hood** section also exposes real runtime measurements, browser capability checks and a visual-field intensity control.
-
-## Runtime resilience
-
-The experience is visually ambitious but does not assume a high-end machine. It starts conservatively, samples real frame timing after the initial reveal, considers available hardware signals when they exist, and selects a render tier. Optional browser APIs degrade to fallbacks. Reduced-motion preferences remove nonessential movement. If the 3D layer fails, the portfolio remains usable.
-
-## Truth contract
-
-Visual ambition is not permission to fabricate engineering evidence.
-
-- Foundry180 remains **BUILDING**. Its curriculum quality audit is complete: 180 authored days, 130 exercises and 603 automated tests passing, but the full browser product is still being built.
-- Project simulations are explanatory interactive models.
-- Future trajectory stages remain future work.
-- Runtime telemetry comes from the current browser.
+Vercel preview validation and real desktop/mobile visual review remain separate release gates.
 
 ## Local development
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Production check:
+Production verification:
 
 ```bash
+npm run typecheck
 npm run build
 ```
 
-## Status
+## Truth contract
 
-`1.0-RC` — final owner-review release candidate.
+- no fabricated metrics, ratings, streaks, expertise, or live-state claims
+- no calendar time presented as learning progress
+- no project promoted merely to fill a grid
+- no public technical telemetry used as decoration
+- no external source owns canonical identity state
+- sparse or zero activity is a valid state
+- meaningful history changes state; it is not overwritten
 
-The production branch remains unchanged until explicit approval.
+## Branch / release rule
+
+Development happens on `aura-rebuild-v2`.
+
+`main` remains the production safety line and must not change until the complete experience passes desktop/mobile owner review and Adham explicitly approves the release.
