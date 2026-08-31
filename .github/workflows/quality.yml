@@ -201,6 +201,21 @@ jobs:
             await sleep(1050);
           }
 
+          async function openIndex(send, label) {
+            const result = await send('Runtime.evaluate', {
+              expression: `(() => {
+                if (document.querySelector('.index-world')) return true;
+                const trigger = document.querySelector('.index-trigger');
+                if (!trigger) return false;
+                trigger.click();
+                return true;
+              })()`,
+              returnByValue: true,
+            });
+            if (!result.result?.value) throw new Error(`${label} could not open Index.`);
+            await sleep(800);
+          }
+
           async function position(send, selector, label) {
             const expression = `(() => {
               const root = document.querySelector(${JSON.stringify(selector)});
@@ -219,7 +234,7 @@ jobs:
             }
           }
 
-          async function certify(send, selector, label) {
+          async function certify(send, selector, label, mustFit) {
             const result = await send('Runtime.evaluate', {
               expression: `(() => {
                 const node = document.querySelector(${JSON.stringify(selector)});
@@ -246,11 +261,12 @@ jobs:
             const view = result.result?.value;
             const intersects = view?.bottom > 0 && view?.top < view?.viewportHeight && view?.right > 0 && view?.left < view?.viewportWidth;
             const visible = view?.found && intersects && view.opacity > 0.01 && view.visibility !== 'hidden' && view.display !== 'none' && view.text;
-            if (!visible) throw new Error(`${label} failed visual DOM certification: ${JSON.stringify(view)}`);
-            console.log(`${label}: ${view.text.replace(/\s+/g, ' ')} @ ${Math.round(view.top)}..${Math.round(view.bottom)}`);
+            const fits = !mustFit || (view.left >= -2 && view.right <= view.viewportWidth + 2);
+            if (!visible || !fits) throw new Error(`${label} failed visual certification: ${JSON.stringify({ ...view, mustFit, fits })}`);
+            console.log(`${label}: ${view.text.replace(/\s+/g, ' ')} @ x ${Math.round(view.left)}..${Math.round(view.right)}, y ${Math.round(view.top)}..${Math.round(view.bottom)}`);
           }
 
-          async function capture(send, name, url, viewport, selector, shouldPosition = true) {
+          async function capture(send, name, url, viewport, selector, options = {}) {
             await send('Emulation.setDeviceMetricsOverride', {
               width: viewport.width,
               height: viewport.height,
@@ -261,8 +277,9 @@ jobs:
             });
             await send('Page.navigate', { url });
             await ready(send);
-            if (shouldPosition) await position(send, selector, name);
-            await certify(send, selector, name);
+            if (options.openIndex) await openIndex(send, name);
+            if (options.position) await position(send, selector, name);
+            await certify(send, selector, name, Boolean(options.mustFit));
             const shot = await send('Page.captureScreenshot', {
               format: 'png',
               fromSurface: true,
@@ -285,22 +302,22 @@ jobs:
             const desktop = { width: 1600, height: 1000, mobile: false };
             const mobile = { width: 390, height: 844, mobile: true };
             const surfaces = [
-              ['home', `${origin}/`, '.hero-v2-name', false],
-              ['index', `${origin}/?review=index`, '.index-world', false],
-              ['now', `${origin}/?review=now`, '#now', true],
-              ['work', `${origin}/?review=work`, '#work', true],
-              ['growth', `${origin}/?review=growth`, '#growth', true],
-              ['history', `${origin}/?review=history`, '#history', true],
-              ['present', `${origin}/?review=present`, '#present', true],
-              ['contact', `${origin}/?review=contact`, '#contact', true],
-              ['zeroupload', `${origin}/work/zeroupload`, '.zu-world-hero', false],
+              ['home', `${origin}/`, '.hero-v2-name', {}],
+              ['index', `${origin}/`, '.index-world', { openIndex: true, mustFit: true }],
+              ['now', `${origin}/?review=now`, '#now', { position: true, mustFit: true }],
+              ['work', `${origin}/?review=work`, '#work', { position: true, mustFit: true }],
+              ['growth', `${origin}/?review=growth`, '#growth', { position: true, mustFit: true }],
+              ['history', `${origin}/?review=history`, '#history', { position: true, mustFit: true }],
+              ['present', `${origin}/?review=present`, '#present', { position: true, mustFit: true }],
+              ['contact', `${origin}/?review=contact`, '#contact', { position: true, mustFit: true }],
+              ['zeroupload', `${origin}/work/zeroupload`, '.zu-world-hero', { mustFit: true }],
             ];
 
-            for (const [name, url, selector, shouldPosition] of surfaces) {
-              await capture(send, `${name}-desktop`, url, desktop, selector, shouldPosition);
+            for (const [name, url, selector, options] of surfaces) {
+              await capture(send, `${name}-desktop`, url, desktop, selector, options);
             }
-            for (const [name, url, selector, shouldPosition] of surfaces) {
-              await capture(send, `${name}-mobile`, url, mobile, selector, shouldPosition);
+            for (const [name, url, selector, options] of surfaces) {
+              await capture(send, `${name}-mobile`, url, mobile, selector, options);
             }
 
             socket.close();
