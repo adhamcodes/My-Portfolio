@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Adham Mahmood — Evolving Portfolio";
+export const alt = "Adham Mahmood — Current Frame";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -36,7 +36,7 @@ export default function Image() {
             <div style={{ fontSize: 118, lineHeight: .78, letterSpacing: -9, fontWeight: 800 }}>ADHAM</div>
             <div style={{ fontSize: 118, lineHeight: .78, letterSpacing: -9, fontWeight: 800, color: "#b7b3ad" }}>MAHMOOD</div>
             <div style={{ marginTop: 34, maxWidth: 720, fontSize: 24, lineHeight: 1.35, color: "#b7b3ad" }}>
-              An evolving record of software work, learning, and history.
+              Software work, learning, and history — a living record that changes as the person does.
             </div>
           </div>
 
