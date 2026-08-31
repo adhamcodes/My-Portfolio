@@ -8,20 +8,20 @@ function trackCopy(id: string) {
     return {
       eyebrow: "PRIMARY PATH",
       direction: "Software engineering",
-      detail: "Foundry180 is prepared. Personal progress remains at zero until the learning journey actually begins.",
+      detail: "A 180-unit software-engineering journey. The public record begins with the first real completed unit.",
     };
   }
   if (id === "ai-ml") {
     return {
       eyebrow: "DIRECTION",
       direction: "AI / ML engineering",
-      detail: "A future specialization to earn through mathematics, models, systems, and shipped work—not a present expertise claim.",
+      detail: "A future specialization. Empty by design until real study, experiments, or artifacts exist.",
     };
   }
   return {
     eyebrow: "SUPPORTING CAPABILITY",
     direction: "AI automation",
-    detail: "Automation, agents, and tooling develop beside stronger software foundations rather than becoming a separate headline identity.",
+    detail: "A supporting capability. It stays secondary until real work gives it weight.",
   };
 }
 
@@ -40,7 +40,7 @@ export default async function GrowthChapter() {
 
       <div className="growth-heading">
         <h2 id="growth-title">BECOMING LEAVES A RECORD.</h2>
-        <p>Learning is allowed to start at zero, pause, resume, finish, and become history without pretending calendar time equals progress.</p>
+        <p>Learning can begin at zero, pause, resume, finish, and become history. Calendar time never pretends to be progress.</p>
       </div>
 
       <div className="growth-topology" aria-label="Current learning directions">
@@ -64,7 +64,7 @@ export default async function GrowthChapter() {
               {track.id === "foundry180" && (
                 <p className="growth-truth">
                   <span>{track.completedUnits ?? 0}</span>
-                  <span>of {track.totalUnits ?? 180} curriculum units completed</span>
+                  <span>of {track.totalUnits ?? 180} units completed</span>
                 </p>
               )}
             </article>
