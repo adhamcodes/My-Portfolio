@@ -15,6 +15,7 @@ import "@/styles/master/story.css";
 import "@/styles/master/work.css";
 import "@/styles/master/quiet.css";
 import "@/styles/master/growth.css";
+import "@/styles/master/pulse.css";
 import "@/styles/master/history.css";
 import "@/styles/master/ending.css";
 import "@/styles/master/worlds.css";
