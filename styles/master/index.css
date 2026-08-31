@@ -17,7 +17,7 @@
 .index-trigger {
   display: inline-flex;
   align-items: center;
-  gap: .55rem;
+  gap: .52rem;
   padding: .55rem .1rem;
   color: var(--adham-ink-soft);
   font-size: .72rem;
@@ -51,8 +51,8 @@
   z-index: var(--adham-z-overlay);
   display: grid;
   place-items: stretch;
-  background: rgba(5, 5, 6, .76);
-  backdrop-filter: blur(22px) saturate(.8);
+  background: rgba(5, 5, 6, .34);
+  backdrop-filter: blur(8px) saturate(.84) brightness(.72);
   animation: index-layer-in var(--adham-duration-settle) var(--adham-ease-reveal) both;
 }
 
@@ -63,20 +63,8 @@
   overflow: auto;
   padding: max(1.25rem, env(safe-area-inset-top)) var(--adham-page-gutter) max(1.5rem, env(safe-area-inset-bottom));
   background:
-    radial-gradient(circle at 72% 42%, rgba(210, 79, 130, .075), transparent 34%),
-    linear-gradient(180deg, rgba(12, 12, 15, .88), rgba(5, 5, 6, .97));
-}
-
-.index-world::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
-  background-size: 12vw 12vw;
-  mask-image: radial-gradient(circle at 58% 48%, #000, transparent 78%);
+    radial-gradient(circle at 72% 44%, rgba(210, 79, 130, .045), transparent 34%),
+    linear-gradient(90deg, rgba(5,5,6,.88) 0%, rgba(5,5,6,.6) 44%, rgba(5,5,6,.2) 76%, rgba(5,5,6,.42) 100%);
 }
 
 .index-heading {
@@ -109,7 +97,7 @@
   margin: 0 auto;
   display: grid;
   align-content: center;
-  gap: clamp(1.1rem, 2.7vh, 2.2rem);
+  gap: clamp(.95rem, 2.4vh, 1.8rem);
 }
 
 .index-axis {
@@ -118,19 +106,19 @@
   top: 10%;
   bottom: 10%;
   width: 1px;
-  background: linear-gradient(180deg, transparent, rgba(242,239,233,.32) 12%, rgba(242,239,233,.18) 88%, transparent);
+  background: linear-gradient(180deg, transparent, rgba(242,239,233,.28) 12%, rgba(242,239,233,.16) 88%, transparent);
 }
 
 .index-destination {
-  --index-offset: calc(var(--index-order) * clamp(.15rem, 1vw, .65rem));
+  --index-offset: calc(var(--index-order) * clamp(.1rem, .7vw, .45rem));
   position: relative;
   display: grid;
-  grid-template-columns: clamp(3.6rem, 9vw, 8rem) minmax(0, .72fr) minmax(15rem, 1fr);
+  grid-template-columns: clamp(3.6rem, 9vw, 8rem) minmax(0, .72fr) minmax(14rem, 1fr);
   align-items: baseline;
   gap: clamp(.8rem, 2vw, 2rem);
-  min-height: clamp(4.2rem, 9vh, 7rem);
-  padding: .65rem 0 .65rem var(--index-offset);
-  color: var(--adham-ink-soft);
+  min-height: clamp(4rem, 8.5vh, 6.5rem);
+  padding: .58rem 0 .58rem var(--index-offset);
+  color: rgba(221, 216, 208, .58);
   text-decoration: none;
   transform-origin: left center;
   transition:
@@ -146,10 +134,10 @@
   right: 0;
   bottom: 0;
   height: 1px;
-  background: linear-gradient(90deg, rgba(242,239,233,.2), transparent 72%);
+  background: linear-gradient(90deg, rgba(242,239,233,.16), transparent 68%);
   transform-origin: left;
-  transform: scaleX(.35);
-  opacity: .34;
+  transform: scaleX(.3);
+  opacity: .28;
   transition: transform var(--adham-duration-settle) var(--adham-ease-transform), opacity var(--adham-duration-response) linear;
 }
 
@@ -162,14 +150,16 @@
   border-radius: 50%;
   border: 1px solid rgba(242,239,233,.34);
   background: var(--adham-void);
-  box-shadow: 0 0 0 0 rgba(210,79,130,0);
   transform: translateY(-50%);
-  transition: box-shadow var(--adham-duration-settle) var(--adham-ease-response), background var(--adham-duration-response) linear;
+  transition:
+    box-shadow var(--adham-duration-settle) var(--adham-ease-response),
+    background var(--adham-duration-response) linear,
+    transform var(--adham-duration-settle) var(--adham-ease-response);
 }
 
 .index-label {
   grid-column: 2;
-  font-size: clamp(2rem, 5.8vw, 5.7rem);
+  font-size: clamp(2rem, 5.2vw, 5.25rem);
   line-height: .88;
   letter-spacing: -.055em;
   font-weight: 650;
@@ -177,9 +167,9 @@
 
 .index-detail {
   grid-column: 3;
-  max-width: 34rem;
+  max-width: 30rem;
   color: var(--adham-ink-muted);
-  font-size: clamp(.88rem, 1.2vw, 1.05rem);
+  font-size: clamp(.88rem, 1.1vw, 1.02rem);
   line-height: 1.45;
 }
 
@@ -187,37 +177,34 @@
 .index-destination:focus-visible,
 .index-destination[data-current="true"] {
   color: var(--adham-paper);
-  transform: translateX(clamp(.35rem, .8vw, .8rem));
+  transform: translateX(clamp(.32rem, .72vw, .72rem));
 }
 
 .index-destination:hover::after,
 .index-destination:focus-visible::after,
 .index-destination[data-current="true"]::after {
   transform: scaleX(1);
-  opacity: .82;
+  opacity: .72;
+}
+
+.index-destination:hover .index-node,
+.index-destination:focus-visible .index-node {
+  transform: translateY(-50%) scale(1.28);
 }
 
 .index-destination[data-current="true"] .index-node {
   background: var(--adham-accent-identity);
   border-color: rgba(242,239,233,.64);
-  box-shadow: 0 0 1.7rem rgba(210,79,130,.46);
-}
-
-.index-footnote {
-  position: absolute;
-  right: var(--adham-page-gutter);
-  bottom: max(1.25rem, env(safe-area-inset-bottom));
-  margin: 0;
-  color: var(--adham-ink-muted);
-  font-size: .72rem;
-  letter-spacing: .04em;
+  box-shadow: 0 0 1.6rem rgba(210,79,130,.42);
 }
 
 html[data-index-open="true"] .living-trace {
-  opacity: .48;
-  transform: scale(1.06);
-  filter: blur(.4px);
-  transition: opacity var(--adham-duration-settle) var(--adham-ease-response), transform var(--adham-duration-world) var(--adham-ease-transform), filter var(--adham-duration-settle) linear;
+  opacity: .98;
+  transition: opacity var(--adham-duration-response) linear;
+}
+
+html[data-index-open="true"] .living-trace::after {
+  opacity: .22;
 }
 
 @keyframes index-layer-in {
@@ -228,6 +215,8 @@ html[data-index-open="true"] .living-trace {
 @media (max-width: 760px) {
   .index-world {
     padding-inline: 1rem;
+    background:
+      linear-gradient(180deg, rgba(5,5,6,.84), rgba(5,5,6,.5) 62%, rgba(5,5,6,.78));
   }
 
   .index-heading {
@@ -236,8 +225,8 @@ html[data-index-open="true"] .living-trace {
 
   .index-map {
     align-content: start;
-    padding-top: 12svh;
-    gap: .5rem;
+    padding-top: 11svh;
+    gap: .45rem;
   }
 
   .index-axis {
@@ -270,11 +259,6 @@ html[data-index-open="true"] .living-trace {
     grid-column: 2;
     margin-top: .15rem;
     font-size: .86rem;
-  }
-
-  .index-footnote {
-    position: static;
-    margin: 2rem 0 .5rem 2.8rem;
   }
 }
 
