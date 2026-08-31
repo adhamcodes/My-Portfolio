@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import type { ChapterId } from "@/core/contracts";
 import { isChapterId, normalizeScrollVelocity } from "@/core/experience";
 
 export default function ExperienceDirector() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const root = document.documentElement;
     const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-chapter]"));
@@ -79,25 +82,26 @@ export default function ExperienceDirector() {
       }, 90);
     };
 
-    const onResize = () => {
-      resolveChapter();
-    };
+    const onResize = () => resolveChapter();
 
     root.dataset.chapter = currentChapter;
+    root.dataset.route = pathname;
     root.style.setProperty("--adham-scroll-velocity", "0");
-    resolveChapter();
+
+    // Let Next finish applying the new route's scroll/hash position before resolving.
+    const routeRaf = requestAnimationFrame(resolveChapter);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
+      cancelAnimationFrame(routeRaf);
       if (scrollRaf) cancelAnimationFrame(scrollRaf);
       window.clearTimeout(settleTimer);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      delete root.dataset.chapter;
       root.style.removeProperty("--adham-scroll-velocity");
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }
