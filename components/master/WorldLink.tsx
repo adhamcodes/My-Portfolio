@@ -31,7 +31,7 @@ export default function WorldLink({ href, world, className, children }: WorldLin
 
     const root = document.documentElement;
     window.dispatchEvent(new CustomEvent("adham:travel", {
-      detail: { phase: "depart", world },
+      detail: { phase: "depart", world, href },
     }));
 
     const reduced = root.dataset.motionMode === "reduced";
