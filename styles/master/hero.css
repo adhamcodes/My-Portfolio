@@ -1,3 +1,27 @@
+.master-shell {
+  font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+}
+
+.master-reading,
+.master-section-head > p,
+.master-work > p,
+.master-growth-item > p,
+.master-history-entry > p,
+.master-present > p {
+  font-family: var(--font-newsreader), Georgia, serif;
+  letter-spacing: -.012em;
+}
+
+.master-number,
+.master-idea,
+.master-status,
+.master-preview-tag,
+.master-wordmark,
+.index-trigger,
+.index-heading {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+}
+
 .hero-v2 {
   position: relative;
   width: 100%;
