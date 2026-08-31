@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import WorldLink from "@/components/master/WorldLink";
 import LocalImageTransform from "@/components/worlds/LocalImageTransform";
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export default function ZeroUploadWorldPage() {
   return (
     <main className="zu-world">
       <header className="zu-world-header">
-        <Link href="/#work">Return to work</Link>
+        <WorldLink href="/#work" world="portfolio">Return to work</WorldLink>
         <span>ZEROUPLOAD / BOUNDARY</span>
       </header>
 
@@ -62,7 +62,7 @@ export default function ZeroUploadWorldPage() {
         <nav aria-label="ZeroUpload links">
           <a href="https://zeroupload.app" target="_blank" rel="noreferrer">Use ZeroUpload ↗</a>
           <a href="https://github.com/adhamcodes/ZeroUpload" target="_blank" rel="noreferrer">Source ↗</a>
-          <Link href="/#work">Return to work</Link>
+          <WorldLink href="/#work" world="portfolio">Return to work</WorldLink>
         </nav>
       </footer>
     </main>
