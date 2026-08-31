@@ -1,9 +1,10 @@
+import GrowthChapter from "@/components/master/GrowthChapter";
 import Hero from "@/components/master/Hero";
 import HumanStory from "@/components/master/HumanStory";
 import Index from "@/components/master/Index";
 import LivingTrace from "@/components/master/LivingTrace";
 import WorkEncounter from "@/components/master/WorkEncounter";
-import { growthTracks, historyEntries, masterIdentity } from "@/content/master";
+import { historyEntries, masterIdentity } from "@/content/master";
 
 type SemanticShellProps = {
   preview?: boolean;
@@ -30,25 +31,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
       <div id="main-story">
         <HumanStory />
         <WorkEncounter />
-
-        <section id="growth" data-chapter="growth" className="master-scene" aria-labelledby="growth-title">
-          <p className="master-number">03 / GROWTH</p>
-          <div className="master-section-head">
-            <h2 id="growth-title">The becoming is part of the record.</h2>
-            <p>These tracks begin at zero. The interface must remain complete even before the first real event exists.</p>
-          </div>
-          <div className="master-growth-list">
-            {growthTracks.map((track) => (
-              <article key={track.id} className="master-growth-item">
-                <div>
-                  <span className="master-status">{track.status.replace("_", " ")}</span>
-                  <h3>{track.label}</h3>
-                </div>
-                <p>{track.note}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+        <GrowthChapter />
 
         <section id="history" data-chapter="history" className="master-scene master-history" aria-labelledby="history-title">
           <p className="master-number">04 / HISTORY</p>
