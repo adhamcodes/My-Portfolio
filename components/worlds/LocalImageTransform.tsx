@@ -5,7 +5,6 @@ import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from "r
 type Result = {
   sourceUrl: string;
   outputUrl: string;
-  sourceName: string;
   sourceBytes: number;
   outputBytes: number;
   sourceWidth: number;
@@ -70,50 +69,6 @@ export default function LocalImageTransform() {
     setWorking(true);
     try {
       const bitmap = await createImageBitmap(file);
-      const target = outputDimensions(bitmap.width, bitmap.height);
-      const canvas = document.createElement("canvas");
-      canvas.width = target.width;
-      canvas.height = target.height;
-      const context = canvas.getContext("2d", { alpha: true });
-      if (!context) throw new Error("Canvas processing is unavailable in this browser.");
-
-      context.imageSmoothingEnabled = true;
-      context.imageSmoothingQuality = "high";
-      context.drawImage(bitmap, 0, 0, target.width, target.height);
-      bitmap.close();
-
-      const output = await canvasToWebp(canvas);
-      const sourceUrl = URL.createObjectURL(file);
-      const outputUrl = URL.createObjectURL(output);
-      replaceUrls([sourceUrl, outputUrl]);
-      setResult({
-        sourceUrl,
-        outputUrl,
-        sourceName: file.name,
-        sourceBytes: file.size,
-        outputBytes: output.size,
-        sourceWidth: canvas.width === target.width ? Math.round(target.width / Math.min(1, MAX_DIMENSION / Math.max(target.width, target.height))) : target.width,
-        sourceHeight: canvas.height === target.height ? Math.round(target.height / Math.min(1, MAX_DIMENSION / Math.max(target.width, target.height))) : target.height,
-        outputWidth: target.width,
-        outputHeight: target.height,
-      });
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "The local transform failed on this device.");
-    } finally {
-      setWorking(false);
-    }
-  };
-
-  const processWithDimensions = async (file: File) => {
-    setError(null);
-    if (!ACCEPTED.has(file.type)) {
-      setError("Choose a JPEG, PNG, or WebP image for this demo.");
-      return;
-    }
-
-    setWorking(true);
-    try {
-      const bitmap = await createImageBitmap(file);
       const sourceWidth = bitmap.width;
       const sourceHeight = bitmap.height;
       const target = outputDimensions(sourceWidth, sourceHeight);
@@ -138,7 +93,6 @@ export default function LocalImageTransform() {
       setResult({
         sourceUrl,
         outputUrl,
-        sourceName: file.name,
         sourceBytes: file.size,
         outputBytes: output.size,
         sourceWidth,
@@ -155,14 +109,14 @@ export default function LocalImageTransform() {
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) void processWithDimensions(file);
+    if (file) void processFile(file);
     event.target.value = "";
   };
 
   const onDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const file = event.dataTransfer.files?.[0];
-    if (file) void processWithDimensions(file);
+    if (file) void processFile(file);
   };
 
   return (
