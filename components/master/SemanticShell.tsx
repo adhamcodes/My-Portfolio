@@ -2,7 +2,8 @@ import Hero from "@/components/master/Hero";
 import HumanStory from "@/components/master/HumanStory";
 import Index from "@/components/master/Index";
 import LivingTrace from "@/components/master/LivingTrace";
-import { featuredWork, growthTracks, historyEntries, masterIdentity } from "@/content/master";
+import WorkEncounter from "@/components/master/WorkEncounter";
+import { growthTracks, historyEntries, masterIdentity } from "@/content/master";
 
 type SemanticShellProps = {
   preview?: boolean;
@@ -28,29 +29,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
 
       <div id="main-story">
         <HumanStory />
-
-        <section id="work" data-chapter="work" className="master-scene" aria-labelledby="work-title">
-          <p className="master-number">02 / WORK</p>
-          <div className="master-section-head">
-            <h2 id="work-title">Evidence, not inventory.</h2>
-            <p>The portfolio does not need a full project grid. Work enters this space only when it earns the attention.</p>
-          </div>
-          <div className="master-work-list">
-            {featuredWork.map((project) => (
-              <article key={project.id} className="master-work" aria-labelledby={`${project.id}-title`}>
-                <div>
-                  <span className="master-idea">{project.centralIdea}</span>
-                  <h3 id={`${project.id}-title`}>{project.name}</h3>
-                </div>
-                <p>{project.summary}</p>
-                <div className="master-links">
-                  {project.liveUrl && <a href={project.liveUrl}>Live product <span aria-hidden="true">↗</span></a>}
-                  {project.sourceUrl && <a href={project.sourceUrl}>Source <span aria-hidden="true">↗</span></a>}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+        <WorkEncounter />
 
         <section id="growth" data-chapter="growth" className="master-scene" aria-labelledby="growth-title">
           <p className="master-number">03 / GROWTH</p>
