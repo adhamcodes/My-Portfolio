@@ -1,0 +1,109 @@
+html[data-world-travel] body {
+  overflow-x: clip;
+}
+
+html[data-world-travel="depart"] body > main {
+  pointer-events: none;
+  opacity: .18;
+  transform: translate3d(-1.25vw, 0, 0) scale(.992);
+  filter: blur(3px);
+  transition:
+    opacity 180ms var(--adham-ease-response),
+    transform 240ms var(--adham-ease-transform),
+    filter 180ms linear;
+}
+
+html[data-world-travel="depart"][data-world-target="portfolio"] body > main {
+  transform: translate3d(1.1vw, 0, 0) scale(.992);
+}
+
+html[data-world-travel="depart"] .living-trace {
+  transform: scale3d(.9, 1.03, 1) translate3d(-2vw, 0, 0);
+  filter: saturate(.82) brightness(.96);
+  transition:
+    transform 260ms var(--adham-ease-transform),
+    filter 220ms linear,
+    opacity 220ms linear;
+}
+
+html[data-world-travel="depart"][data-world-target="zeroupload"] .living-trace {
+  transform: scale3d(.73, 1.06, 1) translate3d(-7vw, 0, 0);
+  filter: saturate(.72) brightness(.9);
+}
+
+html[data-world-travel="arrive"] body > main {
+  animation: world-arrive-content 560ms var(--adham-ease-reveal) both;
+}
+
+html[data-world-travel="arrive"] .living-trace {
+  animation: world-arrive-trace 620ms var(--adham-ease-transform) both;
+}
+
+@keyframes world-arrive-content {
+  from {
+    opacity: .16;
+    transform: translate3d(1.1vw, 0, 0) scale(.994);
+    filter: blur(3px);
+  }
+  48% {
+    opacity: .62;
+    filter: blur(.8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: none;
+  }
+}
+
+@keyframes world-arrive-trace {
+  from {
+    transform: scale3d(.82, 1.04, 1) translate3d(-3vw, 0, 0);
+    filter: saturate(.8) brightness(.94);
+  }
+  to {
+    transform: none;
+    filter: none;
+  }
+}
+
+@media (max-width: 760px) {
+  html[data-world-travel="depart"] body > main {
+    transform: translate3d(0, .5rem, 0) scale(.995);
+    filter: blur(2px);
+  }
+
+  html[data-world-travel="depart"] .living-trace,
+  html[data-world-travel="depart"][data-world-target="zeroupload"] .living-trace {
+    transform: scale3d(.86, 1.04, 1) translate3d(0, -.5rem, 0);
+  }
+
+  @keyframes world-arrive-content {
+    from {
+      opacity: .14;
+      transform: translate3d(0, .75rem, 0) scale(.996);
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-world-travel="depart"] body > main,
+  html[data-world-travel="depart"] .living-trace,
+  html[data-world-travel="arrive"] body > main,
+  html[data-world-travel="arrive"] .living-trace {
+    animation: none;
+    transition: none;
+    transform: none;
+    filter: none;
+  }
+
+  html[data-world-travel="depart"] body > main {
+    opacity: .72;
+  }
+}
