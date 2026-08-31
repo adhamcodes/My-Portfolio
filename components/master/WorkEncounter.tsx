@@ -25,7 +25,7 @@ export default function WorkEncounter() {
         <h2 id="work-title">{project.name}</h2>
         <p>{project.summary}</p>
         <WorldLink className="work-enter" href="/work/zeroupload" world="zeroupload">
-          Enter the boundary <span aria-hidden="true">↗</span>
+          Enter the boundary <span aria-hidden="true">→</span>
         </WorldLink>
       </div>
 
