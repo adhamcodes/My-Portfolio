@@ -1,0 +1,53 @@
+:root {
+  color-scheme: dark;
+  background: var(--adham-void);
+  color: var(--adham-paper);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  background: var(--adham-void);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--adham-void);
+  color: var(--adham-paper);
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img,
+svg,
+canvas,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(210, 79, 130, 0.34);
+  color: var(--adham-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
