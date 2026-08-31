@@ -18,6 +18,7 @@ import "@/styles/master/ending.css";
 import "@/styles/master/worlds.css";
 import "@/styles/master/index.css";
 import "@/styles/master/travel.css";
+import "@/styles/master/mobile.css";
 import "@/styles/master/system.css";
 
 const instrumentSans = Instrument_Sans({
