@@ -11,6 +11,7 @@ import "@/styles/master/story.css";
 import "@/styles/master/work.css";
 import "@/styles/master/growth.css";
 import "@/styles/master/history.css";
+import "@/styles/master/ending.css";
 import "@/styles/master/worlds.css";
 import "@/styles/master/index.css";
 import "@/styles/master/system.css";
