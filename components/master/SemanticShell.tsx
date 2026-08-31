@@ -53,7 +53,9 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
                   document.querySelector('.index-trigger')?.click();
                   return;
                 }
-                document.getElementById(review)?.scrollIntoView({ behavior: 'auto', block: 'center' });
+                const scene = document.getElementById(review);
+                const target = scene?.querySelector('h1, h2, h3') || scene;
+                target?.scrollIntoView({ behavior: 'auto', block: 'center' });
               };
               if (document.readyState === 'complete') setTimeout(run, 450);
               else addEventListener('load', () => setTimeout(run, 450), { once: true });
