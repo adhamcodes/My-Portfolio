@@ -29,7 +29,7 @@ export default function Ending() {
           <span>Software engineering → AI/ML engineering</span>
         </div>
         <nav aria-label="Contact and source">
-          <a href={`mailto:${masterIdentity.workEmail}`}>Email</a>
+          <a href={`mailto:${masterIdentity.workEmail}`}>{masterIdentity.workEmail}</a>
           <a href={masterIdentity.github} target="_blank" rel="noreferrer">GitHub ↗</a>
         </nav>
       </div>
