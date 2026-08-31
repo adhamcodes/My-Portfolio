@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { Component, useEffect, useState, type ReactNode } from "react";
 import type { MotionMode, PublicLivingState, RenderTier } from "@/core/contracts";
 import type { CapabilityDecision } from "@/core/capability";
 import { createCurrentLivingState } from "@/content/living-state";
@@ -12,6 +12,27 @@ type CapabilityView = {
   renderTier: RenderTier;
   motionMode: MotionMode;
 };
+
+type TraceBoundaryProps = {
+  children: ReactNode;
+  onFailure: () => void;
+};
+
+class TraceBoundary extends Component<TraceBoundaryProps, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch() {
+    this.props.onFailure();
+  }
+
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
 
 function StaticTrace() {
   return (
@@ -51,6 +72,7 @@ function isLivingState(value: unknown): value is PublicLivingState {
 export default function LivingTrace() {
   const [capability, setCapability] = useState<CapabilityView | null>(null);
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [livingState, setLivingState] = useState<PublicLivingState>(() => createCurrentLivingState(new Date().toISOString()));
 
   useEffect(() => {
@@ -103,15 +125,27 @@ export default function LivingTrace() {
   }, []);
 
   return (
-    <div className="living-trace" data-ready={ready ? "true" : "false"} aria-hidden="true">
+    <div
+      className="living-trace"
+      data-ready={ready ? "true" : "false"}
+      data-failed={failed ? "true" : "false"}
+      aria-hidden="true"
+    >
       <StaticTrace />
-      {capability && capability.renderTier !== "static-low" && (
-        <LivingTraceCanvas
-          renderTier={capability.renderTier}
-          motionMode={capability.motionMode}
-          livingState={livingState}
-          onReady={() => setReady(true)}
-        />
+      {capability && capability.renderTier !== "static-low" && !failed && (
+        <TraceBoundary
+          onFailure={() => {
+            setFailed(true);
+            setReady(false);
+          }}
+        >
+          <LivingTraceCanvas
+            renderTier={capability.renderTier}
+            motionMode={capability.motionMode}
+            livingState={livingState}
+            onReady={() => setReady(true)}
+          />
+        </TraceBoundary>
       )}
     </div>
   );
