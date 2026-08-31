@@ -15,9 +15,9 @@ concurrency:
 
 jobs:
   verify:
-    name: Typecheck, build, and smoke test
+    name: Build, smoke, and visual surfaces
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
 
     steps:
       - name: Checkout
@@ -60,9 +60,9 @@ jobs:
             exit 1
           fi
 
-          curl --fail --silent --show-error http://127.0.0.1:3000/ > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:3000/ > /tmp/home.html
           curl --fail --silent --show-error http://127.0.0.1:3000/work/zeroupload > /dev/null
-          curl --fail --silent --show-error http://127.0.0.1:3000/work/quiet > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:3000/work/quiet > /tmp/quiet.html
           curl --fail --silent --show-error http://127.0.0.1:3000/api/living-state > /tmp/living-state.json
 
           node - <<'NODE'
@@ -79,5 +79,53 @@ jobs:
             console.error('Living-state API returned an invalid public schema.');
             process.exit(1);
           }
+          if (state.work.some((work) => work?.id === 'quiet')) {
+            console.error('Quiet entered public Living State before its launch gate passed.');
+            process.exit(1);
+          }
           console.log(`Living-state schema ${state.schemaVersion}: ${state.events.length} public events`);
           NODE
+
+          if ! grep -qi 'noindex' /tmp/quiet.html; then
+            echo 'Quiet internal route must remain noindex until its truth gate passes.' >&2
+            exit 1
+          fi
+
+      - name: Capture production review surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome-stable || command -v google-chrome || command -v chromium || true)"
+          if [ -z "$BROWSER" ]; then
+            echo 'No headless Chromium binary is available on this runner.' >&2
+            exit 1
+          fi
+
+          npm run start -- -p 3000 > /tmp/adham-portfolio-visual-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/ > /dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+
+          mkdir -p artifacts/visual-review
+          FLAGS=(--headless=new --no-sandbox --disable-gpu --hide-scrollbars --run-all-compositor-stages-before-draw --virtual-time-budget=3500)
+
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/home-desktop.png http://127.0.0.1:3000/
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/growth-desktop.png 'http://127.0.0.1:3000/#growth'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/history-desktop.png 'http://127.0.0.1:3000/#history'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/zeroupload-desktop.png http://127.0.0.1:3000/work/zeroupload
+          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/home-mobile.png http://127.0.0.1:3000/
+          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/zeroupload-mobile.png http://127.0.0.1:3000/work/zeroupload
+
+      - name: Upload visual review surfaces
+        uses: actions/upload-artifact@v4
+        with:
+          name: master-2-visual-review
+          path: artifacts/visual-review
+          if-no-files-found: error
+          retention-days: 7
