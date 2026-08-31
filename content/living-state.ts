@@ -17,11 +17,11 @@ const growth: GrowthTrack[] = growthTracks.map((track) => ({
 /**
  * Current public truth used by Master 2.0 before external event sources are connected.
  * Nothing here implies learning progress that has not actually happened.
- * Undated archive material lives in work state; dated history events remain empty until verified.
+ * Undated archive material lives in work state; dated events remain empty until verified.
  */
 export function createCurrentLivingState(now: string): PublicLivingState {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     generatedAt: now,
     focus: [
       {
@@ -32,6 +32,6 @@ export function createCurrentLivingState(now: string): PublicLivingState {
     ],
     growth,
     work: allPublicWork,
-    history: [],
+    events: [],
   };
 }
