@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import WorldLink from "@/components/master/WorldLink";
 import QuietSoundscape from "@/components/worlds/QuietSoundscape";
+import { launchGates } from "@/content/master";
 
 export const metadata: Metadata = {
   title: "Quiet",
@@ -9,6 +11,8 @@ export const metadata: Metadata = {
 };
 
 export default function QuietWorldPage() {
+  if (!launchGates.quiet) notFound();
+
   return (
     <>
       <a className="world-skip" href="#project-content">Skip to project content</a>
