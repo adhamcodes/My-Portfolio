@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import type { MotionMode, PublicLivingState, RenderTier } from "@/core/contracts";
 import type { CapabilityDecision } from "@/core/capability";
+import { createCurrentLivingState } from "@/content/living-state";
 
 const LivingTraceCanvas = dynamic(() => import("./LivingTraceCanvas"), { ssr: false });
 
@@ -38,9 +39,19 @@ function activityEnergy(state: PublicLivingState) {
   return "quiet";
 }
 
+function isLivingState(value: unknown): value is PublicLivingState {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<PublicLivingState>;
+  return Array.isArray(candidate.focus)
+    && Array.isArray(candidate.growth)
+    && Array.isArray(candidate.work)
+    && Array.isArray(candidate.events);
+}
+
 export default function LivingTrace() {
   const [capability, setCapability] = useState<CapabilityView | null>(null);
   const [ready, setReady] = useState(false);
+  const [livingState, setLivingState] = useState<PublicLivingState>(() => createCurrentLivingState(new Date().toISOString()));
 
   useEffect(() => {
     const root = document.documentElement;
@@ -69,13 +80,14 @@ export default function LivingTrace() {
       try {
         const response = await fetch("/api/living-state", { signal: controller.signal });
         if (!response.ok) return;
-        const state = await response.json() as PublicLivingState;
-        if (!state || !Array.isArray(state.events)) return;
+        const payload: unknown = await response.json();
+        if (!isLivingState(payload)) return;
 
-        const energy = activityEnergy(state);
+        setLivingState(payload);
+        const energy = activityEnergy(payload);
         if (energy) root.dataset.activityEnergy = energy;
         else delete root.dataset.activityEnergy;
-        window.dispatchEvent(new CustomEvent("adham:living-state", { detail: state }));
+        window.dispatchEvent(new CustomEvent("adham:living-state", { detail: payload }));
       } catch (cause) {
         if (!(cause instanceof DOMException && cause.name === "AbortError")) {
           delete root.dataset.activityEnergy;
@@ -97,6 +109,7 @@ export default function LivingTrace() {
         <LivingTraceCanvas
           renderTier={capability.renderTier}
           motionMode={capability.motionMode}
+          livingState={livingState}
           onReady={() => setReady(true)}
         />
       )}
