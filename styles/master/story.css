@@ -6,13 +6,16 @@
   border-top-color: rgba(242,239,233,.07);
 }
 
-.human-story-monument {
+.human-story-title {
   position: relative;
   z-index: 2;
-  width: min(78rem, 92%);
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(18rem, .58fr);
+  gap: clamp(3rem, 8vw, 9rem);
+  align-items: end;
 }
 
-.human-story-monument h2 {
+.human-story-title h2 {
   margin: 0;
   font-family: var(--font-instrument), "Instrument Sans", sans-serif;
   font-size: clamp(4.6rem, 10.4vw, 10.5rem);
@@ -21,56 +24,79 @@
   letter-spacing: -.082em;
 }
 
-.human-story-monument h2 span {
+.human-story-title h2 span {
   display: block;
   width: max-content;
+  max-width: 100%;
 }
 
-.human-story-monument h2 span:nth-child(2) {
-  margin-left: clamp(2.5rem, 12vw, 12rem);
+.human-story-title h2 span:nth-child(2) {
+  margin-left: clamp(2.5rem, 10vw, 10rem);
   color: transparent;
   -webkit-text-stroke: 1px rgba(242,239,233,.34);
 }
 
-.human-story-monument h2 span:nth-child(3) {
-  margin-left: clamp(.8rem, 4vw, 4rem);
+.human-story-title h2 span:nth-child(3) {
+  margin-left: clamp(.8rem, 3vw, 3rem);
+}
+
+.human-story-thesis {
+  max-width: 28ch;
+  margin: 0 0 .7rem;
+  color: rgba(224,219,212,.7);
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: clamp(1.25rem, 1.9vw, 1.75rem);
+  line-height: 1.32;
+  letter-spacing: -.022em;
 }
 
 .human-story-beats {
   position: relative;
   z-index: 3;
-  width: min(56rem, 64vw);
-  margin: clamp(6rem, 13vw, 13rem) 0 0 auto;
+  width: min(78rem, 88%);
+  margin: clamp(7rem, 13vw, 13rem) 0 0 auto;
 }
 
 .human-story-beats article {
   display: grid;
-  grid-template-columns: minmax(5rem, .28fr) minmax(0, 1fr);
-  gap: clamp(1.5rem, 4vw, 4rem);
-  padding: clamp(1.5rem, 3vw, 2.8rem) 0;
-  border-top: 1px solid rgba(242,239,233,.12);
+  grid-template-columns: minmax(5rem, .22fr) minmax(13rem, .68fr) minmax(18rem, 1fr);
+  gap: clamp(1.4rem, 4vw, 4.5rem);
+  align-items: start;
+  padding: clamp(2rem, 3.8vw, 3.6rem) 0;
+  border-top: 1px solid rgba(242,239,233,.11);
 }
 
 .human-story-beats article:last-child {
-  border-bottom: 1px solid rgba(242,239,233,.08);
+  border-bottom: 1px solid rgba(242,239,233,.07);
 }
 
-.human-story-beats span {
-  padding-top: .22rem;
-  color: var(--adham-ink-muted);
+.human-story-beats article > p:first-child {
+  margin: .38rem 0 0;
+  color: rgba(210,79,130,.64);
   font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: .7rem;
-  letter-spacing: .14em;
+  font-size: .66rem;
+  letter-spacing: .15em;
 }
 
-.human-story-beats p {
+.human-story-beats h3 {
+  max-width: 15ch;
+  margin: 0;
+  color: rgba(242,239,233,.9);
+  font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+  font-size: clamp(2rem, 3.45vw, 3.8rem);
+  font-weight: 590;
+  line-height: .95;
+  letter-spacing: -.052em;
+}
+
+.human-story-beats article > p:last-child {
   max-width: 34ch;
   margin: 0;
-  color: rgba(225,220,213,.82);
+  color: rgba(224,219,212,.7);
   font-family: var(--font-newsreader), Georgia, serif;
-  font-size: clamp(1.35rem, 2.2vw, 2.15rem);
-  line-height: 1.24;
-  letter-spacing: -.024em;
+  font-size: clamp(1.08rem, 1.45vw, 1.32rem);
+  line-height: 1.5;
+  letter-spacing: -.014em;
 }
 
 @media (max-width: 820px) {
@@ -80,36 +106,50 @@
     padding-bottom: 9rem;
   }
 
-  .human-story-monument {
-    width: 100%;
+  .human-story-title {
+    grid-template-columns: 1fr;
+    gap: 2.3rem;
   }
 
-  .human-story-monument h2 {
+  .human-story-title h2 {
     font-size: clamp(4rem, 18vw, 7rem);
     line-height: .78;
   }
 
-  .human-story-monument h2 span:nth-child(2) {
+  .human-story-title h2 span:nth-child(2) {
     margin-left: 8vw;
   }
 
-  .human-story-monument h2 span:nth-child(3) {
+  .human-story-title h2 span:nth-child(3) {
     margin-left: 0;
+  }
+
+  .human-story-thesis {
+    max-width: 25ch;
   }
 
   .human-story-beats {
     width: 100%;
-    margin-top: 7rem;
+    margin-top: 6.5rem;
   }
 
   .human-story-beats article {
     grid-template-columns: 1fr;
-    gap: .75rem;
-    padding: 1.7rem 0;
+    gap: .9rem;
+    padding: 2rem 0 2.4rem;
   }
 
-  .human-story-beats p {
-    max-width: 27ch;
-    font-size: clamp(1.35rem, 6vw, 1.75rem);
+  .human-story-beats article > p:first-child {
+    margin-top: 0;
+  }
+
+  .human-story-beats h3 {
+    max-width: 14ch;
+    font-size: clamp(2.25rem, 10vw, 3.4rem);
+  }
+
+  .human-story-beats article > p:last-child {
+    max-width: 28ch;
+    font-size: clamp(1.08rem, 4.8vw, 1.28rem);
   }
 }
