@@ -7,6 +7,7 @@ export const masterIdentity = {
   currentFrame:
     "The direction is clear. The proof is still being built, and this portfolio is designed to change as that becomes true.",
   github: "https://github.com/adhamcodes",
+  workEmail: "adham.mahmood.work@gmail.com",
 } as const;
 
 /**
