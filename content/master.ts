@@ -21,6 +21,15 @@ export const featuredWork: WorkEntry[] = [
     sourceUrl: "https://github.com/adhamcodes/ZeroUpload",
     featured: true,
   },
+  {
+    id: "quiet",
+    name: "Quiet",
+    summary:
+      "A frontend focus space where ambient sound is generated live in the browser and the interface recedes into a distraction-free Sanctuary.",
+    centralIdea: "Absence",
+    maturity: "active",
+    featured: true,
+  },
 ];
 
 export const historicalWork: WorkEntry[] = [
