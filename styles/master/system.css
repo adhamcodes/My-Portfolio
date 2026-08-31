@@ -1,0 +1,59 @@
+.master-system-state {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: var(--adham-page-gutter);
+  background: var(--adham-void);
+  color: var(--adham-paper);
+}
+
+.master-system-inner {
+  width: min(760px, 100%);
+  padding: clamp(3rem, 8vw, 7rem) 0;
+  border-top: 1px solid rgba(242, 239, 233, 0.14);
+  border-bottom: 1px solid rgba(242, 239, 233, 0.14);
+}
+
+.master-system-label {
+  margin: 0 0 1.5rem;
+  color: var(--adham-ink-muted);
+  font-size: var(--adham-type-meta);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.master-system-inner h1 {
+  margin: 0;
+  max-width: 11ch;
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 0.94;
+  letter-spacing: -0.06em;
+}
+
+.master-system-inner > p:not(.master-system-label) {
+  max-width: 52ch;
+  margin: 2rem 0 0;
+  color: var(--adham-ink-soft);
+  font-size: var(--adham-type-body);
+  line-height: var(--adham-leading-body);
+}
+
+.master-system-inner a,
+.master-system-inner button {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0 0 0.45rem;
+  border: 0;
+  border-bottom: 1px solid rgba(242, 239, 233, 0.34);
+  background: transparent;
+  color: var(--adham-paper);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.master-system-inner a:focus-visible,
+.master-system-inner button:focus-visible {
+  outline: 2px solid var(--adham-paper);
+  outline-offset: 5px;
+}

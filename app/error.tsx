@@ -4,17 +4,16 @@ import { useEffect } from "react";
 
 export default function ErrorState({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    console.error("Portfolio application boundary:", error);
+    console.error("Portfolio error boundary:", error);
   }, [error]);
 
   return (
-    <main className="system-error">
-      <div className="system-error-shell">
-        <span>APPLICATION ERROR</span>
-        <h1>SOMETHING<br />BROKE.</h1>
-        <p>The page hit an unexpected state. Try the recovery control below without losing the rest of the experience.</p>
-        <button onClick={reset}>TRY AGAIN ↗</button>
-        {error.digest && <code>ERROR ID / {error.digest}</code>}
+    <main className="master-system-state">
+      <div className="master-system-inner">
+        <p className="master-system-label">Something went wrong</p>
+        <h1>The page hit an unexpected state.</h1>
+        <p>Try again. If the problem persists, the rest of the portfolio should still remain reachable from a fresh load.</p>
+        <button type="button" onClick={reset}>Try again</button>
       </div>
     </main>
   );

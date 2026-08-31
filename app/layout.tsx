@@ -4,6 +4,7 @@ import ExperienceDirector from "@/components/master/ExperienceDirector";
 import "@/styles/master/tokens.css";
 import "@/styles/master/base.css";
 import "@/styles/master/shell.css";
+import "@/styles/master/system.css";
 
 export const metadata: Metadata = {
   title: {
