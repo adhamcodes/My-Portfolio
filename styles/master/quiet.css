@@ -442,7 +442,7 @@ html[data-scene-world="quiet"] .living-trace {
 .quiet-world-footer {
   display: flex;
   justify-content: space-between;
-  align-items: end;
+  align-items: flex-end;
   gap: 2rem;
   padding: 4rem 0 max(5rem, calc(env(safe-area-inset-bottom) + 3rem));
   border-top: 1px solid rgba(242,239,233,.07);
