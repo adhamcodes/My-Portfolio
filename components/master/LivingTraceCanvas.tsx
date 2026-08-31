@@ -2,7 +2,7 @@
 
 import { Line } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import * as THREE from "three";
 import type {
   ChapterId,
@@ -32,6 +32,8 @@ type StrandSpec = {
   phase: number;
   dormant: boolean;
   emphasis: number;
+  responseX: number;
+  responseY: number;
   decorative?: boolean;
 };
 
@@ -39,6 +41,14 @@ type LivingTraceCanvasProps = {
   renderTier: RenderTier;
   motionMode: MotionMode;
   onReady: () => void;
+};
+
+type StrandTransform = {
+  x: number;
+  y: number;
+  z: number;
+  scale: number;
+  rz: number;
 };
 
 function hash01(input: string) {
@@ -51,9 +61,9 @@ function hash01(input: string) {
 }
 
 function regionColor(region: TraceRegion) {
-  if (region.domain === "self") return "#e4c9d4";
-  if (region.domain === "work") return "#98b8bf";
-  if (region.domain === "growth") return "#c09157";
+  if (region.domain === "self") return "#e7d8df";
+  if (region.domain === "work") return "#9ab8bf";
+  if (region.domain === "growth") return "#c39762";
   return "#8d9098";
 }
 
@@ -85,18 +95,19 @@ function createSpine() {
 }
 
 function createBraid(spine: THREE.CatmullRomCurve3, offset: number, phase: number) {
-  const samples = 42;
+  const samples = 48;
   const points = Array.from({ length: samples + 1 }, (_, index) => {
     const t = index / samples;
     const point = spine.getPoint(t);
     const tangent = spine.getTangent(t).normalize();
     const normal = new THREE.Vector3(-tangent.y, tangent.x, 0).normalize();
     const binormal = new THREE.Vector3().crossVectors(tangent, normal).normalize();
-    const wave = Math.sin(t * Math.PI * 5.5 + phase);
-    const depth = Math.cos(t * Math.PI * 4.5 + phase);
+    const envelope = 0.42 + Math.sin(t * Math.PI) * 0.58;
+    const wave = Math.sin(t * Math.PI * 6.2 + phase);
+    const depth = Math.cos(t * Math.PI * 4.8 + phase);
     return point.clone()
-      .add(normal.multiplyScalar(wave * offset))
-      .add(binormal.multiplyScalar(depth * offset * 0.72));
+      .add(normal.multiplyScalar(wave * offset * envelope))
+      .add(binormal.multiplyScalar(depth * offset * 0.72 * envelope));
   });
   return makeCurve(points);
 }
@@ -107,26 +118,27 @@ function createBranch(spine: THREE.CatmullRomCurve3, region: TraceRegion, index:
   const h3 = hash01(`${region.id}:c`);
   const dormant = region.energy === "dormant";
 
-  const growthAnchor = [0.24, 0.42, 0.68, 0.79][index % 4];
-  const anchorT = region.domain === "work" ? 0.56 : region.domain === "history" ? 0.76 : growthAnchor;
+  const growthAnchor = [0.22, 0.39, 0.64, 0.8][index % 4];
+  const anchorT = region.domain === "work" ? 0.54 : region.domain === "history" ? 0.76 : growthAnchor;
   const anchor = spine.getPoint(anchorT);
   const tangent = spine.getTangent(anchorT).normalize();
   const sign = h1 > 0.5 ? 1 : -1;
-  const length = dormant ? 1.7 + h2 * 0.75 : 2.55 + h2 * 1.25;
-  const lift = sign * (0.9 + h3 * 1.75);
-  const depth = (h2 - 0.5) * 2.1;
+  const length = dormant ? 1.85 + h2 * 0.8 : 2.6 + h2 * 1.28;
+  const lift = sign * (0.94 + h3 * 1.84);
+  const depth = (h2 - 0.5) * 2.2;
 
   return makeCurve([
     anchor.clone(),
-    anchor.clone().add(tangent.clone().multiplyScalar(0.42)),
-    anchor.clone().add(new THREE.Vector3(length * 0.3, lift * 0.18, depth * 0.22)),
-    anchor.clone().add(new THREE.Vector3(length * 0.6, lift * 0.58, depth * 0.62)),
+    anchor.clone().add(tangent.clone().multiplyScalar(0.36)),
+    anchor.clone().add(new THREE.Vector3(length * 0.26, lift * 0.14, depth * 0.18)),
+    anchor.clone().add(new THREE.Vector3(length * 0.54, lift * 0.5, depth * 0.56)),
+    anchor.clone().add(new THREE.Vector3(length * 0.78, lift * 0.82, depth * 0.82)),
     anchor.clone().add(new THREE.Vector3(length, lift, depth)),
   ]);
 }
 
 function buildStrands(projection: WorldProjection, renderTier: RenderTier): StrandSpec[] {
-  const segments = renderTier === "full" ? 110 : 78;
+  const segments = renderTier === "full" ? 112 : 78;
   const spine = createSpine();
   const selfRegion = projection.regions.find((region) => region.domain === "self");
   const strands: StrandSpec[] = [];
@@ -139,28 +151,32 @@ function buildStrands(projection: WorldProjection, renderTier: RenderTier): Stra
       points: spine.getPoints(segments),
       color: regionColor(selfRegion),
       opacity: regionOpacity(selfRegion),
-      radius: 0.075 * (0.82 + selfRegion.emphasis * 0.28),
+      radius: 0.047 * (0.84 + selfRegion.emphasis * 0.2),
       depth: 1,
       phase: hash01(selfRegion.id) * Math.PI * 2,
       dormant: false,
       emphasis: selfRegion.emphasis,
+      responseX: -0.16,
+      responseY: 0.08,
     });
 
-    const braidCount = renderTier === "full" ? 3 : 2;
+    const braidCount = renderTier === "full" ? 4 : 3;
     for (let index = 0; index < braidCount; index += 1) {
-      const curve = createBraid(spine, 0.09 + index * 0.025, index * 2.1 + 0.6);
+      const curve = createBraid(spine, 0.085 + index * 0.022, index * 1.72 + 0.55);
       strands.push({
         id: `${selfRegion.id}:braid:${index}`,
         domain: "self",
         curve,
         points: curve.getPoints(segments),
-        color: index === 0 ? "#f0dde5" : "#b9899f",
-        opacity: 0.24 + selfRegion.emphasis * 0.12,
-        radius: 0.012 + index * 0.002,
-        depth: 0.82 + index * 0.08,
-        phase: index * 1.8,
+        color: index % 2 === 0 ? "#f1e5ea" : "#b98c9f",
+        opacity: 0.2 + selfRegion.emphasis * 0.1,
+        radius: 0.0085 + index * 0.0015,
+        depth: 0.72 + index * 0.08,
+        phase: index * 1.55,
         dormant: false,
         emphasis: selfRegion.emphasis,
+        responseX: -0.36 + index * 0.22,
+        responseY: 0.14 - index * 0.1,
         decorative: true,
       });
     }
@@ -176,30 +192,37 @@ function buildStrands(projection: WorldProjection, renderTier: RenderTier): Stra
       id: region.id,
       domain: region.domain,
       curve,
-      points: curve.getPoints(dormant ? Math.max(34, Math.floor(segments * 0.62)) : Math.max(48, Math.floor(segments * 0.78))),
+      points: curve.getPoints(dormant ? Math.max(36, Math.floor(segments * 0.64)) : Math.max(50, Math.floor(segments * 0.8))),
       color: regionColor(region),
       opacity: regionOpacity(region),
-      radius: dormant ? 0.012 + region.emphasis * 0.012 : 0.025 + region.emphasis * 0.024,
-      depth: 0.52 + hash01(`${region.id}:depth`) * 0.75,
+      radius: dormant ? 0.009 + region.emphasis * 0.008 : 0.02 + region.emphasis * 0.016,
+      depth: 0.48 + hash01(`${region.id}:depth`) * 0.82,
       phase: hash01(region.id) * Math.PI * 2,
       dormant,
       emphasis: region.emphasis,
+      responseX: hash01(`${region.id}:response-x`) * 1.8 - 0.9,
+      responseY: hash01(`${region.id}:response-y`) * 1.4 - 0.7,
     });
   }
 
   return strands;
 }
 
-function SignalPulse({ spec, motionMode }: { spec: StrandSpec; motionMode: MotionMode }) {
+function SignalPulse({ spec, motionMode, indexOpen }: {
+  spec: StrandSpec;
+  motionMode: MotionMode;
+  indexOpen: boolean;
+}) {
   const mesh = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     const target = mesh.current;
     if (!target || motionMode === "reduced") return;
-    const speed = spec.domain === "self" ? 0.035 : 0.018 + spec.emphasis * 0.014;
+    const speedBase = spec.domain === "self" ? 0.03 : 0.015 + spec.emphasis * 0.012;
+    const speed = indexOpen ? speedBase * 0.45 : speedBase;
     const t = (state.clock.elapsedTime * speed + spec.phase / (Math.PI * 2)) % 1;
     target.position.copy(spec.curve.getPoint(t));
-    const pulse = 0.72 + Math.sin(state.clock.elapsedTime * 2.2 + spec.phase) * 0.18;
+    const pulse = 0.68 + Math.sin(state.clock.elapsedTime * 1.8 + spec.phase) * 0.16;
     target.scale.setScalar(pulse);
   });
 
@@ -207,11 +230,11 @@ function SignalPulse({ spec, motionMode }: { spec: StrandSpec; motionMode: Motio
 
   return (
     <mesh ref={mesh}>
-      <sphereGeometry args={[0.035 + spec.emphasis * 0.016, 12, 12]} />
+      <sphereGeometry args={[0.028 + spec.emphasis * 0.012, 10, 10]} />
       <meshBasicMaterial
         color={spec.color}
         transparent
-        opacity={0.6 + spec.emphasis * 0.18}
+        opacity={indexOpen ? 0.42 : 0.62 + spec.emphasis * 0.14}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         toneMapped={false}
@@ -220,31 +243,31 @@ function SignalPulse({ spec, motionMode }: { spec: StrandSpec; motionMode: Motio
   );
 }
 
-function Terminal({ spec }: { spec: StrandSpec }) {
+function Terminal({ spec, indexOpen }: { spec: StrandSpec; indexOpen: boolean }) {
   if (spec.decorative || spec.domain === "self") return null;
   const end = spec.curve.getPoint(1);
-  const size = spec.dormant ? 0.026 : 0.045 + spec.emphasis * 0.018;
+  const size = spec.dormant ? 0.022 : 0.038 + spec.emphasis * 0.014;
 
   return (
     <group position={end}>
       <mesh>
-        <sphereGeometry args={[size, 12, 12]} />
+        <sphereGeometry args={[size, 10, 10]} />
         <meshBasicMaterial
           color={spec.color}
           transparent
-          opacity={spec.dormant ? 0.22 : 0.62}
+          opacity={spec.dormant ? 0.2 : indexOpen ? 0.74 : 0.58}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           toneMapped={false}
         />
       </mesh>
       {!spec.dormant && (
-        <mesh scale={2.4}>
+        <mesh scale={indexOpen ? 3.2 : 2.35}>
           <sphereGeometry args={[size, 10, 10]} />
           <meshBasicMaterial
             color={spec.color}
             transparent
-            opacity={0.055}
+            opacity={indexOpen ? 0.075 : 0.045}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             toneMapped={false}
@@ -255,22 +278,79 @@ function Terminal({ spec }: { spec: StrandSpec }) {
   );
 }
 
-function TraceStrand({ spec, interaction, motionMode, renderTier }: {
+function chapterTransform(spec: StrandSpec, chapter: ChapterId, indexOpen: boolean, mobile: boolean): StrandTransform {
+  if (indexOpen) {
+    const domainY: Record<TraceRegion["domain"], number> = {
+      self: 1.9,
+      work: 0.82,
+      growth: -0.28,
+      history: -1.62,
+    };
+    const spread = spec.domain === "growth" ? (hash01(`${spec.id}:index`) - 0.5) * 0.58 : 0;
+    const x = -1.25 + (hash01(`${spec.id}:index-x`) - 0.5) * 0.75;
+    const base = {
+      x: mobile ? x * 0.32 : x,
+      y: mobile ? domainY[spec.domain] * 0.72 + spread : domainY[spec.domain] + spread,
+      z: spec.decorative ? -0.55 : -0.18,
+      scale: mobile ? 0.62 : spec.domain === "self" ? 0.7 : 0.78,
+      rz: spec.domain === "self" ? -0.02 : (hash01(`${spec.id}:index-r`) - 0.5) * 0.16,
+    };
+    return base;
+  }
+
+  const neutral: StrandTransform = { x: 0, y: 0, z: 0, scale: 1, rz: 0 };
+  if (chapter === "origin") return spec.domain === "self" ? neutral : { x: 0.08, y: 0, z: -0.16, scale: 0.88, rz: 0 };
+  if (chapter === "human") return spec.domain === "self" ? { x: 0.08, y: 0.02, z: 0.12, scale: 1.08, rz: 0.015 } : { x: 0.12, y: -0.04, z: -0.26, scale: 0.76, rz: 0 };
+  if (chapter === "work") {
+    if (spec.domain === "work") return { x: -0.72, y: 0.16, z: 0.32, scale: 1.46, rz: -0.08 };
+    if (spec.domain === "self") return { x: 0.36, y: -0.04, z: -0.42, scale: 0.72, rz: 0.025 };
+    return { x: 0.28, y: 0, z: -0.52, scale: 0.62, rz: 0.02 };
+  }
+  if (chapter === "growth") {
+    if (spec.domain === "growth") {
+      const splay = (hash01(`${spec.id}:growth-splay`) - 0.5) * 1.12;
+      return { x: -0.2 + splay * 0.34, y: splay, z: 0.3, scale: 1.42, rz: splay * 0.08 };
+    }
+    if (spec.domain === "self") return { x: 0.32, y: 0, z: -0.46, scale: 0.68, rz: -0.015 };
+    return { x: 0.18, y: -0.06, z: -0.6, scale: 0.56, rz: 0 };
+  }
+  if (chapter === "history") {
+    if (spec.domain === "history") return { x: -0.44, y: -0.12, z: 0.4, scale: 1.38, rz: 0.07 };
+    if (spec.domain === "self") return { x: 0.5, y: 0.02, z: -0.62, scale: 0.58, rz: -0.025 };
+    return { x: 0.3, y: 0.02, z: -0.7, scale: 0.52, rz: 0 };
+  }
+  if (chapter === "present") return { x: 0, y: 0, z: -0.18, scale: spec.domain === "self" ? 0.86 : 0.76, rz: 0 };
+  return neutral;
+}
+
+function TraceStrand({
+  spec,
+  interaction,
+  motionMode,
+  renderTier,
+  chapter,
+  indexOpen,
+  mobile,
+}: {
   spec: StrandSpec;
-  interaction: React.MutableRefObject<InteractionState>;
+  interaction: MutableRefObject<InteractionState>;
   motionMode: MotionMode;
   renderTier: RenderTier;
+  chapter: ChapterId;
+  indexOpen: boolean;
+  mobile: boolean;
 }) {
   const group = useRef<THREE.Group>(null);
-  const tubularSegments = renderTier === "full" ? 120 : 84;
-  const radialSegments = renderTier === "full" ? 7 : 5;
+  const tubularSegments = renderTier === "full" ? 108 : 72;
+  const radialSegments = renderTier === "full" ? 6 : 4;
+  const transform = chapterTransform(spec, chapter, indexOpen, mobile);
 
   const coreGeometry = useMemo(
     () => new THREE.TubeGeometry(spec.curve, tubularSegments, spec.radius, radialSegments, false),
     [radialSegments, spec.curve, spec.radius, tubularSegments],
   );
   const haloGeometry = useMemo(
-    () => new THREE.TubeGeometry(spec.curve, Math.floor(tubularSegments * 0.74), spec.radius * 3.4, 5, false),
+    () => new THREE.TubeGeometry(spec.curve, Math.floor(tubularSegments * 0.68), spec.radius * 3.8, 4, false),
     [spec.curve, spec.radius, tubularSegments],
   );
 
@@ -284,19 +364,32 @@ function TraceStrand({ spec, interaction, motionMode, renderTier }: {
     if (!target) return;
 
     if (motionMode === "reduced") {
-      target.position.set(0, 0, 0);
+      target.position.set(transform.x, transform.y, transform.z);
+      target.scale.setScalar(transform.scale);
+      target.rotation.z = transform.rz;
       return;
     }
 
-    const idle = Math.sin(state.clock.elapsedTime * 0.28 + spec.phase) * 0.024 * spec.depth;
-    const targetX = interaction.current.pointerX * 0.16 * spec.depth;
-    const targetY = interaction.current.pointerY * 0.12 * spec.depth + interaction.current.scrollVelocity * 0.24 * spec.depth + idle;
-    const targetZ = interaction.current.scrollVelocity * 0.15 * spec.depth;
+    const pointer = interaction.current;
+    const distance = Math.hypot(pointer.pointerX - spec.responseX, pointer.pointerY - spec.responseY);
+    const proximity = Math.max(0, 1 - distance / 1.15);
+    const influence = proximity * proximity;
+    const phaseDirection = Math.sin(spec.phase) >= 0 ? 1 : -1;
+    const idle = Math.sin(state.clock.elapsedTime * 0.22 + spec.phase) * 0.018 * spec.depth;
+    const disturbanceX = indexOpen ? 0 : pointer.pointerX * influence * 0.3 * spec.depth;
+    const disturbanceY = indexOpen ? 0 : pointer.pointerY * influence * 0.24 * spec.depth;
+    const velocityShear = indexOpen ? 0 : pointer.scrollVelocity * 0.2 * spec.depth * phaseDirection;
+    const damping = 2.7 + spec.depth * 1.35;
 
-    target.position.x = THREE.MathUtils.damp(target.position.x, targetX, 3.6, delta);
-    target.position.y = THREE.MathUtils.damp(target.position.y, targetY, 3.6, delta);
-    target.position.z = THREE.MathUtils.damp(target.position.z, targetZ, 3.6, delta);
+    target.position.x = THREE.MathUtils.damp(target.position.x, transform.x + disturbanceX, damping, delta);
+    target.position.y = THREE.MathUtils.damp(target.position.y, transform.y + disturbanceY + velocityShear + idle, damping, delta);
+    target.position.z = THREE.MathUtils.damp(target.position.z, transform.z + velocityShear * 0.46, damping, delta);
+    target.rotation.z = THREE.MathUtils.damp(target.rotation.z, transform.rz + influence * 0.018 * phaseDirection, 2.6, delta);
+    const nextScale = THREE.MathUtils.damp(target.scale.x, transform.scale * (1 + influence * 0.025), 2.8, delta);
+    target.scale.setScalar(nextScale);
   });
+
+  const indexFactor = indexOpen ? 0.82 : 1;
 
   return (
     <group ref={group}>
@@ -304,7 +397,7 @@ function TraceStrand({ spec, interaction, motionMode, renderTier }: {
         <meshBasicMaterial
           color={spec.color}
           transparent
-          opacity={spec.opacity * (spec.dormant ? 0.025 : 0.07)}
+          opacity={spec.opacity * (spec.dormant ? 0.018 : 0.052) * indexFactor}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           side={THREE.DoubleSide}
@@ -315,7 +408,7 @@ function TraceStrand({ spec, interaction, motionMode, renderTier }: {
         <meshBasicMaterial
           color={spec.color}
           transparent
-          opacity={spec.opacity * (spec.decorative ? 0.55 : 0.82)}
+          opacity={spec.opacity * (spec.decorative ? 0.42 : 0.72) * indexFactor}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           side={THREE.DoubleSide}
@@ -325,30 +418,31 @@ function TraceStrand({ spec, interaction, motionMode, renderTier }: {
       <Line
         points={spec.points}
         color={spec.color}
-        lineWidth={spec.domain === "self" && !spec.decorative ? 1.25 : 0.7}
+        lineWidth={spec.domain === "self" && !spec.decorative ? 1.05 : 0.72}
         transparent
-        opacity={Math.min(0.92, spec.opacity * (spec.dormant ? 0.5 : 0.88))}
+        opacity={Math.min(0.9, spec.opacity * (spec.dormant ? 0.56 : 0.92) * indexFactor)}
         depthWrite={false}
         toneMapped={false}
       />
-      <SignalPulse spec={spec} motionMode={motionMode} />
-      <Terminal spec={spec} />
+      <SignalPulse spec={spec} motionMode={motionMode} indexOpen={indexOpen} />
+      <Terminal spec={spec} indexOpen={indexOpen} />
     </group>
   );
 }
 
-function FieldMatter({ renderTier, motionMode }: { renderTier: RenderTier; motionMode: MotionMode }) {
+function FieldMatter({ renderTier, motionMode, indexOpen }: {
+  renderTier: RenderTier;
+  motionMode: MotionMode;
+  indexOpen: boolean;
+}) {
   const points = useRef<THREE.Points>(null);
   const geometry = useMemo(() => {
-    const count = renderTier === "full" ? 120 : 64;
+    const count = renderTier === "full" ? 128 : 68;
     const positions = new Float32Array(count * 3);
     for (let index = 0; index < count; index += 1) {
-      const seed = hash01(`matter:${index}`);
-      const seed2 = hash01(`matter:${index}:y`);
-      const seed3 = hash01(`matter:${index}:z`);
-      positions[index * 3] = (seed - 0.5) * 12;
-      positions[index * 3 + 1] = (seed2 - 0.5) * 7;
-      positions[index * 3 + 2] = -1.6 + seed3 * 3.2;
+      positions[index * 3] = (hash01(`matter:${index}`) - 0.5) * 12;
+      positions[index * 3 + 1] = (hash01(`matter:${index}:y`) - 0.5) * 7;
+      positions[index * 3 + 2] = -1.7 + hash01(`matter:${index}:z`) * 3.4;
     }
     const value = new THREE.BufferGeometry();
     value.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -359,17 +453,24 @@ function FieldMatter({ renderTier, motionMode }: { renderTier: RenderTier; motio
 
   useFrame((state, delta) => {
     if (!points.current || motionMode === "reduced") return;
-    points.current.rotation.z += delta * 0.0025;
-    points.current.position.y = Math.sin(state.clock.elapsedTime * 0.12) * 0.05;
+    points.current.rotation.z += delta * (indexOpen ? 0.0008 : 0.0022);
+    points.current.position.y = THREE.MathUtils.damp(
+      points.current.position.y,
+      (indexOpen ? 0 : Math.sin(state.clock.elapsedTime * 0.11) * 0.045),
+      2.4,
+      delta,
+    );
+    const scale = THREE.MathUtils.damp(points.current.scale.x, indexOpen ? 1.28 : 1, 2.2, delta);
+    points.current.scale.setScalar(scale);
   });
 
   return (
     <points ref={points} geometry={geometry}>
       <pointsMaterial
         color="#cbbac1"
-        size={renderTier === "full" ? 0.018 : 0.015}
+        size={renderTier === "full" ? 0.018 : 0.014}
         transparent
-        opacity={0.18}
+        opacity={indexOpen ? 0.09 : 0.16}
         sizeAttenuation
         depthWrite={false}
         blending={THREE.AdditiveBlending}
@@ -379,38 +480,45 @@ function FieldMatter({ renderTier, motionMode }: { renderTier: RenderTier; motio
   );
 }
 
-function chapterTarget(chapter: ChapterId, mobile: boolean) {
+function chapterTarget(chapter: ChapterId, mobile: boolean, indexOpen: boolean) {
+  if (indexOpen) {
+    return mobile
+      ? { x: 0.16, y: 0.02, z: -0.58, scale: 0.8, rz: 0 }
+      : { x: 0.72, y: 0, z: -0.52, scale: 0.88, rz: 0 };
+  }
+
   const desktop: Record<ChapterId, { x: number; y: number; z: number; scale: number; rz: number }> = {
-    origin: { x: 0.78, y: 0.04, z: 0.1, scale: 1.18, rz: -0.03 },
-    human: { x: 1.08, y: -0.12, z: -0.18, scale: 1.04, rz: 0.025 },
-    work: { x: -0.58, y: 0.14, z: 0.2, scale: 1.16, rz: -0.055 },
-    growth: { x: 0.16, y: 0.24, z: 0.1, scale: 1.13, rz: 0.06 },
-    history: { x: 0.9, y: -0.1, z: -0.4, scale: 0.94, rz: -0.04 },
+    origin: { x: 0.72, y: 0.04, z: 0.08, scale: 1.14, rz: -0.025 },
+    human: { x: 1.02, y: -0.12, z: -0.16, scale: 1.02, rz: 0.02 },
+    work: { x: -0.18, y: 0.1, z: 0.12, scale: 1.08, rz: -0.035 },
+    growth: { x: 0.08, y: 0.18, z: 0.06, scale: 1.06, rz: 0.035 },
+    history: { x: 0.54, y: -0.08, z: -0.34, scale: 0.94, rz: -0.028 },
     understanding: { x: 0, y: 0, z: -0.16, scale: 1, rz: 0 },
-    present: { x: 0.12, y: 0, z: -0.25, scale: 0.9, rz: 0.018 },
+    present: { x: 0.08, y: 0, z: -0.24, scale: 0.9, rz: 0.012 },
   };
   const value = desktop[chapter];
   if (!mobile) return value;
   return {
-    x: value.x * 0.32,
-    y: value.y + 0.12,
+    x: value.x * 0.3,
+    y: value.y + 0.1,
     z: value.z - 0.28,
     scale: value.scale * 0.72,
     rz: value.rz * 0.5,
   };
 }
 
-function TraceWorld({ projection, interaction, renderTier, motionMode }: {
+function TraceWorld({ projection, interaction, renderTier, motionMode, indexOpen }: {
   projection: WorldProjection;
-  interaction: React.MutableRefObject<InteractionState>;
+  interaction: MutableRefObject<InteractionState>;
   renderTier: RenderTier;
   motionMode: MotionMode;
+  indexOpen: boolean;
 }) {
   const root = useRef<THREE.Group>(null);
   const initialized = useRef(false);
   const mobile = useThree((state) => state.size.width < 760);
   const strands = useMemo(() => buildStrands(projection, renderTier), [projection, renderTier]);
-  const target = chapterTarget(projection.chapter, mobile);
+  const target = chapterTarget(projection.chapter, mobile, indexOpen);
 
   useFrame((_, delta) => {
     const group = root.current;
@@ -424,11 +532,11 @@ function TraceWorld({ projection, interaction, renderTier, motionMode }: {
       return;
     }
 
-    group.position.x = THREE.MathUtils.damp(group.position.x, target.x, 2.6, delta);
-    group.position.y = THREE.MathUtils.damp(group.position.y, target.y, 2.6, delta);
-    group.position.z = THREE.MathUtils.damp(group.position.z, target.z, 2.6, delta);
-    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, target.rz, 2.2, delta);
-    const nextScale = THREE.MathUtils.damp(group.scale.x, target.scale, 2.5, delta);
+    group.position.x = THREE.MathUtils.damp(group.position.x, target.x, indexOpen ? 3.2 : 2.45, delta);
+    group.position.y = THREE.MathUtils.damp(group.position.y, target.y, indexOpen ? 3.2 : 2.45, delta);
+    group.position.z = THREE.MathUtils.damp(group.position.z, target.z, indexOpen ? 3.2 : 2.45, delta);
+    group.rotation.z = THREE.MathUtils.damp(group.rotation.z, target.rz, 2.4, delta);
+    const nextScale = THREE.MathUtils.damp(group.scale.x, target.scale, indexOpen ? 3.1 : 2.35, delta);
     group.scale.setScalar(nextScale);
   });
 
@@ -441,6 +549,9 @@ function TraceWorld({ projection, interaction, renderTier, motionMode }: {
           interaction={interaction}
           motionMode={motionMode}
           renderTier={renderTier}
+          chapter={projection.chapter}
+          indexOpen={indexOpen}
+          mobile={mobile}
         />
       ))}
     </group>
@@ -449,13 +560,16 @@ function TraceWorld({ projection, interaction, renderTier, motionMode }: {
 
 export default function LivingTraceCanvas({ renderTier, motionMode, onReady }: LivingTraceCanvasProps) {
   const [chapter, setChapter] = useState<ChapterId>("origin");
+  const [indexOpen, setIndexOpen] = useState(false);
   const interaction = useRef<InteractionState>({ pointerX: 0, pointerY: 0, scrollVelocity: 0 });
   const livingState = useMemo(() => createCurrentLivingState(new Date().toISOString()), []);
   const projection = useMemo(() => createWorldProjection(livingState, chapter), [livingState, chapter]);
 
   useEffect(() => {
-    const storedChapter = document.documentElement.dataset.chapter as ChapterId | undefined;
+    const root = document.documentElement;
+    const storedChapter = root.dataset.chapter as ChapterId | undefined;
     if (storedChapter) setChapter(storedChapter);
+    setIndexOpen(root.dataset.indexOpen === "true");
 
     const onPointerMove = (event: PointerEvent) => {
       if (motionMode === "reduced") return;
@@ -473,21 +587,29 @@ export default function LivingTraceCanvas({ renderTier, motionMode, onReady }: L
       if (next) setChapter(next);
     };
 
+    const onIndex = (event: Event) => {
+      const detail = (event as CustomEvent<{ open?: boolean }>).detail;
+      setIndexOpen(Boolean(detail?.open));
+      if (detail?.open) interaction.current.scrollVelocity = 0;
+    };
+
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("adham:motion", onMotion);
     window.addEventListener("adham:chapter", onChapter);
+    window.addEventListener("adham:index", onIndex);
 
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("adham:motion", onMotion);
       window.removeEventListener("adham:chapter", onChapter);
+      window.removeEventListener("adham:index", onIndex);
     };
   }, [motionMode]);
 
   return (
     <Canvas
       className="living-trace-canvas"
-      dpr={renderTier === "full" ? [1, 1.55] : [1, 1.2]}
+      dpr={renderTier === "full" ? [1, 1.5] : [1, 1.18]}
       camera={{ position: [0, 0, 8.3], fov: 46, near: 0.1, far: 30 }}
       gl={{ alpha: true, antialias: renderTier === "full", powerPreference: "high-performance" }}
       frameloop={motionMode === "reduced" ? "demand" : "always"}
@@ -496,12 +618,13 @@ export default function LivingTraceCanvas({ renderTier, motionMode, onReady }: L
         onReady();
       }}
     >
-      <FieldMatter renderTier={renderTier} motionMode={motionMode} />
+      <FieldMatter renderTier={renderTier} motionMode={motionMode} indexOpen={indexOpen} />
       <TraceWorld
         projection={projection}
         interaction={interaction}
         renderTier={renderTier}
         motionMode={motionMode}
+        indexOpen={indexOpen}
       />
     </Canvas>
   );
