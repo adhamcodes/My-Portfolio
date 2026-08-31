@@ -1,17 +1,10 @@
+import Index from "@/components/master/Index";
 import LivingTrace from "@/components/master/LivingTrace";
 import { featuredWork, growthTracks, historyEntries, masterIdentity } from "@/content/master";
 
 type SemanticShellProps = {
   preview?: boolean;
 };
-
-const navItems = [
-  ["Now", "#now"],
-  ["Work", "#work"],
-  ["Growth", "#growth"],
-  ["History", "#history"],
-  ["Present", "#present"],
-] as const;
 
 export default function SemanticShell({ preview = false }: SemanticShellProps) {
   return (
@@ -23,19 +16,16 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
         <a className="master-wordmark" href="#origin" aria-label="Adham Mahmood, back to beginning">
           <strong>ADHAM</strong><span>MAHMOOD</span>
         </a>
-        <nav aria-label="Primary">
-          {navItems.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
-        </nav>
-        {preview ? <span className="master-preview-tag">FOUNDATION / INTERNAL</span> : <span className="master-preview-tag" aria-hidden="true" />}
+        <div className="master-header-actions">
+          {preview && <span className="master-preview-tag">INTERNAL BUILD</span>}
+          <Index />
+        </div>
       </header>
 
       <section id="origin" data-chapter="origin" className="master-scene master-origin" aria-labelledby="origin-title">
         <div className="master-kicker">CURRENT FRAME</div>
         <h1 id="origin-title"><span>ADHAM</span><span>MAHMOOD</span></h1>
         <p className="master-thesis">{masterIdentity.thesis}</p>
-        {preview && (
-          <p className="master-note">Internal semantic foundation only. Living Trace, Index, authored motion and project worlds are intentionally absent at this checkpoint.</p>
-        )}
       </section>
 
       <div id="main-story">
