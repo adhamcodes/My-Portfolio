@@ -5,6 +5,13 @@ import LocalImageTransform from "@/components/worlds/LocalImageTransform";
 export const metadata: Metadata = {
   title: "ZeroUpload",
   description: "A browser-first file toolkit built around keeping useful file work on the device when a server is unnecessary.",
+  alternates: { canonical: "/work/zeroupload" },
+  openGraph: {
+    title: "ZeroUpload — Adham Mahmood",
+    description: "A browser-first file toolkit built around keeping useful file work on the device when a server is unnecessary.",
+    url: "/work/zeroupload",
+    type: "website",
+  },
 };
 
 export default function ZeroUploadWorldPage() {
