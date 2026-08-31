@@ -24,8 +24,12 @@ export default function Ending() {
       </div>
 
       <div className="ending-contact">
-        <p>ADHAM MAHMOOD</p>
+        <div>
+          <p>ADHAM MAHMOOD</p>
+          <span>Software engineering → AI/ML engineering</span>
+        </div>
         <nav aria-label="Contact and source">
+          <a href={`mailto:${masterIdentity.workEmail}`}>Email</a>
           <a href={masterIdentity.github} target="_blank" rel="noreferrer">GitHub ↗</a>
         </nav>
       </div>
