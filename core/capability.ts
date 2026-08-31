@@ -43,6 +43,7 @@ export function chooseRenderTier(input: CapabilityInput): RenderTier {
 
   if (
     input.saveData ||
+    input.coarsePointer ||
     cores <= 4 ||
     (memory !== undefined && memory <= 4) ||
     (fps !== undefined && fps < 55)
