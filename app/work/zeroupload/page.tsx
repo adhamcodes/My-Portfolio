@@ -15,7 +15,7 @@ export default function ZeroUploadWorldPage() {
 
       <header className="zu-world-header">
         <Link href="/#work">Return to work</Link>
-        <span>ZERUPLOAD / BOUNDARY</span>
+        <span>ZEROUPLOAD / BOUNDARY</span>
       </header>
 
       <section data-chapter="work" className="zu-world-hero" aria-labelledby="zu-title">
