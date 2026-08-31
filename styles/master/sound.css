@@ -86,6 +86,11 @@ html[data-route="/work/quiet"] .sound-control[aria-pressed="true"] {
     bottom: max(.7rem, env(safe-area-inset-bottom));
     font-size: .6rem;
   }
+
+  html[data-route="/work/zeroupload"] .sound-control {
+    right: auto;
+    left: var(--adham-page-gutter);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
