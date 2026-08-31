@@ -225,11 +225,12 @@
 
 .hero-v2,
 #main-story {
-  transition: opacity 280ms var(--adham-ease-response), filter 420ms var(--adham-ease-response);
+  transition: opacity 220ms var(--adham-ease-response), filter 300ms var(--adham-ease-response);
 }
 
 html[data-index-open="true"] .hero-v2,
 html[data-index-open="true"] #main-story {
+  visibility: hidden;
   opacity: 0;
   filter: blur(8px);
   pointer-events: none;
