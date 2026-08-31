@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
+import PulseField from "@/components/master/PulseField";
 import { buildPulseSnapshot } from "@/core/pulse";
-import { createCurrentLivingState } from "@/content/living-state";
+import { getCurrentPublicLivingState } from "@/server/living-state";
 
 function trackCopy(id: string) {
   if (id === "foundry180") {
@@ -24,10 +25,9 @@ function trackCopy(id: string) {
   };
 }
 
-export default function GrowthChapter() {
-  const state = createCurrentLivingState(new Date().toISOString());
+export default async function GrowthChapter() {
+  const state = await getCurrentPublicLivingState();
   const pulse = buildPulseSnapshot(state);
-  const hasPulse = pulse.signals.length > 0;
 
   return (
     <section
@@ -72,17 +72,7 @@ export default function GrowthChapter() {
         })}
       </div>
 
-      <div className="pulse-zero" data-has-signals={hasPulse ? "true" : "false"}>
-        <div className="pulse-zero-line" aria-hidden="true" />
-        <div>
-          <p>PULSE</p>
-          {hasPulse ? (
-            <span>Real learning, code, work, and career events appear here as separate signals over time.</span>
-          ) : (
-            <span>No public activity events are being projected yet. The field begins when real events exist.</span>
-          )}
-        </div>
-      </div>
+      <PulseField pulse={pulse} />
     </section>
   );
 }
