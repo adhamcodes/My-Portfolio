@@ -4,16 +4,16 @@ import type { ExperienceState, PublicLivingState } from "./contracts";
  * Safe zero-state constructors for Master 2.0.
  *
  * They intentionally contain no invented progress. Real public state will be
- * projected from verified sources or explicit human input later in Foundation/Growth work.
+ * projected from verified sources or explicit human input later in Growth work.
  */
 export function createEmptyLivingState(now: string): PublicLivingState {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     generatedAt: now,
     focus: [],
     growth: [],
     work: [],
-    history: [],
+    events: [],
   };
 }
 
