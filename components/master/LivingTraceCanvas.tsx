@@ -7,12 +7,12 @@ import * as THREE from "three";
 import type {
   ChapterId,
   MotionMode,
+  PublicLivingState,
   RenderTier,
   TraceRegion,
   WorldProjection,
 } from "@/core/contracts";
 import { createWorldProjection } from "@/core/projection";
-import { createCurrentLivingState } from "@/content/living-state";
 
 type InteractionState = {
   pointerX: number;
@@ -40,6 +40,7 @@ type StrandSpec = {
 type LivingTraceCanvasProps = {
   renderTier: RenderTier;
   motionMode: MotionMode;
+  livingState: PublicLivingState;
   onReady: () => void;
 };
 
@@ -558,11 +559,10 @@ function TraceWorld({ projection, interaction, renderTier, motionMode, indexOpen
   );
 }
 
-export default function LivingTraceCanvas({ renderTier, motionMode, onReady }: LivingTraceCanvasProps) {
+export default function LivingTraceCanvas({ renderTier, motionMode, livingState, onReady }: LivingTraceCanvasProps) {
   const [chapter, setChapter] = useState<ChapterId>("origin");
   const [indexOpen, setIndexOpen] = useState(false);
   const interaction = useRef<InteractionState>({ pointerX: 0, pointerY: 0, scrollVelocity: 0 });
-  const livingState = useMemo(() => createCurrentLivingState(new Date().toISOString()), []);
   const projection = useMemo(() => createWorldProjection(livingState, chapter), [livingState, chapter]);
 
   useEffect(() => {
