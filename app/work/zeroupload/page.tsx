@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import LivingTrace from "@/components/master/LivingTrace";
 import LocalImageTransform from "@/components/worlds/LocalImageTransform";
 
 export const metadata: Metadata = {
@@ -11,8 +10,6 @@ export const metadata: Metadata = {
 export default function ZeroUploadWorldPage() {
   return (
     <main className="zu-world">
-      <LivingTrace />
-
       <header className="zu-world-header">
         <Link href="/#work">Return to work</Link>
         <span>ZEROUPLOAD / BOUNDARY</span>
