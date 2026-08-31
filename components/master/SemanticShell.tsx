@@ -4,6 +4,7 @@ import Hero from "@/components/master/Hero";
 import HistoryChapter from "@/components/master/HistoryChapter";
 import HumanStory from "@/components/master/HumanStory";
 import Index from "@/components/master/Index";
+import QuietEncounter from "@/components/master/QuietEncounter";
 import WorkEncounter from "@/components/master/WorkEncounter";
 
 type SemanticShellProps = {
@@ -30,6 +31,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
       <div id="main-story">
         <HumanStory />
         <WorkEncounter />
+        <QuietEncounter />
         <GrowthChapter />
         <HistoryChapter />
         <Ending />
