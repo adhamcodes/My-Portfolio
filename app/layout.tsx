@@ -7,6 +7,7 @@ import TravelDirector from "@/components/master/TravelDirector";
 import "@/styles/master/tokens.css";
 import "@/styles/master/base.css";
 import "@/styles/master/shell.css";
+import "@/styles/master/navigation.css";
 import "@/styles/master/trace.css";
 import "@/styles/master/hero.css";
 import "@/styles/master/story.css";
