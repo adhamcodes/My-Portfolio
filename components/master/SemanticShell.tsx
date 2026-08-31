@@ -1,10 +1,11 @@
 import GrowthChapter from "@/components/master/GrowthChapter";
 import Hero from "@/components/master/Hero";
+import HistoryChapter from "@/components/master/HistoryChapter";
 import HumanStory from "@/components/master/HumanStory";
 import Index from "@/components/master/Index";
 import LivingTrace from "@/components/master/LivingTrace";
 import WorkEncounter from "@/components/master/WorkEncounter";
-import { historyEntries, masterIdentity } from "@/content/master";
+import { masterIdentity } from "@/content/master";
 
 type SemanticShellProps = {
   preview?: boolean;
@@ -32,20 +33,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
         <HumanStory />
         <WorkEncounter />
         <GrowthChapter />
-
-        <section id="history" data-chapter="history" className="master-scene master-history" aria-labelledby="history-title">
-          <p className="master-number">04 / HISTORY</p>
-          <div className="master-section-head">
-            <h2 id="history-title">Nothing meaningful gets erased.</h2>
-            <p>Earlier work can become history without pretending it represents the present.</p>
-          </div>
-          {historyEntries.map((entry) => (
-            <article key={entry.id} className="master-history-entry">
-              <h3>{entry.label}</h3>
-              <p>{entry.note}</p>
-            </article>
-          ))}
-        </section>
+        <HistoryChapter />
 
         <section id="present" data-chapter="present" className="master-scene master-present" aria-labelledby="present-title">
           <p className="master-number">05 / PRESENT</p>
