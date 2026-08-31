@@ -1,0 +1,133 @@
+.hero-v2 {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  min-height: 100svh;
+  margin: 0;
+  padding: max(7rem, 12svh) var(--adham-page-gutter) clamp(3rem, 7svh, 6rem);
+  border-top: 0;
+  display: grid;
+  align-content: center;
+  isolation: isolate;
+}
+
+.hero-v2::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(5,5,6,.82) 0%, rgba(5,5,6,.46) 31%, transparent 58%),
+    linear-gradient(180deg, rgba(5,5,6,.18), transparent 52%, rgba(5,5,6,.28));
+}
+
+.hero-v2-name-wrap {
+  position: relative;
+  z-index: 2;
+  width: min(92vw, 1680px);
+}
+
+.hero-v2-name {
+  margin: 0;
+  font-family: var(--font-instrument), "Instrument Sans", sans-serif;
+  font-size: clamp(5.4rem, 12.6vw, 15.2rem);
+  font-weight: 700;
+  line-height: .7;
+  letter-spacing: -.09em;
+  text-transform: uppercase;
+  text-wrap: nowrap;
+}
+
+.hero-v2-line {
+  display: block;
+  width: max-content;
+  animation: hero-v2-resolve 920ms var(--adham-ease-reveal) 80ms both;
+}
+
+.hero-v2-line-outline {
+  margin-left: clamp(2.4rem, 7vw, 8rem);
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(242,239,233,.42);
+  animation-delay: 160ms;
+}
+
+.hero-v2-thought {
+  position: absolute;
+  right: clamp(1.4rem, 6vw, 7rem);
+  bottom: clamp(3rem, 10svh, 7.5rem);
+  z-index: 3;
+  max-width: 27ch;
+  margin: 0;
+  color: rgba(224, 219, 212, .78);
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: clamp(1.3rem, 2vw, 2.15rem);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -.022em;
+  text-wrap: balance;
+  animation: hero-v2-thought-in 820ms var(--adham-ease-reveal) 620ms both;
+}
+
+@keyframes hero-v2-resolve {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transform: translate3d(0, 1.4rem, 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-v2-thought-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, .9rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (max-width: 820px) {
+  .hero-v2 {
+    padding-top: max(6rem, 13svh);
+    align-content: start;
+  }
+
+  .hero-v2::before {
+    background:
+      linear-gradient(180deg, rgba(5,5,6,.5), transparent 48%, rgba(5,5,6,.42));
+  }
+
+  .hero-v2-name {
+    margin-top: 10svh;
+    font-size: clamp(4.5rem, 22vw, 8.2rem);
+    line-height: .72;
+    white-space: normal;
+  }
+
+  .hero-v2-line-outline {
+    margin-left: clamp(1.2rem, 8vw, 3.5rem);
+  }
+
+  .hero-v2-thought {
+    right: var(--adham-page-gutter);
+    bottom: clamp(2.5rem, 7svh, 5rem);
+    left: var(--adham-page-gutter);
+    max-width: 24ch;
+    margin-left: auto;
+    font-size: clamp(1.28rem, 5.6vw, 1.7rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-v2-line,
+  .hero-v2-thought {
+    animation: none;
+  }
+}
