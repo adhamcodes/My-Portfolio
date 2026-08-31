@@ -1,0 +1,101 @@
+.sound-control {
+  position: fixed;
+  right: var(--adham-page-gutter);
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: calc(var(--adham-z-navigation) + 2);
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 44px;
+  padding: .4rem 0;
+  border: 0;
+  background: transparent;
+  color: rgba(183,179,173,.52);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: .65rem;
+  letter-spacing: .12em;
+  cursor: pointer;
+  text-shadow: 0 1px 18px rgba(5,5,6,.92);
+  opacity: 1;
+  transition:
+    color var(--adham-duration-response) linear,
+    opacity var(--adham-duration-settle) var(--adham-ease-response),
+    transform var(--adham-duration-settle) var(--adham-ease-response);
+}
+
+.sound-control:hover,
+.sound-control:focus-visible,
+.sound-control[aria-pressed="true"] {
+  color: rgba(242,239,233,.82);
+}
+
+.sound-control:focus-visible {
+  outline: 1px solid rgba(242,239,233,.58);
+  outline-offset: 6px;
+}
+
+.sound-control-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: 10px;
+  height: 9px;
+}
+
+.sound-control-mark i {
+  display: block;
+  width: 1px;
+  height: 3px;
+  background: currentColor;
+  opacity: .62;
+  transition: height var(--adham-duration-settle) var(--adham-ease-response);
+}
+
+.sound-control-mark i:nth-child(2) { height: 6px; }
+.sound-control-mark i:nth-child(3) { height: 4px; }
+
+.sound-control[aria-pressed="true"] .sound-control-mark i:first-child { height: 7px; }
+.sound-control[aria-pressed="true"] .sound-control-mark i:nth-child(2) { height: 4px; }
+.sound-control[aria-pressed="true"] .sound-control-mark i:nth-child(3) { height: 8px; }
+
+html[data-chapter="origin"] .sound-control {
+  opacity: 0;
+  transform: translate3d(0, .5rem, 0);
+  pointer-events: none;
+}
+
+html[data-world-travel="depart"] .sound-control {
+  opacity: 0;
+  transform: translate3d(0, .5rem, 0);
+  pointer-events: none;
+}
+
+html[data-scene-world="quiet"] .sound-control,
+html[data-route="/work/quiet"] .sound-control {
+  color: rgba(183,179,173,.32);
+}
+
+html[data-scene-world="quiet"] .sound-control[aria-pressed="true"],
+html[data-route="/work/quiet"] .sound-control[aria-pressed="true"] {
+  color: rgba(242,239,233,.52);
+}
+
+@media (max-width: 760px) {
+  .sound-control {
+    right: var(--adham-page-gutter);
+    bottom: max(.7rem, env(safe-area-inset-bottom));
+    font-size: .6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-control,
+  .sound-control-mark i {
+    transition-duration: 80ms;
+  }
+
+  html[data-chapter="origin"] .sound-control,
+  html[data-world-travel="depart"] .sound-control {
+    transform: none;
+  }
+}
