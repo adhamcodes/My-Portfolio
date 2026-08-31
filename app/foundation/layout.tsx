@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CapabilityDirector from "@/components/master/CapabilityDirector";
 import "../../styles/master/tokens.css";
 import "../../styles/master/shell.css";
 
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function FoundationLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return children;
+  return (
+    <>
+      <CapabilityDirector />
+      {children}
+    </>
+  );
 }
