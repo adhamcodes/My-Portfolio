@@ -54,9 +54,7 @@ function tone(audio: WebAudioState, options: {
 
   oscillator.type = options.type ?? "sine";
   oscillator.frequency.setValueAtTime(options.frequency, start);
-  if (options.endFrequency) {
-    oscillator.frequency.exponentialRampToValueAtTime(options.endFrequency, end);
-  }
+  if (options.endFrequency) oscillator.frequency.exponentialRampToValueAtTime(options.endFrequency, end);
 
   envelope.gain.setValueAtTime(0.0001, start);
   envelope.gain.exponentialRampToValueAtTime(Math.max(0.0002, options.gain), start + Math.min(0.035, options.duration * 0.18));
@@ -138,10 +136,12 @@ export default function SoundDirector() {
 
     if (stored !== "on") return;
 
-    // Restore preference without making noise on page load. The context is only
-    // unlocked by the visitor's next real gesture and no sound is played by it.
     const prime = () => {
-      void ensureAudio();
+      void ensureAudio().catch(() => {
+        setPreference("off");
+        writePreference("off");
+        publish("off");
+      });
       window.removeEventListener("pointerdown", prime);
       window.removeEventListener("keydown", prime);
     };
@@ -198,17 +198,26 @@ export default function SoundDirector() {
 
   const toggle = async () => {
     const next: SoundPreference = preference === "on" ? "off" : "on";
-    setPreference(next);
-    writePreference(next);
-    publish(next);
 
     if (next === "off") {
+      setPreference("off");
+      writePreference("off");
+      publish("off");
       const audio = audioRef.current;
       if (audio?.context.state === "running") void audio.context.suspend();
       return;
     }
 
-    await ensureAudio();
+    try {
+      await ensureAudio();
+      setPreference("on");
+      writePreference("on");
+      publish("on");
+    } catch {
+      setPreference("off");
+      writePreference("off");
+      publish("off");
+    }
   };
 
   return (
