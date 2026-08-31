@@ -85,8 +85,16 @@ export default function CapabilityDirector() {
       if (current.inputMode !== "keyboard") publish({ ...current, inputMode: "keyboard" });
     };
 
+    const scheduleFrameSample = (delay: number) => {
+      window.clearTimeout(sampleTimer);
+      sampleTimer = window.setTimeout(sampleFramePacing, delay);
+    };
+
     const sampleFramePacing = () => {
-      if (document.visibilityState !== "visible" || !baseInput.webgl) return;
+      if (document.visibilityState !== "visible" || !baseInput.webgl || current?.renderTier === "static-low") {
+        if (current?.renderTier !== "static-low") scheduleFrameSample(5000);
+        return;
+      }
 
       const deltas: number[] = [];
       let previous = performance.now();
@@ -98,7 +106,7 @@ export default function CapabilityDirector() {
         if (frames > 8 && delta > 4 && delta < 100) deltas.push(delta);
         frames += 1;
 
-        if (frames < 90) {
+        if (frames < 72) {
           raf = requestAnimationFrame(tick);
           return;
         }
@@ -106,14 +114,22 @@ export default function CapabilityDirector() {
         const frameMs = median(deltas);
         const measuredFps = Math.max(1, Math.min(120, 1000 / frameMs));
         resolveAndPublish({ ...baseInput, measuredFps }, true);
+        if (current?.renderTier !== "static-low") scheduleFrameSample(18000);
       };
 
       raf = requestAnimationFrame(tick);
     };
 
-    sampleTimer = window.setTimeout(sampleFramePacing, 900);
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible" && current?.renderTier !== "static-low") {
+        scheduleFrameSample(1200);
+      }
+    };
+
+    scheduleFrameSample(900);
     reducedQuery.addEventListener("change", handleMotionPreference);
     coarseQuery.addEventListener("change", handlePointerPreference);
+    document.addEventListener("visibilitychange", handleVisibility);
     window.addEventListener("pointerdown", handlePointerDown, { passive: true });
     window.addEventListener("keydown", handleKeyDown, { passive: true });
 
@@ -122,6 +138,7 @@ export default function CapabilityDirector() {
       window.clearTimeout(sampleTimer);
       reducedQuery.removeEventListener("change", handleMotionPreference);
       coarseQuery.removeEventListener("change", handlePointerPreference);
+      document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("pointerdown", handlePointerDown);
       window.removeEventListener("keydown", handleKeyDown);
       delete root.dataset.renderTier;
