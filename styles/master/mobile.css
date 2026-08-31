@@ -311,10 +311,6 @@
 }
 
 @media (hover: none), (pointer: coarse) {
-  .work-encounter:has(.work-enter:hover) .work-boundary-object {
-    transform: inherit;
-  }
-
   .index-destination:hover {
     transform: none;
   }
