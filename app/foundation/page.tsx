@@ -20,10 +20,10 @@ export default function FoundationPage() {
         <nav aria-label="Primary">
           {navItems.map(([label, href]) => <a key={href} href={href}>{label}</a>)}
         </nav>
-        <span className="master-preview-tag">FOUNDATION / 00B</span>
+        <span className="master-preview-tag">FOUNDATION / 00D</span>
       </header>
 
-      <section id="origin" className="master-scene master-origin" aria-labelledby="origin-title">
+      <section id="origin" data-chapter="origin" className="master-scene master-origin" aria-labelledby="origin-title">
         <div className="master-kicker">CURRENT FRAME</div>
         <h1 id="origin-title"><span>ADHAM</span><span>MAHMOOD</span></h1>
         <p className="master-thesis">{masterIdentity.thesis}</p>
@@ -31,7 +31,7 @@ export default function FoundationPage() {
       </section>
 
       <div id="main-story">
-        <section id="now" className="master-scene master-human" aria-labelledby="now-title">
+        <section id="now" data-chapter="human" className="master-scene master-human" aria-labelledby="now-title">
           <p className="master-number">01 / NOW</p>
           <h2 id="now-title">NOT A STATIC PERSON.</h2>
           <div className="master-reading">
@@ -40,7 +40,7 @@ export default function FoundationPage() {
           </div>
         </section>
 
-        <section id="work" className="master-scene" aria-labelledby="work-title">
+        <section id="work" data-chapter="work" className="master-scene" aria-labelledby="work-title">
           <p className="master-number">02 / WORK</p>
           <div className="master-section-head">
             <h2 id="work-title">Evidence, not inventory.</h2>
@@ -63,7 +63,7 @@ export default function FoundationPage() {
           </div>
         </section>
 
-        <section id="growth" className="master-scene" aria-labelledby="growth-title">
+        <section id="growth" data-chapter="growth" className="master-scene" aria-labelledby="growth-title">
           <p className="master-number">03 / GROWTH</p>
           <div className="master-section-head">
             <h2 id="growth-title">The becoming is part of the record.</h2>
@@ -82,7 +82,7 @@ export default function FoundationPage() {
           </div>
         </section>
 
-        <section id="history" className="master-scene master-history" aria-labelledby="history-title">
+        <section id="history" data-chapter="history" className="master-scene master-history" aria-labelledby="history-title">
           <p className="master-number">04 / HISTORY</p>
           <div className="master-section-head">
             <h2 id="history-title">Nothing meaningful gets erased.</h2>
@@ -96,7 +96,7 @@ export default function FoundationPage() {
           ))}
         </section>
 
-        <section id="present" className="master-scene master-present" aria-labelledby="present-title">
+        <section id="present" data-chapter="present" className="master-scene master-present" aria-labelledby="present-title">
           <p className="master-number">05 / PRESENT</p>
           <h2 id="present-title">THIS IS THE CURRENT FRAME.</h2>
           <p>The structure continues beyond what exists today. Future work and growth should enter because reality changed, not because the layout needs filling.</p>

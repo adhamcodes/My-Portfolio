@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CapabilityDirector from "@/components/master/CapabilityDirector";
+import ExperienceDirector from "@/components/master/ExperienceDirector";
 import "../../styles/master/tokens.css";
 import "../../styles/master/shell.css";
 
@@ -12,6 +13,7 @@ export default function FoundationLayout({ children }: Readonly<{ children: Reac
   return (
     <>
       <CapabilityDirector />
+      <ExperienceDirector />
       {children}
     </>
   );
