@@ -254,6 +254,8 @@ jobs:
                   display: style.display,
                   viewportWidth: innerWidth,
                   viewportHeight: innerHeight,
+                  screenWidth: screen.width,
+                  screenHeight: screen.height,
                 };
               })()`,
               returnByValue: true,
@@ -261,9 +263,9 @@ jobs:
             const view = result.result?.value;
             const intersects = view?.bottom > 0 && view?.top < view?.viewportHeight && view?.right > 0 && view?.left < view?.viewportWidth;
             const visible = view?.found && intersects && view.opacity > 0.01 && view.visibility !== 'hidden' && view.display !== 'none' && view.text;
-            const fits = !mustFit || (view.left >= -2 && view.right <= view.viewportWidth + 2);
+            const fits = !mustFit || (view.left >= -2 && view.right <= view.screenWidth + 2);
             if (!visible || !fits) throw new Error(`${label} failed visual certification: ${JSON.stringify({ ...view, mustFit, fits })}`);
-            console.log(`${label}: ${view.text.replace(/\s+/g, ' ')} @ x ${Math.round(view.left)}..${Math.round(view.right)}, y ${Math.round(view.top)}..${Math.round(view.bottom)}`);
+            console.log(`${label}: ${view.text.replace(/\s+/g, ' ')} @ x ${Math.round(view.left)}..${Math.round(view.right)} / screen ${view.screenWidth}, y ${Math.round(view.top)}..${Math.round(view.bottom)}`);
           }
 
           async function capture(send, name, url, viewport, selector, options = {}) {
