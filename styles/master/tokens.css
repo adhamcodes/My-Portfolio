@@ -1,0 +1,79 @@
+:root {
+  /* ADHAM — Master 2.0 design tokens. Not imported by runtime until Foundation 00E. */
+
+  /* Surfaces */
+  --adham-void: #050506;
+  --adham-charcoal-1: #0a0a0c;
+  --adham-charcoal-2: #111115;
+  --adham-charcoal-3: #17171c;
+  --adham-paper: #f2efe9;
+  --adham-ink-soft: #b7b3ad;
+  --adham-ink-muted: #7c7975;
+
+  /* Semantic accents — restrained and meaning-driven */
+  --adham-accent-identity: #d24f82;
+  --adham-accent-growth: #c4934a;
+  --adham-accent-anatomy: #7fa8b7;
+  --adham-accent-history: #a9abb1;
+  --adham-accent-unresolved: #6e6479;
+
+  /* Type scale */
+  --adham-type-monument-min: 4rem;
+  --adham-type-monument-fluid: clamp(4rem, 11vw, 11rem);
+  --adham-type-display: clamp(2.5rem, 6vw, 6rem);
+  --adham-type-heading: clamp(1.75rem, 3vw, 3.5rem);
+  --adham-type-body: clamp(1rem, 1.15vw, 1.125rem);
+  --adham-type-small: 0.875rem;
+  --adham-type-meta: 0.75rem;
+
+  /* Reading */
+  --adham-leading-tight: 0.94;
+  --adham-leading-display: 1.02;
+  --adham-leading-body: 1.65;
+  --adham-reading-width: 66ch;
+
+  /* Space */
+  --adham-space-1: 0.375rem;
+  --adham-space-2: 0.625rem;
+  --adham-space-3: 1rem;
+  --adham-space-4: 1.5rem;
+  --adham-space-5: 2.25rem;
+  --adham-space-6: 3.5rem;
+  --adham-space-7: 5.5rem;
+  --adham-space-8: 8rem;
+  --adham-space-scene: clamp(6rem, 12vw, 13rem);
+
+  /* Structure */
+  --adham-hairline: 1px;
+  --adham-radius-small: 0.375rem;
+  --adham-radius-medium: 0.75rem;
+  --adham-radius-large: 1.25rem;
+
+  /* Motion vocabulary */
+  --adham-ease-response: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --adham-ease-reveal: cubic-bezier(0.22, 1, 0.36, 1);
+  --adham-ease-transform: cubic-bezier(0.76, 0, 0.24, 1);
+  --adham-duration-response: 160ms;
+  --adham-duration-settle: 420ms;
+  --adham-duration-reveal: 760ms;
+  --adham-duration-world: 1050ms;
+
+  /* Layering */
+  --adham-z-world: 0;
+  --adham-z-content: 10;
+  --adham-z-navigation: 40;
+  --adham-z-overlay: 80;
+
+  /* Content geometry */
+  --adham-page-gutter: clamp(1rem, 3vw, 3rem);
+  --adham-content-max: 1440px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --adham-duration-response: 80ms;
+    --adham-duration-settle: 140ms;
+    --adham-duration-reveal: 180ms;
+    --adham-duration-world: 220ms;
+  }
+}
