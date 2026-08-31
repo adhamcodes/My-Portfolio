@@ -1,9 +1,6 @@
 name: Portfolio Quality
 
 on:
-  push:
-    branches:
-      - aura-rebuild-v2
   pull_request:
     branches:
       - main
@@ -33,6 +30,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+
+      - name: Preserve generated lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-lockfile
+          path: package-lock.json
+          retention-days: 1
 
       - name: Typecheck
         run: npm run typecheck
