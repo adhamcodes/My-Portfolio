@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { buildPulseSnapshot } from "@/core/pulse";
 import { createCurrentLivingState } from "@/content/living-state";
 
@@ -51,7 +52,7 @@ export default function GrowthChapter() {
               key={track.id}
               className="growth-path"
               data-state={track.status}
-              style={{ "--growth-index": index } as React.CSSProperties}
+              style={{ "--growth-index": index } as CSSProperties}
             >
               <span className="growth-node" aria-hidden="true" />
               <div className="growth-path-meta">
