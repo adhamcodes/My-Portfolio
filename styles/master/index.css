@@ -302,6 +302,15 @@ html[data-index-open="true"] .living-trace::before {
 
   .index-heading {
     padding-top: .25rem;
+    padding-right: .65rem;
+  }
+
+  .index-heading button {
+    white-space: nowrap;
+  }
+
+  .index-heading button span {
+    display: none;
   }
 
   .index-map {
