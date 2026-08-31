@@ -80,32 +80,37 @@ function opacityFor(region: TraceRegion) {
   return Math.min(1, Math.max(0.08, energy * (0.48 + region.emphasis * 0.48)));
 }
 
+/**
+ * The permanent identity path is deliberately asymmetric. It is a trajectory,
+ * not an oscilloscope: one fold, one recovery, and enough depth for the
+ * subsidiary strands to read as a material rather than duplicated waves.
+ */
 function createSpine() {
   return makeCurve([
-    new THREE.Vector3(-5.3, -1.35, -0.3),
-    new THREE.Vector3(-4.25, -0.7, 0.22),
-    new THREE.Vector3(-3.15, 0.18, -0.12),
-    new THREE.Vector3(-1.95, 0.72, 0.18),
-    new THREE.Vector3(-0.72, 0.28, -0.06),
-    new THREE.Vector3(0.55, -0.28, 0.2),
-    new THREE.Vector3(1.85, 0.2, -0.2),
-    new THREE.Vector3(3.05, 0.82, 0.14),
-    new THREE.Vector3(4.2, 0.34, -0.08),
-    new THREE.Vector3(5.3, 0.72, 0.12),
+    new THREE.Vector3(-4.95, -1.62, -0.42),
+    new THREE.Vector3(-3.95, -1.04, 0.08),
+    new THREE.Vector3(-2.92, -0.14, 0.4),
+    new THREE.Vector3(-1.78, 0.54, 0.08),
+    new THREE.Vector3(-0.62, 0.5, -0.34),
+    new THREE.Vector3(0.54, -0.08, -0.06),
+    new THREE.Vector3(1.56, -0.34, 0.44),
+    new THREE.Vector3(2.52, 0.12, 0.62),
+    new THREE.Vector3(3.42, 0.88, 0.18),
+    new THREE.Vector3(4.56, 1.35, -0.24),
   ]);
 }
 
-function createFilament(spine: THREE.CatmullRomCurve3, offset: number, phase: number) {
-  const samples = 62;
+function createFilament(path: THREE.CatmullRomCurve3, offset: number, phase: number, turns = 3.65) {
+  const samples = 58;
   return makeCurve(Array.from({ length: samples + 1 }, (_, index) => {
     const t = index / samples;
-    const point = spine.getPoint(t);
-    const tangent = spine.getTangent(t).normalize();
+    const point = path.getPoint(t);
+    const tangent = path.getTangent(t).normalize();
     const normal = new THREE.Vector3(-tangent.y, tangent.x, 0).normalize();
     const binormal = new THREE.Vector3().crossVectors(tangent, normal).normalize();
-    const envelope = 0.24 + Math.sin(t * Math.PI) * 0.76;
-    const lateral = Math.sin(t * Math.PI * 7.2 + phase) * offset * envelope;
-    const depth = Math.cos(t * Math.PI * 5.1 + phase * 0.8) * offset * 0.8 * envelope;
+    const envelope = 0.16 + Math.sin(t * Math.PI) * 0.84;
+    const lateral = Math.sin(t * Math.PI * turns + phase) * offset * envelope;
+    const depth = Math.cos(t * Math.PI * (turns * 0.72) + phase * 0.78) * offset * 0.92 * envelope;
     return point.clone()
       .add(normal.multiplyScalar(lateral))
       .add(binormal.multiplyScalar(depth));
@@ -116,28 +121,28 @@ function createBranch(spine: THREE.CatmullRomCurve3, region: TraceRegion, index:
   const h1 = hash01(`${region.id}:side`);
   const h2 = hash01(`${region.id}:reach`);
   const h3 = hash01(`${region.id}:depth`);
-  const anchors = [0.18, 0.34, 0.58, 0.77, 0.88];
-  const anchorT = region.domain === "work" ? 0.55 : region.domain === "history" ? 0.78 : anchors[index % anchors.length];
+  const anchors = [0.2, 0.36, 0.6, 0.76, 0.87];
+  const anchorT = region.domain === "work" ? 0.56 : region.domain === "history" ? 0.78 : anchors[index % anchors.length];
   const anchor = spine.getPoint(anchorT);
   const tangent = spine.getTangent(anchorT).normalize();
   const sign = h1 > 0.5 ? 1 : -1;
   const dormant = region.energy === "dormant";
-  const reach = (dormant ? 1.8 : 2.6) + h2 * (dormant ? 0.7 : 1.25);
-  const lift = sign * ((dormant ? 0.7 : 1.05) + h3 * 1.65);
-  const depth = (h2 - 0.5) * 1.7;
+  const reach = (dormant ? 1.55 : 2.35) + h2 * (dormant ? 0.65 : 1.1);
+  const lift = sign * ((dormant ? 0.66 : 0.96) + h3 * 1.5);
+  const depth = (h2 - 0.5) * 1.72;
 
   return makeCurve([
     anchor.clone(),
-    anchor.clone().add(tangent.clone().multiplyScalar(0.28)),
-    anchor.clone().add(new THREE.Vector3(reach * 0.3, lift * 0.18, depth * 0.18)),
-    anchor.clone().add(new THREE.Vector3(reach * 0.58, lift * 0.5, depth * 0.55)),
-    anchor.clone().add(new THREE.Vector3(reach * 0.82, lift * 0.82, depth * 0.82)),
+    anchor.clone().add(tangent.clone().multiplyScalar(0.26)),
+    anchor.clone().add(new THREE.Vector3(reach * 0.3, lift * 0.17, depth * 0.16)),
+    anchor.clone().add(new THREE.Vector3(reach * 0.58, lift * 0.48, depth * 0.52)),
+    anchor.clone().add(new THREE.Vector3(reach * 0.82, lift * 0.8, depth * 0.82)),
     anchor.clone().add(new THREE.Vector3(reach, lift, depth)),
   ]);
 }
 
 function buildTrace(projection: WorldProjection, renderTier: RenderTier): TraceSpec[] {
-  const samples = renderTier === "full" ? 132 : 92;
+  const samples = renderTier === "full" ? 126 : 88;
   const spine = createSpine();
   const self = projection.regions.find((region) => region.domain === "self");
   const specs: TraceSpec[] = [];
@@ -150,7 +155,7 @@ function buildTrace(projection: WorldProjection, renderTier: RenderTier): TraceS
       points: spine.getPoints(samples),
       color: colorFor(self),
       opacity: opacityFor(self),
-      width: 1.65,
+      width: 1.18,
       phase: hash01(self.id) * Math.PI * 2,
       depth: 1,
       emphasis: self.emphasis,
@@ -160,25 +165,25 @@ function buildTrace(projection: WorldProjection, renderTier: RenderTier): TraceS
       responseY: 0.06,
     });
 
-    const count = renderTier === "full" ? 7 : 5;
+    const count = renderTier === "full" ? 4 : 3;
     for (let index = 0; index < count; index += 1) {
-      const offset = 0.075 + index * 0.025;
-      const curve = createFilament(spine, offset, 0.7 + index * 1.19);
+      const offset = 0.105 + index * 0.038;
+      const curve = createFilament(spine, offset, 0.75 + index * 1.47, 3.25 + index * 0.26);
       specs.push({
         id: `${self.id}:filament:${index}`,
         domain: "self",
         curve,
         points: curve.getPoints(samples),
-        color: index % 3 === 0 ? "#f0e3e8" : index % 3 === 1 ? "#c39aac" : "#9db5bb",
-        opacity: 0.22 + self.emphasis * 0.08,
-        width: 0.62 + (index % 3) * 0.18,
-        phase: index * 1.33,
-        depth: 0.62 + index * 0.06,
+        color: index % 3 === 0 ? "#f0e3e8" : index % 3 === 1 ? "#ba8da1" : "#9db5bb",
+        opacity: 0.2 + self.emphasis * 0.075,
+        width: 0.58 + (index % 2) * 0.14,
+        phase: index * 1.61,
+        depth: 0.66 + index * 0.09,
         emphasis: self.emphasis,
         dormant: false,
         role: "filament",
-        responseX: -0.55 + index * 0.17,
-        responseY: 0.28 - index * 0.1,
+        responseX: -0.48 + index * 0.29,
+        responseY: 0.24 - index * 0.15,
       });
     }
   }
@@ -189,22 +194,46 @@ function buildTrace(projection: WorldProjection, renderTier: RenderTier): TraceS
     const branchIndex = region.domain === "growth" ? growthIndex++ : 0;
     const curve = createBranch(spine, region, branchIndex);
     const dormant = region.energy === "dormant";
+    const branchOpacity = opacityFor(region);
+
     specs.push({
       id: region.id,
       domain: region.domain,
       curve,
-      points: curve.getPoints(dormant ? Math.floor(samples * 0.6) : Math.floor(samples * 0.78)),
+      points: curve.getPoints(dormant ? Math.floor(samples * 0.58) : Math.floor(samples * 0.76)),
       color: colorFor(region),
-      opacity: opacityFor(region),
-      width: dormant ? 0.65 + region.emphasis * 0.35 : 1.05 + region.emphasis * 0.65,
+      opacity: branchOpacity,
+      width: dormant ? 0.58 + region.emphasis * 0.28 : 1.08 + region.emphasis * 0.52,
       phase: hash01(region.id) * Math.PI * 2,
-      depth: 0.6 + hash01(`${region.id}:depth`) * 0.7,
+      depth: 0.62 + hash01(`${region.id}:depth`) * 0.68,
       emphasis: region.emphasis,
       dormant,
       role: "branch",
-      responseX: hash01(`${region.id}:response-x`) * 1.8 - 0.9,
-      responseY: hash01(`${region.id}:response-y`) * 1.4 - 0.7,
+      responseX: hash01(`${region.id}:response-x`) * 1.7 - 0.85,
+      responseY: hash01(`${region.id}:response-y`) * 1.3 - 0.65,
     });
+
+    // Mature/current domains acquire material depth. Dormant growth remains a
+    // single unresolved direction until real activity gives it more structure.
+    if (!dormant && renderTier === "full") {
+      const companion = createFilament(curve, 0.052, hash01(`${region.id}:companion`) * Math.PI * 2, 2.6);
+      specs.push({
+        id: `${region.id}:companion`,
+        domain: region.domain,
+        curve: companion,
+        points: companion.getPoints(Math.floor(samples * 0.72)),
+        color: colorFor(region),
+        opacity: branchOpacity * 0.34,
+        width: 0.46,
+        phase: hash01(`${region.id}:companion-phase`) * Math.PI * 2,
+        depth: 0.7,
+        emphasis: region.emphasis,
+        dormant: false,
+        role: "filament",
+        responseX: hash01(`${region.id}:companion-x`) * 1.4 - 0.7,
+        responseY: hash01(`${region.id}:companion-y`) * 1.2 - 0.6,
+      });
+    }
   }
 
   return specs;
@@ -212,46 +241,65 @@ function buildTrace(projection: WorldProjection, renderTier: RenderTier): TraceS
 
 function transformFor(spec: TraceSpec, chapter: ChapterId, indexOpen: boolean, mobile: boolean): TraceTransform {
   if (indexOpen) {
-    const lane: Record<TraceRegion["domain"], number> = { self: 1.55, work: 0.55, growth: -0.42, history: -1.45 };
-    const scatter = spec.domain === "growth" ? (hash01(`${spec.id}:index-y`) - 0.5) * 0.54 : 0;
+    const lane: Record<TraceRegion["domain"], number> = { self: 1.52, work: 0.5, growth: -0.48, history: -1.47 };
+    const scatter = spec.domain === "growth" ? (hash01(`${spec.id}:index-y`) - 0.5) * 0.62 : 0;
     return {
-      x: mobile ? -0.08 : -1.15 + (hash01(`${spec.id}:index-x`) - 0.5) * 0.62,
+      x: mobile ? -0.04 : -0.92 + (hash01(`${spec.id}:index-x`) - 0.5) * 0.44,
       y: (lane[spec.domain] + scatter) * (mobile ? 0.7 : 1),
-      z: spec.role === "filament" ? -0.38 : -0.12,
-      scale: mobile ? 0.72 : spec.domain === "self" ? 0.72 : 0.8,
-      rz: spec.domain === "self" ? -0.02 : (hash01(`${spec.id}:index-r`) - 0.5) * 0.13,
+      z: spec.role === "filament" ? -0.34 : -0.08,
+      scale: mobile ? 0.7 : spec.domain === "self" ? 0.66 : 0.84,
+      rz: spec.domain === "self" ? -0.04 : (hash01(`${spec.id}:index-r`) - 0.5) * 0.11,
     };
   }
 
   const neutral: TraceTransform = { x: 0, y: 0, z: 0, scale: 1, rz: 0 };
   if (chapter === "origin") {
     if (spec.domain === "self") return neutral;
-    return { x: 0.12, y: 0, z: -0.2, scale: 0.86, rz: 0 };
+    return { x: 0.1, y: 0, z: -0.2, scale: 0.82, rz: 0 };
   }
   if (chapter === "human") {
-    if (spec.domain === "self") return { x: 0.08, y: 0.03, z: 0.08, scale: 1.06, rz: 0.012 };
-    return { x: 0.16, y: -0.02, z: -0.3, scale: 0.74, rz: 0 };
+    if (spec.domain === "self") return { x: 0.04, y: 0.04, z: 0.08, scale: 1.02, rz: 0.018 };
+    return { x: 0.16, y: -0.02, z: -0.32, scale: 0.7, rz: 0 };
   }
   if (chapter === "work") {
-    if (spec.domain === "work") return { x: -0.82, y: 0.14, z: 0.3, scale: 1.48, rz: -0.07 };
-    if (spec.domain === "self") return { x: 0.4, y: 0, z: -0.4, scale: 0.68, rz: 0.02 };
-    return { x: 0.3, y: 0, z: -0.56, scale: 0.58, rz: 0.02 };
+    if (spec.domain === "work") return { x: -0.84, y: 0.14, z: 0.32, scale: 1.52, rz: -0.075 };
+    if (spec.domain === "self") return { x: 0.42, y: -0.02, z: -0.46, scale: 0.62, rz: 0.025 };
+    return { x: 0.3, y: 0, z: -0.62, scale: 0.52, rz: 0.02 };
   }
   if (chapter === "growth") {
     if (spec.domain === "growth") {
-      const splay = (hash01(`${spec.id}:growth`) - 0.5) * 1.18;
-      return { x: -0.18 + splay * 0.3, y: splay, z: 0.28, scale: 1.46, rz: splay * 0.075 };
+      const splay = (hash01(`${spec.id}:growth`) - 0.5) * 1.28;
+      return { x: -0.2 + splay * 0.3, y: splay, z: 0.3, scale: 1.52, rz: splay * 0.078 };
     }
-    if (spec.domain === "self") return { x: 0.38, y: 0, z: -0.48, scale: 0.62, rz: -0.01 };
-    return { x: 0.2, y: -0.04, z: -0.64, scale: 0.52, rz: 0 };
+    if (spec.domain === "self") return { x: 0.4, y: 0, z: -0.52, scale: 0.56, rz: -0.012 };
+    return { x: 0.2, y: -0.04, z: -0.68, scale: 0.48, rz: 0 };
   }
   if (chapter === "history") {
-    if (spec.domain === "history") return { x: -0.46, y: -0.08, z: 0.34, scale: 1.42, rz: 0.06 };
-    if (spec.domain === "self") return { x: 0.48, y: 0.04, z: -0.62, scale: 0.55, rz: -0.02 };
-    return { x: 0.28, y: 0, z: -0.7, scale: 0.48, rz: 0 };
+    if (spec.domain === "history") return { x: -0.48, y: -0.08, z: 0.36, scale: 1.46, rz: 0.065 };
+    if (spec.domain === "self") return { x: 0.5, y: 0.04, z: -0.66, scale: 0.5, rz: -0.022 };
+    return { x: 0.3, y: 0, z: -0.72, scale: 0.44, rz: 0 };
   }
-  if (chapter === "present") return { x: 0, y: 0, z: -0.18, scale: spec.domain === "self" ? 0.82 : 0.72, rz: 0 };
+  if (chapter === "present") return { x: 0, y: 0, z: -0.2, scale: spec.domain === "self" ? 0.78 : 0.68, rz: 0 };
   return neutral;
+}
+
+function presenceFor(spec: TraceSpec, chapter: ChapterId, indexOpen: boolean) {
+  if (indexOpen) {
+    if (spec.role === "filament") return spec.domain === "self" ? 0.14 : 0.3;
+    if (spec.role === "spine") return 0.38;
+    return 1.08;
+  }
+
+  if (chapter === "origin") {
+    if (spec.domain !== "self") return 0.34;
+    return spec.role === "spine" ? 0.62 : 0.52;
+  }
+  if (chapter === "human") return spec.domain === "self" ? 0.92 : 0.26;
+  if (chapter === "work") return spec.domain === "work" ? 1.14 : spec.domain === "self" ? 0.24 : 0.15;
+  if (chapter === "growth") return spec.domain === "growth" ? 1.18 : spec.domain === "self" ? 0.2 : 0.13;
+  if (chapter === "history") return spec.domain === "history" ? 1.12 : spec.domain === "self" ? 0.18 : 0.12;
+  if (chapter === "present") return spec.domain === "self" ? 0.66 : 0.4;
+  return 0.7;
 }
 
 function Signal({ spec, motionMode, indexOpen }: { spec: TraceSpec; motionMode: MotionMode; indexOpen: boolean }) {
@@ -259,10 +307,10 @@ function Signal({ spec, motionMode, indexOpen }: { spec: TraceSpec; motionMode: 
 
   useFrame((state) => {
     if (!mesh.current || motionMode === "reduced") return;
-    const speed = (spec.domain === "self" ? 0.026 : 0.013 + spec.emphasis * 0.011) * (indexOpen ? 0.45 : 1);
+    const speed = (spec.domain === "self" ? 0.022 : 0.012 + spec.emphasis * 0.01) * (indexOpen ? 0.38 : 1);
     const t = (state.clock.elapsedTime * speed + spec.phase / (Math.PI * 2)) % 1;
     mesh.current.position.copy(spec.curve.getPoint(t));
-    const pulse = 0.72 + Math.sin(state.clock.elapsedTime * 1.6 + spec.phase) * 0.14;
+    const pulse = 0.74 + Math.sin(state.clock.elapsedTime * 1.45 + spec.phase) * 0.12;
     mesh.current.scale.setScalar(pulse);
   });
 
@@ -270,11 +318,11 @@ function Signal({ spec, motionMode, indexOpen }: { spec: TraceSpec; motionMode: 
 
   return (
     <mesh ref={mesh}>
-      <sphereGeometry args={[spec.role === "spine" ? 0.023 : 0.028 + spec.emphasis * 0.01, 8, 8]} />
+      <sphereGeometry args={[spec.role === "spine" ? 0.02 : 0.026 + spec.emphasis * 0.009, 8, 8]} />
       <meshBasicMaterial
         color={spec.color}
         transparent
-        opacity={indexOpen ? 0.38 : 0.58}
+        opacity={indexOpen ? 0.48 : 0.56}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         toneMapped={false}
@@ -286,7 +334,7 @@ function Signal({ spec, motionMode, indexOpen }: { spec: TraceSpec; motionMode: 
 function Terminal({ spec, indexOpen }: { spec: TraceSpec; indexOpen: boolean }) {
   if (spec.role !== "branch") return null;
   const end = spec.curve.getPoint(1);
-  const size = spec.dormant ? 0.018 : 0.028 + spec.emphasis * 0.012;
+  const size = spec.dormant ? 0.017 : 0.026 + spec.emphasis * 0.011;
   return (
     <group position={end}>
       <mesh>
@@ -294,14 +342,14 @@ function Terminal({ spec, indexOpen }: { spec: TraceSpec; indexOpen: boolean }) 
         <meshBasicMaterial
           color={spec.color}
           transparent
-          opacity={spec.dormant ? 0.22 : indexOpen ? 0.72 : 0.58}
+          opacity={spec.dormant ? 0.2 : indexOpen ? 0.8 : 0.56}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           toneMapped={false}
         />
       </mesh>
       {!spec.dormant && (
-        <mesh scale={indexOpen ? 3 : 2.2}>
+        <mesh scale={indexOpen ? 3.2 : 2.15}>
           <sphereGeometry args={[size, 8, 8]} />
           <meshBasicMaterial color={spec.color} transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
         </mesh>
@@ -340,26 +388,26 @@ function TraceLine({
 
     const pointer = interaction.current;
     const distance = Math.hypot(pointer.pointerX - spec.responseX, pointer.pointerY - spec.responseY);
-    const proximity = indexOpen ? 0 : Math.max(0, 1 - distance / 1.18);
+    const proximity = indexOpen ? 0 : Math.max(0, 1 - distance / 1.12);
     const influence = proximity * proximity;
     const direction = Math.sin(spec.phase) >= 0 ? 1 : -1;
-    const idle = Math.sin(state.clock.elapsedTime * (spec.role === "filament" ? 0.34 : 0.2) + spec.phase) * 0.018 * spec.depth;
-    const px = pointer.pointerX * influence * 0.23 * spec.depth;
-    const py = pointer.pointerY * influence * 0.19 * spec.depth;
-    const shear = pointer.scrollVelocity * 0.16 * spec.depth * direction;
-    const damping = 2.8 + spec.depth;
+    const idle = Math.sin(state.clock.elapsedTime * (spec.role === "filament" ? 0.27 : 0.17) + spec.phase) * 0.014 * spec.depth;
+    const px = pointer.pointerX * influence * 0.18 * spec.depth;
+    const py = pointer.pointerY * influence * 0.15 * spec.depth;
+    const shear = pointer.scrollVelocity * 0.135 * spec.depth * direction;
+    const damping = 3 + spec.depth;
 
     node.position.x = THREE.MathUtils.damp(node.position.x, target.x + px, damping, delta);
     node.position.y = THREE.MathUtils.damp(node.position.y, target.y + py + shear + idle, damping, delta);
-    node.position.z = THREE.MathUtils.damp(node.position.z, target.z + shear * 0.32, damping, delta);
-    node.rotation.z = THREE.MathUtils.damp(node.rotation.z, target.rz + influence * 0.012 * direction, 2.5, delta);
-    const scale = THREE.MathUtils.damp(node.scale.x, target.scale * (1 + influence * 0.015), 2.8, delta);
+    node.position.z = THREE.MathUtils.damp(node.position.z, target.z + shear * 0.28, damping, delta);
+    node.rotation.z = THREE.MathUtils.damp(node.rotation.z, target.rz + influence * 0.009 * direction, 2.7, delta);
+    const scale = THREE.MathUtils.damp(node.scale.x, target.scale * (1 + influence * 0.012), 3, delta);
     node.scale.setScalar(scale);
   });
 
-  const widthBoost = mobile ? 1.16 : 1;
-  const chapterFactor = chapter === "origin" && spec.role === "spine" ? 0.72 : 1;
-  const opacity = spec.opacity * chapterFactor * (indexOpen ? 0.82 : 1);
+  const widthBoost = mobile ? 1.1 : 1;
+  const presence = presenceFor(spec, chapter, indexOpen);
+  const opacity = spec.opacity * presence;
 
   return (
     <group ref={group}>
@@ -367,9 +415,9 @@ function TraceLine({
         <Line
           points={spec.points}
           color={spec.color}
-          lineWidth={spec.width * 4.2 * widthBoost}
+          lineWidth={spec.width * 3.2 * widthBoost}
           transparent
-          opacity={Math.min(0.075, opacity * 0.075)}
+          opacity={Math.min(0.045, opacity * 0.052)}
           depthWrite={false}
           toneMapped={false}
         />
@@ -379,7 +427,7 @@ function TraceLine({
         color={spec.color}
         lineWidth={spec.width * widthBoost}
         transparent
-        opacity={spec.role === "filament" ? opacity * 0.78 : Math.min(0.88, opacity * 0.86)}
+        opacity={spec.role === "filament" ? Math.min(0.34, opacity * 0.72) : Math.min(0.86, opacity * 0.84)}
         depthWrite={false}
         toneMapped={false}
       />
@@ -392,7 +440,7 @@ function TraceLine({
 function FieldMatter({ renderTier, motionMode, indexOpen }: { renderTier: RenderTier; motionMode: MotionMode; indexOpen: boolean }) {
   const points = useRef<THREE.Points>(null);
   const geometry = useMemo(() => {
-    const count = renderTier === "full" ? 150 : 82;
+    const count = renderTier === "full" ? 104 : 58;
     const positions = new Float32Array(count * 3);
     for (let index = 0; index < count; index += 1) {
       positions[index * 3] = (hash01(`matter:${index}`) - 0.5) * 12;
@@ -408,9 +456,9 @@ function FieldMatter({ renderTier, motionMode, indexOpen }: { renderTier: Render
 
   useFrame((state, delta) => {
     if (!points.current || motionMode === "reduced") return;
-    points.current.rotation.z += delta * (indexOpen ? 0.0007 : 0.0018);
-    points.current.position.y = THREE.MathUtils.damp(points.current.position.y, indexOpen ? 0 : Math.sin(state.clock.elapsedTime * 0.1) * 0.04, 2.3, delta);
-    const scale = THREE.MathUtils.damp(points.current.scale.x, indexOpen ? 1.2 : 1, 2.2, delta);
+    points.current.rotation.z += delta * (indexOpen ? 0.00055 : 0.00135);
+    points.current.position.y = THREE.MathUtils.damp(points.current.position.y, indexOpen ? 0 : Math.sin(state.clock.elapsedTime * 0.09) * 0.035, 2.3, delta);
+    const scale = THREE.MathUtils.damp(points.current.scale.x, indexOpen ? 1.16 : 1, 2.2, delta);
     points.current.scale.setScalar(scale);
   });
 
@@ -418,9 +466,9 @@ function FieldMatter({ renderTier, motionMode, indexOpen }: { renderTier: Render
     <points ref={points} geometry={geometry}>
       <pointsMaterial
         color="#c7b7bd"
-        size={renderTier === "full" ? 0.017 : 0.014}
+        size={renderTier === "full" ? 0.015 : 0.013}
         transparent
-        opacity={indexOpen ? 0.08 : 0.14}
+        opacity={indexOpen ? 0.065 : 0.095}
         sizeAttenuation
         depthWrite={false}
         blending={THREE.AdditiveBlending}
@@ -432,28 +480,28 @@ function FieldMatter({ renderTier, motionMode, indexOpen }: { renderTier: Render
 
 function worldTarget(chapter: ChapterId, mobile: boolean, indexOpen: boolean): TraceTransform {
   if (indexOpen) return mobile
-    ? { x: 0.02, y: 0, z: -0.4, scale: 0.42, rz: 0 }
-    : { x: 0.72, y: 0, z: -0.42, scale: 0.86, rz: 0 };
+    ? { x: 0.04, y: 0.02, z: -0.4, scale: 0.4, rz: 0 }
+    : { x: 1.08, y: 0, z: -0.4, scale: 0.82, rz: 0 };
 
   const desktop: Record<ChapterId, TraceTransform> = {
-    origin: { x: 1.05, y: -0.02, z: -0.08, scale: 0.9, rz: -0.02 },
-    human: { x: 1.05, y: -0.12, z: -0.18, scale: 0.98, rz: 0.018 },
-    work: { x: -0.15, y: 0.1, z: 0.08, scale: 1.04, rz: -0.03 },
-    growth: { x: 0.08, y: 0.16, z: 0.02, scale: 1.04, rz: 0.032 },
-    history: { x: 0.52, y: -0.06, z: -0.3, scale: 0.92, rz: -0.024 },
-    understanding: { x: 0, y: 0, z: -0.16, scale: 0.96, rz: 0 },
-    present: { x: 0.12, y: 0, z: -0.22, scale: 0.88, rz: 0.01 },
+    origin: { x: 2.05, y: 0.24, z: -0.08, scale: 0.78, rz: 0.035 },
+    human: { x: 1.7, y: 0.02, z: -0.16, scale: 0.9, rz: 0.028 },
+    work: { x: -0.1, y: 0.08, z: 0.08, scale: 1.04, rz: -0.03 },
+    growth: { x: 0.1, y: 0.14, z: 0.02, scale: 1.02, rz: 0.03 },
+    history: { x: 0.54, y: -0.04, z: -0.3, scale: 0.9, rz: -0.022 },
+    understanding: { x: 0, y: 0, z: -0.16, scale: 0.94, rz: 0 },
+    present: { x: 0.12, y: 0, z: -0.22, scale: 0.84, rz: 0.01 },
   };
   if (!mobile) return desktop[chapter];
 
   const mobileTargets: Record<ChapterId, TraceTransform> = {
-    origin: { x: 0.18, y: -0.22, z: -0.02, scale: 0.41, rz: -0.035 },
-    human: { x: 0.08, y: -0.1, z: -0.08, scale: 0.43, rz: 0.015 },
-    work: { x: -0.05, y: 0.05, z: 0, scale: 0.43, rz: -0.03 },
-    growth: { x: 0, y: 0.08, z: 0, scale: 0.44, rz: 0.025 },
-    history: { x: 0.06, y: -0.04, z: -0.1, scale: 0.42, rz: -0.02 },
-    understanding: { x: 0, y: 0, z: -0.12, scale: 0.42, rz: 0 },
-    present: { x: 0.02, y: 0, z: -0.08, scale: 0.4, rz: 0 },
+    origin: { x: 0.52, y: -0.08, z: -0.02, scale: 0.34, rz: 0.02 },
+    human: { x: 0.16, y: -0.05, z: -0.08, scale: 0.4, rz: 0.015 },
+    work: { x: -0.04, y: 0.04, z: 0, scale: 0.42, rz: -0.028 },
+    growth: { x: 0, y: 0.07, z: 0, scale: 0.43, rz: 0.024 },
+    history: { x: 0.06, y: -0.04, z: -0.1, scale: 0.4, rz: -0.018 },
+    understanding: { x: 0, y: 0, z: -0.12, scale: 0.4, rz: 0 },
+    present: { x: 0.02, y: 0, z: -0.08, scale: 0.38, rz: 0 },
   };
   return mobileTargets[chapter];
 }
@@ -481,11 +529,11 @@ function TraceWorld({ projection, interaction, renderTier, motionMode, indexOpen
       initialized.current = true;
       return;
     }
-    const damping = indexOpen ? 3.2 : 2.45;
+    const damping = indexOpen ? 3.4 : 2.6;
     node.position.x = THREE.MathUtils.damp(node.position.x, target.x, damping, delta);
     node.position.y = THREE.MathUtils.damp(node.position.y, target.y, damping, delta);
     node.position.z = THREE.MathUtils.damp(node.position.z, target.z, damping, delta);
-    node.rotation.z = THREE.MathUtils.damp(node.rotation.z, target.rz, 2.4, delta);
+    node.rotation.z = THREE.MathUtils.damp(node.rotation.z, target.rz, 2.6, delta);
     const scale = THREE.MathUtils.damp(node.scale.x, target.scale, damping, delta);
     node.scale.setScalar(scale);
   });
@@ -510,6 +558,7 @@ function TraceWorld({ projection, interaction, renderTier, motionMode, indexOpen
 export default function LivingTraceCanvas({ renderTier, motionMode, livingState, onReady }: LivingTraceCanvasProps) {
   const [chapter, setChapter] = useState<ChapterId>("origin");
   const [indexOpen, setIndexOpen] = useState(false);
+  const [visible, setVisible] = useState(true);
   const interaction = useRef<InteractionState>({ pointerX: 0, pointerY: 0, scrollVelocity: 0 });
   const projection = useMemo(() => createWorldProjection(livingState, chapter), [livingState, chapter]);
 
@@ -518,6 +567,7 @@ export default function LivingTraceCanvas({ renderTier, motionMode, livingState,
     const storedChapter = root.dataset.chapter as ChapterId | undefined;
     if (storedChapter) setChapter(storedChapter);
     setIndexOpen(root.dataset.indexOpen === "true");
+    setVisible(document.visibilityState === "visible");
 
     const onPointerMove = (event: PointerEvent) => {
       if (motionMode === "reduced") return;
@@ -536,16 +586,21 @@ export default function LivingTraceCanvas({ renderTier, motionMode, livingState,
       setIndexOpen(open);
       if (open) interaction.current.scrollVelocity = 0;
     };
+    const onVisibility = (event: Event) => {
+      setVisible(Boolean((event as CustomEvent<{ visible?: boolean }>).detail?.visible));
+    };
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("adham:motion", onMotion);
     window.addEventListener("adham:chapter", onChapter);
     window.addEventListener("adham:index", onIndex);
+    window.addEventListener("adham:visibility", onVisibility);
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("adham:motion", onMotion);
       window.removeEventListener("adham:chapter", onChapter);
       window.removeEventListener("adham:index", onIndex);
+      window.removeEventListener("adham:visibility", onVisibility);
     };
   }, [motionMode]);
 
@@ -555,7 +610,7 @@ export default function LivingTraceCanvas({ renderTier, motionMode, livingState,
       dpr={renderTier === "full" ? [1, 1.4] : [1, 1.12]}
       camera={{ position: [0, 0, 8.3], fov: 46, near: 0.1, far: 30 }}
       gl={{ alpha: true, antialias: renderTier === "full", powerPreference: "high-performance" }}
-      frameloop={motionMode === "reduced" ? "demand" : "always"}
+      frameloop={motionMode === "reduced" || !visible ? "demand" : "always"}
       onCreated={({ gl }) => {
         gl.setClearColor(0x000000, 0);
         onReady();
