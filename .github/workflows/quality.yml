@@ -60,7 +60,7 @@ jobs:
             exit 1
           fi
 
-          curl --fail --silent --show-error http://127.0.0.1:3000/ > /dev/null
+          curl --fail --silent --show-error http://127.0.0.1:3000/ > /tmp/home.html
           curl --fail --silent --show-error http://127.0.0.1:3000/work/zeroupload > /dev/null
           QUIET_STATUS="$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:3000/work/quiet)"
           if [ "$QUIET_STATUS" != "404" ]; then
@@ -90,6 +90,11 @@ jobs:
           console.log(`Living-state schema ${state.schemaVersion}: ${state.events.length} public events`);
           NODE
 
+          if ! grep -q 'mailto:adham.mahmood.work@gmail.com' /tmp/home.html; then
+            echo 'Final professional contact email is missing from the rendered home page.' >&2
+            exit 1
+          fi
+
       - name: Capture production review surfaces
         shell: bash
         run: |
@@ -112,14 +117,20 @@ jobs:
           done
 
           mkdir -p artifacts/visual-review
-          FLAGS=(--headless=new --no-sandbox --disable-gpu --hide-scrollbars --run-all-compositor-stages-before-draw --virtual-time-budget=3500)
-          REDUCED_FLAGS=("${FLAGS[@]}" --force-prefers-reduced-motion)
+          FLAGS=(--headless=new --no-sandbox --disable-gpu --hide-scrollbars --run-all-compositor-stages-before-draw --virtual-time-budget=5000)
 
           "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/home-desktop.png http://127.0.0.1:3000/
-          "$BROWSER" "${REDUCED_FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/growth-desktop.png 'http://127.0.0.1:3000/#growth'
-          "$BROWSER" "${REDUCED_FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/history-desktop.png 'http://127.0.0.1:3000/#history'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/index-desktop.png 'http://127.0.0.1:3000/?review=index'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/now-desktop.png 'http://127.0.0.1:3000/?review=now'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/work-desktop.png 'http://127.0.0.1:3000/?review=work'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/growth-desktop.png 'http://127.0.0.1:3000/?review=growth'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/history-desktop.png 'http://127.0.0.1:3000/?review=history'
+          "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/present-desktop.png 'http://127.0.0.1:3000/?review=present'
           "$BROWSER" "${FLAGS[@]}" --window-size=1600,1000 --screenshot=artifacts/visual-review/zeroupload-desktop.png http://127.0.0.1:3000/work/zeroupload
           "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/home-mobile.png http://127.0.0.1:3000/
+          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/index-mobile.png 'http://127.0.0.1:3000/?review=index'
+          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/growth-mobile.png 'http://127.0.0.1:3000/?review=growth'
+          "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/present-mobile.png 'http://127.0.0.1:3000/?review=present'
           "$BROWSER" "${FLAGS[@]}" --window-size=390,844 --force-device-scale-factor=1 --screenshot=artifacts/visual-review/zeroupload-mobile.png http://127.0.0.1:3000/work/zeroupload
 
       - name: Upload visual review surfaces
