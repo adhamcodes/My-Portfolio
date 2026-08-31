@@ -302,10 +302,14 @@ html[data-index-open="true"] .living-trace::before {
 
   .index-heading {
     padding-top: .25rem;
-    padding-right: .65rem;
+    padding-right: 3.8rem;
   }
 
   .index-heading button {
+    position: fixed;
+    top: max(1.25rem, env(safe-area-inset-top));
+    right: 1rem;
+    z-index: 4;
     white-space: nowrap;
   }
 
