@@ -198,7 +198,25 @@ jobs:
               awaitPromise: true,
               returnByValue: true,
             });
-            await sleep(1150);
+            await sleep(1050);
+          }
+
+          async function position(send, selector, label) {
+            const expression = `(() => {
+              const root = document.querySelector(${JSON.stringify(selector)});
+              if (!root) return false;
+              const target = root.matches('h1,h2,h3,a,button') ? root : (root.querySelector('h1,h2,h3,a,button') || root);
+              const rect = target.getBoundingClientRect();
+              const top = Math.max(0, window.scrollY + rect.top - window.innerHeight * 0.18);
+              window.scrollTo({ top, behavior: 'auto' });
+              return true;
+            })()`;
+
+            for (let attempt = 0; attempt < 2; attempt += 1) {
+              const result = await send('Runtime.evaluate', { expression, returnByValue: true });
+              if (!result.result?.value) throw new Error(`${label} target could not be positioned.`);
+              await sleep(attempt === 0 ? 500 : 350);
+            }
           }
 
           async function certify(send, selector, label) {
@@ -232,7 +250,7 @@ jobs:
             console.log(`${label}: ${view.text.replace(/\s+/g, ' ')} @ ${Math.round(view.top)}..${Math.round(view.bottom)}`);
           }
 
-          async function capture(send, name, url, viewport, selector) {
+          async function capture(send, name, url, viewport, selector, shouldPosition = true) {
             await send('Emulation.setDeviceMetricsOverride', {
               width: viewport.width,
               height: viewport.height,
@@ -243,6 +261,7 @@ jobs:
             });
             await send('Page.navigate', { url });
             await ready(send);
+            if (shouldPosition) await position(send, selector, name);
             await certify(send, selector, name);
             const shot = await send('Page.captureScreenshot', {
               format: 'png',
@@ -266,22 +285,22 @@ jobs:
             const desktop = { width: 1600, height: 1000, mobile: false };
             const mobile = { width: 390, height: 844, mobile: true };
             const surfaces = [
-              ['home', `${origin}/`, '.hero-v2-name'],
-              ['index', `${origin}/?review=index`, '.index-world'],
-              ['now', `${origin}/?review=now`, '#now'],
-              ['work', `${origin}/?review=work`, '#work'],
-              ['growth', `${origin}/?review=growth`, '#growth'],
-              ['history', `${origin}/?review=history`, '#history'],
-              ['present', `${origin}/?review=present`, '#present'],
-              ['contact', `${origin}/?review=contact`, '#contact'],
-              ['zeroupload', `${origin}/work/zeroupload`, '.zu-world-hero'],
+              ['home', `${origin}/`, '.hero-v2-name', false],
+              ['index', `${origin}/?review=index`, '.index-world', false],
+              ['now', `${origin}/?review=now`, '#now', true],
+              ['work', `${origin}/?review=work`, '#work', true],
+              ['growth', `${origin}/?review=growth`, '#growth', true],
+              ['history', `${origin}/?review=history`, '#history', true],
+              ['present', `${origin}/?review=present`, '#present', true],
+              ['contact', `${origin}/?review=contact`, '#contact', true],
+              ['zeroupload', `${origin}/work/zeroupload`, '.zu-world-hero', false],
             ];
 
-            for (const [name, url, selector] of surfaces) {
-              await capture(send, `${name}-desktop`, url, desktop, selector);
+            for (const [name, url, selector, shouldPosition] of surfaces) {
+              await capture(send, `${name}-desktop`, url, desktop, selector, shouldPosition);
             }
-            for (const [name, url, selector] of surfaces) {
-              await capture(send, `${name}-mobile`, url, mobile, selector);
+            for (const [name, url, selector, shouldPosition] of surfaces) {
+              await capture(send, `${name}-mobile`, url, mobile, selector, shouldPosition);
             }
 
             socket.close();
