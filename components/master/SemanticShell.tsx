@@ -28,7 +28,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
 
       <Hero />
 
-      <div id="main-story">
+      <div id="main-story" tabIndex={-1}>
         <HumanStory />
         <WorkEncounter />
         <QuietEncounter />
