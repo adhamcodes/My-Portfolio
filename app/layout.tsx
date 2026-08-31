@@ -1,12 +1,33 @@
 import type { Metadata, Viewport } from "next";
+import { Instrument_Sans, Newsreader, Space_Mono } from "next/font/google";
 import CapabilityDirector from "@/components/master/CapabilityDirector";
 import ExperienceDirector from "@/components/master/ExperienceDirector";
 import "@/styles/master/tokens.css";
 import "@/styles/master/base.css";
 import "@/styles/master/shell.css";
 import "@/styles/master/trace.css";
+import "@/styles/master/hero.css";
 import "@/styles/master/index.css";
 import "@/styles/master/system.css";
+
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-instrument",
+  display: "swap",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -66,7 +87,7 @@ const structuredData = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${instrumentSans.variable} ${newsreader.variable} ${spaceMono.variable}`}>
       <body>
         <CapabilityDirector />
         <ExperienceDirector />
