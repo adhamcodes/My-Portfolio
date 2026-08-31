@@ -14,6 +14,7 @@ type Result = {
 };
 
 const MAX_DIMENSION = 1600;
+const MAX_SOURCE_BYTES = 25 * 1024 * 1024;
 const WEBP_QUALITY = 0.82;
 const ACCEPTED = new Set(["image/jpeg", "image/png", "image/webp"]);
 
@@ -63,6 +64,10 @@ export default function LocalImageTransform() {
     setError(null);
     if (!ACCEPTED.has(file.type)) {
       setError("Choose a JPEG, PNG, or WebP image for this demo.");
+      return;
+    }
+    if (file.size > MAX_SOURCE_BYTES) {
+      setError("For this portfolio demo, choose an image under 25 MB.");
       return;
     }
 
@@ -138,7 +143,7 @@ export default function LocalImageTransform() {
         <button type="button" onClick={() => inputRef.current?.click()} disabled={working}>
           {working ? "Transforming here…" : result ? "Choose another image" : "Choose an image"}
         </button>
-        <p>JPEG, PNG, or WebP. The demo resizes only when needed and encodes a WebP result in this tab.</p>
+        <p>JPEG, PNG, or WebP under 25 MB. The demo resizes only when needed and encodes a WebP result in this tab.</p>
       </div>
 
       <div className="zu-demo-boundary" aria-hidden="true">
