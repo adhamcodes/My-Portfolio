@@ -14,7 +14,7 @@ function projectWork(work: WorkEntry): Pick<TraceRegion, "energy" | "maturity" |
     case "active": return { energy: "active", maturity: "forming", emphasis: work.featured ? 0.9 : 0.58 };
     case "maintained": return { energy: "quiet", maturity: "stable", emphasis: work.featured ? 0.78 : 0.5 };
     case "completed": return { energy: "quiet", maturity: "historical", emphasis: work.featured ? 0.65 : 0.42 };
-    case "archived": return { energy: "dormant", maturity: "historical", emphasis: 0.28 };
+    case "archived": return { energy: "dormant", maturity: "historical", emphasis: 0.34 };
     default: return { energy: "quiet", maturity: "forming", emphasis: work.featured ? 0.66 : 0.4 };
   }
 }
@@ -30,12 +30,12 @@ function projectGrowth(track: GrowthTrack): Pick<TraceRegion, "energy" | "maturi
 }
 
 function chapterWeight(chapter: ChapterId, domain: TraceRegion["domain"]) {
-  if (chapter === "work") return domain === "work" ? 1.5 : domain === "self" ? 0.9 : 0.55;
-  if (chapter === "growth") return domain === "growth" ? 2.15 : domain === "self" ? 0.86 : 0.5;
-  if (chapter === "history") return domain === "history" ? 1.9 : domain === "self" ? 0.72 : 0.48;
-  if (chapter === "human") return domain === "self" ? 1.25 : 0.7;
-  if (chapter === "present") return domain === "self" ? 1.1 : 0.82;
-  return domain === "self" ? 1.12 : 0.74;
+  if (chapter === "work") return domain === "work" ? 1.7 : domain === "self" ? 0.48 : 0.48;
+  if (chapter === "growth") return domain === "growth" ? 3.1 : domain === "self" ? 0.44 : 0.44;
+  if (chapter === "history") return domain === "history" ? 2.8 : domain === "self" ? 0.36 : 0.42;
+  if (chapter === "human") return domain === "self" ? 1.25 : 0.62;
+  if (chapter === "present") return domain === "self" ? 0.92 : 0.76;
+  return domain === "self" ? 1.12 : 0.7;
 }
 
 export function createWorldProjection(state: PublicLivingState, chapter: ChapterId): WorldProjection {
@@ -53,7 +53,13 @@ export function createWorldProjection(state: PublicLivingState, chapter: Chapter
   }
 
   for (const work of state.work) {
-    regions.push({ id: `work:${work.id}`, domain: "work", sourceId: work.id, ...projectWork(work) });
+    const visual = projectWork(work);
+    regions.push({
+      id: `${work.maturity === "archived" ? "history" : "work"}:${work.id}`,
+      domain: work.maturity === "archived" ? "history" : "work",
+      sourceId: work.id,
+      ...visual,
+    });
   }
 
   for (const track of state.growth) {
