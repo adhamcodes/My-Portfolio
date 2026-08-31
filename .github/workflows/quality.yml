@@ -60,9 +60,13 @@ jobs:
             exit 1
           fi
 
-          curl --fail --silent --show-error http://127.0.0.1:3000/ > /tmp/home.html
+          curl --fail --silent --show-error http://127.0.0.1:3000/ > /dev/null
           curl --fail --silent --show-error http://127.0.0.1:3000/work/zeroupload > /dev/null
-          curl --fail --silent --show-error http://127.0.0.1:3000/work/quiet > /tmp/quiet.html
+          QUIET_STATUS="$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:3000/work/quiet)"
+          if [ "$QUIET_STATUS" != "404" ]; then
+            echo "Quiet launch gate expected HTTP 404, received $QUIET_STATUS." >&2
+            exit 1
+          fi
           curl --fail --silent --show-error http://127.0.0.1:3000/api/living-state > /tmp/living-state.json
 
           node - <<'NODE'
@@ -85,11 +89,6 @@ jobs:
           }
           console.log(`Living-state schema ${state.schemaVersion}: ${state.events.length} public events`);
           NODE
-
-          if ! grep -qi 'noindex' /tmp/quiet.html; then
-            echo 'Quiet internal route must remain noindex until its truth gate passes.' >&2
-            exit 1
-          fi
 
       - name: Capture production review surfaces
         shell: bash
