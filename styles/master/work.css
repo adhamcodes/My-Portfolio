@@ -35,10 +35,18 @@
   transition: transform var(--adham-duration-world) var(--adham-ease-transform), border-color var(--adham-duration-settle) linear;
 }
 
-.work-encounter:has(.work-enter:hover) .work-boundary-object,
-.work-encounter:has(.work-enter:focus-visible) .work-boundary-object {
-  transform: translate(-32%, -50%) rotate(0deg) scaleX(.58);
-  border-color: rgba(154,184,191,.62);
+@media (min-width: 821px) {
+  .work-encounter:has(.work-enter:focus-visible) .work-boundary-object {
+    transform: translate(-32%, -50%) rotate(0deg) scaleX(.58);
+    border-color: rgba(154,184,191,.62);
+  }
+}
+
+@media (min-width: 821px) and (hover: hover) and (pointer: fine) {
+  .work-encounter:has(.work-enter:hover) .work-boundary-object {
+    transform: translate(-32%, -50%) rotate(0deg) scaleX(.58);
+    border-color: rgba(154,184,191,.62);
+  }
 }
 
 .work-encounter-copy {
