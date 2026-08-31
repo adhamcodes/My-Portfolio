@@ -49,6 +49,14 @@ export default function ExperienceDirector() {
       }));
     };
 
+    const resolveNavigation = (y: number, instant: number) => {
+      if (y < 120 || instant < -0.055) {
+        root.dataset.nav = "present";
+        return;
+      }
+      if (y > 180 && instant > 0.07) root.dataset.nav = "retreat";
+    };
+
     const settleVelocity = () => {
       smoothedVelocity *= 0.5;
       if (Math.abs(smoothedVelocity) < 0.015) {
@@ -72,6 +80,7 @@ export default function ExperienceDirector() {
         lastY = y;
         lastTime = now;
         publishVelocity(smoothedVelocity);
+        resolveNavigation(y, instant);
         resolveChapter();
       });
 
@@ -86,9 +95,9 @@ export default function ExperienceDirector() {
 
     root.dataset.chapter = currentChapter;
     root.dataset.route = pathname;
+    root.dataset.nav = window.scrollY < 120 ? "present" : "retreat";
     root.style.setProperty("--adham-scroll-velocity", "0");
 
-    // Let Next finish applying the new route's scroll/hash position before resolving.
     const routeRaf = requestAnimationFrame(resolveChapter);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
