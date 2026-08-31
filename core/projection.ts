@@ -1,6 +1,7 @@
 import type {
   ChapterId,
   GrowthTrack,
+  LivingEvent,
   PublicLivingState,
   TraceEnergy,
   TraceMaturity,
@@ -27,6 +28,20 @@ function projectGrowth(track: GrowthTrack): Pick<TraceRegion, "energy" | "maturi
     case "archived": return { energy: "dormant", maturity: "historical", emphasis: 0.3 };
     default: return { energy: "dormant", maturity: "forming", emphasis: 0.2 };
   }
+}
+
+function isHistoricalEvent(event: LivingEvent) {
+  if (event.domain === "career") return true;
+  if (event.domain === "code") return false;
+  if (event.domain === "work") {
+    return event.type === "milestone_reached"
+      || event.type === "release_shipped"
+      || event.type === "project_completed"
+      || event.type === "project_archived";
+  }
+  return event.type === "track_started"
+    || event.type === "milestone_reached"
+    || event.type === "track_completed";
 }
 
 function chapterWeight(chapter: ChapterId, domain: TraceRegion["domain"]) {
@@ -66,7 +81,7 @@ export function createWorldProjection(state: PublicLivingState, chapter: Chapter
     regions.push({ id: `growth:${track.id}`, domain: "growth", sourceId: track.id, ...projectGrowth(track) });
   }
 
-  for (const event of state.history) {
+  for (const event of state.events.filter(isHistoricalEvent)) {
     regions.push({
       id: `history:${event.domain}:${event.id}`,
       domain: "history",
