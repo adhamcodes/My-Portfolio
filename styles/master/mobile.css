@@ -96,8 +96,8 @@
   }
 
   .work-encounter h2 {
-    max-width: 5.5ch;
-    font-size: clamp(4.25rem, 21vw, 7.2rem);
+    max-width: 100%;
+    font-size: clamp(4rem, 19vw, 6.8rem);
   }
 
   .work-encounter-copy > p {
@@ -146,6 +146,11 @@
 
   .pulse-zero {
     margin-top: 7rem;
+  }
+
+  .history-heading h2 {
+    font-size: clamp(3.7rem, 15.5vw, 6.2rem);
+    line-height: .82;
   }
 
   .history-time {
