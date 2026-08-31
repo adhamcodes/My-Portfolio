@@ -1,4 +1,4 @@
-import Link from "next/link";
+import WorldLink from "@/components/master/WorldLink";
 import { featuredWork } from "@/content/master";
 
 export default function WorkEncounter() {
@@ -23,9 +23,9 @@ export default function WorkEncounter() {
         <span className="work-encounter-idea">{project.centralIdea}</span>
         <h2 id="work-title">{project.name}</h2>
         <p>{project.summary}</p>
-        <Link className="work-enter" href="/work/zeroupload">
+        <WorldLink className="work-enter" href="/work/zeroupload" world="zeroupload">
           Enter the boundary <span aria-hidden="true">↗</span>
-        </Link>
+        </WorldLink>
       </div>
 
       <p className="work-outside" aria-hidden="true">OUTSIDE</p>
