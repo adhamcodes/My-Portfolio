@@ -23,6 +23,20 @@ export const featuredWork: WorkEntry[] = [
   },
 ];
 
+export const historicalWork: WorkEntry[] = [
+  {
+    id: "nova",
+    name: "Nova",
+    summary:
+      "A visual web experiment from an earlier phase, preserved as evidence of evolution rather than presented as current flagship engineering work.",
+    centralIdea: "Earlier visual experiment",
+    maturity: "archived",
+    featured: false,
+  },
+];
+
+export const allPublicWork: WorkEntry[] = [...featuredWork, ...historicalWork];
+
 export const growthTracks = [
   {
     id: "foundry180",
@@ -47,11 +61,8 @@ export const growthTracks = [
   },
 ] as const;
 
-export const historyEntries = [
-  {
-    id: "nova",
-    label: "Nova",
-    note:
-      "A visual web experiment from an earlier phase, preserved as evidence of evolution rather than presented as current flagship engineering work.",
-  },
-] as const;
+export const historyEntries = historicalWork.map((work) => ({
+  id: work.id,
+  label: work.name,
+  note: work.summary,
+}));
