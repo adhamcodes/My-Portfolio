@@ -159,7 +159,7 @@ html[data-chapter="origin"] .living-trace::after {
 
 .monument-static-mass path:first-child {
   fill: url(#monument-face);
-  stroke: rgba(225,207,216,.18);
+  stroke: rgba(225,207,216,.24);
   stroke-width: 1;
 }
 
@@ -271,6 +271,7 @@ html[data-chapter="origin"] .living-trace[data-failed="true"] .living-monument-s
   min-height: 100svh;
   overflow: hidden auto;
   padding: max(1.25rem, env(safe-area-inset-top)) var(--adham-page-gutter) max(1.5rem, env(safe-area-inset-bottom));
+  font-family: var(--font-instrument), "Instrument Sans", sans-serif;
   background:
     linear-gradient(90deg, rgba(5,5,6,.99) 0%, rgba(5,5,6,.94) 39%, rgba(5,5,6,.66) 54%, rgba(5,5,6,.12) 76%, rgba(5,5,6,.34) 100%);
 }
@@ -335,7 +336,7 @@ html[data-chapter="origin"] .living-trace[data-failed="true"] .living-monument-s
   column-gap: clamp(.7rem, 1.4vw, 1.4rem);
   min-height: clamp(4.2rem, 10.5vh, 7rem);
   padding: .45rem 0 .7rem var(--index-offset);
-  color: rgba(215,210,205,.38);
+  color: rgba(215,210,205,.52);
   text-decoration: none;
   transform-origin: left center;
   transition: color 220ms linear, transform 460ms var(--adham-ease-response);

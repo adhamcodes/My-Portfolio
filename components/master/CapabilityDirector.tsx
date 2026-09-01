@@ -34,6 +34,7 @@ export default function CapabilityDirector() {
     const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const coarseQuery = window.matchMedia("(pointer: coarse)");
     const automatedBrowser = navigator.webdriver === true;
+    const automatedWorldReview = new URLSearchParams(window.location.search).get("reviewTier") === "full";
 
     let raf = 0;
     let sampleTimer = 0;
@@ -42,7 +43,9 @@ export default function CapabilityDirector() {
       // Headless review runners are not a meaningful GPU benchmark. Keep their
       // deterministic certification on the authored static fallback instead of
       // asking SwiftShader to stand in for a visitor's real hardware.
-      webgl: supportsWebGL() && !automatedBrowser,
+      // The explicit reviewer query lets visual certification inspect the actual
+      // world through headless SwiftShader. It never changes normal visitor tiers.
+      webgl: supportsWebGL() && (!automatedBrowser || automatedWorldReview),
       hardwareConcurrency: navigator.hardwareConcurrency || 4,
       deviceMemory: nav.deviceMemory,
       saveData: Boolean(nav.connection?.saveData),
