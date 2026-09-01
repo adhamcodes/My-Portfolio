@@ -305,14 +305,18 @@ jobs:
             const mobile = { width: 390, height: 844, mobile: true };
             const surfaces = [
               ['home', `${origin}/`, '.hero-v3-name', {}],
-              ['index', `${origin}/`, '.index-world', { openIndex: true, mustFit: true }],
+              ['index', `${origin}/`, '.index-destination[data-current="true"]', { openIndex: true, mustFit: true }],
               ['now', `${origin}/?review=now`, '#now', { position: true, mustFit: true }],
               ['work', `${origin}/?review=work`, '#work', { position: true, mustFit: true }],
               ['growth', `${origin}/?review=growth`, '#growth', { position: true, mustFit: true }],
+              ['pulse', `${origin}/?review=growth`, '.pulse-live, .pulse-zero', { position: true, mustFit: true }],
               ['history', `${origin}/?review=history`, '#history', { position: true, mustFit: true }],
+              ['history-archive', `${origin}/?review=history`, '.history-archive', { position: true, mustFit: true }],
               ['present', `${origin}/?review=present`, '#present', { position: true, mustFit: true }],
               ['contact', `${origin}/?review=contact`, '#contact', { position: true, mustFit: true }],
               ['zeroupload', `${origin}/work/zeroupload`, '.zu-world-hero', { mustFit: true }],
+              ['zeroupload-demo', `${origin}/work/zeroupload`, '.zu-world-demo-section', { position: true, mustFit: true }],
+              ['zeroupload-story', `${origin}/work/zeroupload`, '.zu-world-story', { position: true, mustFit: true }],
             ];
 
             for (const [name, url, selector, options] of surfaces) {
