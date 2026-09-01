@@ -422,7 +422,7 @@
 
   .zu-world-hero h1 {
     max-width: 100%;
-    font-size: clamp(4.3rem, 21vw, 8rem);
+    font-size: clamp(3.4rem, 15.6vw, 6.4rem);
   }
 
   .zu-world-plane-line,
