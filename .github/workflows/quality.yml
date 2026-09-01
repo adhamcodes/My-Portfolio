@@ -68,10 +68,12 @@ jobs:
             exit 1
           fi
           curl --fail --silent --show-error http://127.0.0.1:3000/api/living-state > /tmp/living-state.json
+          curl --fail --silent --show-error http://127.0.0.1:3000/api/activity-veil > /tmp/activity-veil.json
 
           node - <<'NODE'
           const fs = require('node:fs');
           const state = JSON.parse(fs.readFileSync('/tmp/living-state.json', 'utf8'));
+          const activity = JSON.parse(fs.readFileSync('/tmp/activity-veil.json', 'utf8'));
           const valid = state
             && Number.isFinite(state.schemaVersion)
             && typeof state.generatedAt === 'string'
@@ -87,7 +89,20 @@ jobs:
             console.error('Quiet entered public Living State before its launch gate passed.');
             process.exit(1);
           }
+          const activityValid = activity
+            && typeof activity.generatedAt === 'string'
+            && activity.coverage?.source === 'github-public-events'
+            && activity.coverage?.complete === false
+            && typeof activity.coverage?.disclosure === 'string'
+            && Array.isArray(activity.days)
+            && Array.isArray(activity.landmarks)
+            && activity.days.every((day) => typeof day.date === 'string' && Number.isFinite(day.commitCount) && day.commitCount >= 0);
+          if (!activityValid) {
+            console.error('Activity Veil API returned an invalid or overclaimed public projection.');
+            process.exit(1);
+          }
           console.log(`Living-state schema ${state.schemaVersion}: ${state.events.length} public events`);
+          console.log(`Activity Veil: ${activity.days.length} observed public activity days, complete=${activity.coverage.complete}`);
           NODE
 
           if ! grep -q 'mailto:adham.mahmood.work@gmail.com' /tmp/home.html; then
@@ -330,7 +345,7 @@ jobs:
               ['now-direction', `${origin}/?review=now&reviewTier=full`, '.human-story-beat:last-child', { position: true, mustFit: true }],
               ['work', `${origin}/?review=work&reviewTier=full`, '#work', { position: true, mustFit: true }],
               ['growth', `${origin}/?review=growth&reviewTier=full`, '#growth', { position: true, mustFit: true }],
-              ['pulse', `${origin}/?review=growth&reviewTier=full`, '.pulse-live, .pulse-zero', { position: true, mustFit: true }],
+              ['activity-veil', `${origin}/?review=growth&reviewTier=full`, '.activity-veil', { position: true, mustFit: true }],
               ['history', `${origin}/?review=history&reviewTier=full`, '#history', { position: true, mustFit: true }],
               ['history-archive', `${origin}/?review=history&reviewTier=full`, '.history-archive', { position: true, mustFit: true }],
               ['present', `${origin}/?review=present&reviewTier=full`, '#present', { position: true, mustFit: true }],

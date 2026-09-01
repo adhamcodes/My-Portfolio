@@ -1,5 +1,5 @@
-import PulseField from "@/components/master/PulseField";
-import { buildPulseSnapshot } from "@/core/pulse";
+import ActivityVeil from "@/components/master/ActivityVeil";
+import { buildActivityVeilSnapshot } from "@/core/activity-veil";
 import type { GrowthTrack } from "@/core/contracts";
 import { getCurrentPublicLivingState } from "@/server/living-state";
 
@@ -38,7 +38,7 @@ function trackState(track: GrowthTrack) {
 
 export default async function GrowthChapter() {
   const state = await getCurrentPublicLivingState();
-  const pulse = buildPulseSnapshot(state);
+  const activity = buildActivityVeilSnapshot(state);
 
   return (
     <section
@@ -90,7 +90,7 @@ export default async function GrowthChapter() {
         })}
       </div>
 
-      <PulseField pulse={pulse} />
+      <ActivityVeil snapshot={activity} />
     </section>
   );
 }
