@@ -198,7 +198,7 @@ jobs:
               awaitPromise: true,
               returnByValue: true,
             });
-            await sleep(1050);
+            await sleep(1450);
           }
 
           async function openIndex(send, label) {
@@ -304,7 +304,7 @@ jobs:
             const desktop = { width: 1600, height: 1000, mobile: false };
             const mobile = { width: 390, height: 844, mobile: true };
             const surfaces = [
-              ['home', `${origin}/`, '.hero-v2-name', {}],
+              ['home', `${origin}/`, '.hero-v3-name', {}],
               ['index', `${origin}/`, '.index-world', { openIndex: true, mustFit: true }],
               ['now', `${origin}/?review=now`, '#now', { position: true, mustFit: true }],
               ['work', `${origin}/?review=work`, '#work', { position: true, mustFit: true }],
