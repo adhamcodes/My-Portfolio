@@ -68,12 +68,12 @@ html[data-chapter="origin"] .sound-control * {
   opacity: .34;
 }
 
-/* MAHMOOD is not transparent glass. It is a physical occluder: the organism
-   disappears behind the letters and re-emerges outside them. This makes type
-   and world share depth instead of merely overlapping. */
+/* MAHMOOD is a physical occluder. The Trace must disappear completely behind
+   the letterforms, then re-emerge into the void. Keeping the fill fully opaque
+   also avoids compositing artifacts between text stroke and WebGL. */
 .hero-v3-last {
-  color: rgba(5, 5, 6, .9);
-  -webkit-text-stroke-color: rgba(239,233,230,.48);
+  color: #050506;
+  -webkit-text-stroke-color: rgba(239,233,230,.5);
   text-shadow:
     0 0 1px rgba(255,255,255,.08),
     0 0 34px rgba(207,118,151,.035);
@@ -99,8 +99,8 @@ html[data-chapter="origin"] .sound-control * {
     margin-left: 0;
     font-size: clamp(3.48rem, 16.55vw, 5.9rem);
     letter-spacing: -.078em;
-    color: rgba(5, 5, 6, .91);
-    -webkit-text-stroke-color: rgba(239,233,230,.44);
+    color: #050506;
+    -webkit-text-stroke-color: rgba(239,233,230,.46);
   }
 
   .hero-v3-caption {
