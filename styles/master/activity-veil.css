@@ -62,12 +62,12 @@
 }
 
 .activity-veil-stage::before {
-  inset: 7% 2% 12%;
+  inset: 2% -1% 8%;
   z-index: -2;
   background:
-    radial-gradient(ellipse at 50% 48%, rgba(127,177,186,.09), transparent 57%),
-    linear-gradient(90deg, transparent, rgba(242,239,233,.025) 48%, transparent);
-  filter: blur(18px);
+    radial-gradient(ellipse 72% 78% at 50% 48%, rgba(5,5,6,.9), rgba(5,5,6,.7) 52%, rgba(5,5,6,.18) 78%, transparent),
+    radial-gradient(ellipse at 50% 48%, rgba(127,177,186,.13), transparent 59%);
+  filter: blur(10px);
 }
 
 .activity-veil-stage::after {
@@ -113,6 +113,11 @@
   transition: transform 620ms var(--adham-ease-response), filter 360ms linear;
 }
 
+.activity-veil-stage[data-density="sparse"] .activity-veil-day {
+  width: calc(8rem + var(--veil-energy) * 8rem);
+  height: calc(22rem + var(--veil-energy) * 15rem);
+}
+
 .activity-veil-day summary {
   display: block;
   width: 100%;
@@ -132,14 +137,14 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border: 1px solid rgba(172,211,218,calc(.09 + var(--veil-energy) * .2));
+  border: 1px solid rgba(172,211,218,calc(.18 + var(--veil-energy) * .3));
   clip-path: polygon(9% 0, 100% 4%, 91% 96%, 0 100%, 7% 57%);
   background:
-    linear-gradient(155deg, rgba(177,215,220,calc(.025 + var(--veil-energy) * .08)), rgba(198,154,172,calc(.015 + var(--veil-energy) * .06)) 56%, rgba(8,9,11,.08)),
-    repeating-linear-gradient(180deg, transparent 0 16%, rgba(221,234,235,.025) 16.4% 16.8%, transparent 17.2% 28%);
+    linear-gradient(155deg, rgba(177,215,220,calc(.07 + var(--veil-energy) * .14)), rgba(198,154,172,calc(.045 + var(--veil-energy) * .11)) 56%, rgba(8,9,11,.12)),
+    repeating-linear-gradient(180deg, transparent 0 16%, rgba(221,234,235,.055) 16.4% 16.8%, transparent 17.2% 28%);
   box-shadow:
-    inset 1px 0 rgba(231,239,239,.045),
-    0 0 calc(2rem + var(--veil-energy) * 4rem) rgba(127,179,188,calc(.015 + var(--veil-energy) * .055));
+    inset 1px 0 rgba(231,239,239,.09),
+    0 0 calc(2rem + var(--veil-energy) * 5rem) rgba(127,179,188,calc(.035 + var(--veil-energy) * .09));
   backdrop-filter: blur(calc(2px + var(--veil-energy) * 6px));
 }
 
@@ -368,9 +373,9 @@
   }
 
   .activity-veil-stage {
-    width: 126%;
+    width: 100%;
     height: 36rem;
-    margin-left: -13%;
+    margin-left: 0;
     margin-top: 4rem;
     perspective: 850px;
   }
@@ -378,6 +383,11 @@
   .activity-veil-day {
     width: calc(2.3rem + var(--veil-energy) * 3.5rem);
     height: calc(12rem + var(--veil-energy) * 9rem);
+  }
+
+  .activity-veil-stage[data-density="sparse"] .activity-veil-day {
+    width: calc(5.5rem + var(--veil-energy) * 5rem);
+    height: calc(18rem + var(--veil-energy) * 10rem);
   }
 
   .activity-veil-facts {

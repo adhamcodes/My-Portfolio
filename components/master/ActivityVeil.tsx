@@ -30,8 +30,13 @@ function observedSummary(day: ActivityVeilDay) {
 }
 
 function styleFor(day: ActivityVeilDay, index: number, count: number): VeilStyle {
+  const sparsePositions: Record<number, number[]> = {
+    1: [50],
+    2: [34, 66],
+    3: [24, 50, 76],
+  };
   const denominator = Math.max(1, count - 1);
-  const x = 7 + (index / denominator) * 86;
+  const x = sparsePositions[count]?.[index] ?? 7 + (index / denominator) * 86;
   return {
     "--veil-x": `${x.toFixed(2)}%`,
     "--veil-y": `${Y_PATTERN[index % Y_PATTERN.length]}%`,
@@ -58,7 +63,11 @@ export default function ActivityVeil({ snapshot }: { snapshot: ActivityVeilSnaps
         </p>
       </header>
 
-      <div className="activity-veil-stage" data-has-days={days.length > 0 ? "true" : "false"}>
+      <div
+        className="activity-veil-stage"
+        data-has-days={days.length > 0 ? "true" : "false"}
+        data-density={days.length > 0 && days.length <= 3 ? "sparse" : "field"}
+      >
         <span className="activity-veil-depth" aria-hidden="true" />
         {days.length > 0 ? (
           <ol className="activity-veil-days">
