@@ -9,7 +9,6 @@ export default function Hero() {
       <div className="hero-v3-field" aria-hidden="true">
         <span className="hero-v3-field-line hero-v3-field-line-a" />
         <span className="hero-v3-field-line hero-v3-field-line-b" />
-        <span className="hero-v3-field-mark" />
       </div>
 
       <div className="hero-v3-name-wrap">
