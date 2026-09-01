@@ -346,6 +346,7 @@ jobs:
               ['work', `${origin}/?review=work&reviewTier=full`, '#work', { position: true, mustFit: true }],
               ['growth', `${origin}/?review=growth&reviewTier=full`, '#growth', { position: true, mustFit: true }],
               ['activity-veil', `${origin}/?review=growth&reviewTier=full`, '.activity-veil', { position: true, mustFit: true }],
+              ['activity-veil-field', `${origin}/?review=growth&reviewTier=full`, '.activity-veil-stage', { position: true, mustFit: true }],
               ['history', `${origin}/?review=history&reviewTier=full`, '#history', { position: true, mustFit: true }],
               ['history-archive', `${origin}/?review=history&reviewTier=full`, '.history-archive', { position: true, mustFit: true }],
               ['present', `${origin}/?review=present&reviewTier=full`, '#present', { position: true, mustFit: true }],
