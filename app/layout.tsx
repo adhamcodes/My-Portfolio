@@ -25,6 +25,7 @@ import "@/styles/master/travel.css";
 import "@/styles/master/sound.css";
 import "@/styles/master/mobile.css";
 import "@/styles/master/v3.css";
+import "@/styles/master/v3-trace.css";
 import "@/styles/master/v3-hero-lock.css";
 import "@/styles/master/v3-zeroupload.css";
 import "@/styles/master/accessibility.css";
