@@ -235,7 +235,7 @@ html[data-chapter="growth"] .living-trace::after {
   }
 
   .growth-heading h2 {
-    font-size: clamp(4rem, 18vw, 7rem);
+    font-size: clamp(3.45rem, 17.2vw, 6.6rem);
   }
 
   .growth-heading h2 span:last-child {
