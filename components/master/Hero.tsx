@@ -13,21 +13,15 @@ export default function Hero() {
       </div>
 
       <div className="hero-v3-name-wrap">
-        <h1 id="origin-title" className="hero-v3-name" aria-label="Adham Mahmood">
+        <h1 id="origin-title" className="hero-v3-name">
           <span className="hero-v3-first">ADHAM</span>
-          <span className="hero-v3-last" aria-hidden="true">
-            <span>MAH</span>
-            <span className="hero-v3-name-breach" />
-            <span>MOOD</span>
-          </span>
+          <span className="hero-v3-last">MAHMOOD</span>
         </h1>
       </div>
 
       <div className="hero-v3-caption">
         <span className="hero-v3-caption-rule" aria-hidden="true" />
-        <p>
-          Rebuilding from software foundations. Learning, work, and history change this place only when they become real.
-        </p>
+        <p>Building from software foundations toward software engineering and AI/ML. The proof is still being built.</p>
       </div>
 
       <div className="hero-v3-scroll" aria-hidden="true">
