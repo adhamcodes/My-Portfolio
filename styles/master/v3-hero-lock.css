@@ -55,6 +55,19 @@ html[data-chapter="origin"] .sound-control * {
   pointer-events: none;
 }
 
+/* No panel around the identity. The void and the object are the frame. */
+.hero-v3::after {
+  display: none;
+}
+
+.hero-v3-field-line-a {
+  opacity: .72;
+}
+
+.hero-v3-field-line-b {
+  opacity: .34;
+}
+
 .hero-v3-last {
   color: rgba(226,220,217,.13);
   -webkit-text-stroke-color: rgba(239,233,230,.38);
