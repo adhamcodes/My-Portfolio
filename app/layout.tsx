@@ -24,6 +24,7 @@ import "@/styles/master/index.css";
 import "@/styles/master/travel.css";
 import "@/styles/master/sound.css";
 import "@/styles/master/mobile.css";
+import "@/styles/master/v3.css";
 import "@/styles/master/accessibility.css";
 import "@/styles/master/system.css";
 
