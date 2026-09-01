@@ -44,7 +44,11 @@ export default function ExperienceDirector() {
         if (!isChapterId(chapter)) continue;
         const rect = section.getBoundingClientRect();
         if (rect.bottom < -window.innerHeight * 0.35 || rect.top > window.innerHeight * 1.35) continue;
-        const distance = Math.abs(rect.top + rect.height * 0.5 - center);
+        const distance = center < rect.top
+          ? rect.top - center
+          : center > rect.bottom
+            ? center - rect.bottom
+            : 0;
         if (!best || distance < best.distance) {
           best = { chapter, distance, world: section.dataset.world };
         }

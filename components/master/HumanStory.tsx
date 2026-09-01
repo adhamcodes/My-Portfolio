@@ -2,20 +2,26 @@ const beats = [
   {
     index: "01",
     label: "RESET",
-    title: "Start where the truth is.",
-    copy: "I left university before finishing my degree. What comes next is deliberate: rebuild from software foundations and let the work carry the proof.",
+    title: "The degree ended. The direction did not.",
+    copy: "I left university before completing it. That fact belongs here without mythology. The response is practical: return to fundamentals and rebuild deliberately.",
   },
   {
     index: "02",
-    label: "WORK",
-    title: "Make knowledge physical.",
-    copy: "Projects are where theory stops being abstract. What ships becomes evidence; what fails becomes information for the next attempt.",
+    label: "BEGINNING",
+    title: "Foundry starts at zero.",
+    copy: "The 180-unit system exists. My personal record begins only when the learning does. Until verified work enters it, zero is not failure—it is the honest starting state.",
   },
   {
     index: "03",
+    label: "PRACTICE",
+    title: "Build because building is the point.",
+    copy: "Small tools, experiments, strange ideas, useful systems—making projects across subjects is not a side brand. It is how I stay curious and turn understanding into something real.",
+  },
+  {
+    index: "04",
     label: "DIRECTION",
-    title: "Earn the next identity.",
-    copy: "Software engineering is the primary path. AI/ML is the long-term direction to earn through study, experiments, and real systems—not a title to claim early.",
+    title: "Software first. Intelligence earned.",
+    copy: "Software engineering is the foundation. AI/ML is the destination; automation is leverage along the way. The identity changes only when the evidence does.",
   },
 ] as const;
 
@@ -24,7 +30,7 @@ export default function HumanStory() {
     <section
       id="now"
       data-chapter="human"
-      className="master-scene human-story human-story-v3"
+      className="master-scene human-story human-story-v4"
       aria-labelledby="human-title"
     >
       <p className="master-number">01 / NOW</p>
@@ -34,20 +40,18 @@ export default function HumanStory() {
           <span>NOT A STATIC</span>
           <span>PERSON.</span>
         </h2>
-        <p className="human-story-thesis">
-          The portfolio changes for the same reason the person does: new work, new understanding, new evidence.
-        </p>
+        <div className="human-story-thesis">
+          <p>Right now, I am rebuilding from the foundations.</p>
+          <p>
+            Foundry is the beginning. Software engineering is the foundation. AI/ML is where the path is going.
+            Automation creates leverage—and I keep making things because I genuinely love the act of building.
+          </p>
+        </div>
       </div>
 
-      <div className="human-story-rupture" aria-hidden="true">
-        <span className="human-story-rupture-before">BEFORE</span>
-        <span className="human-story-rupture-seam" />
-        <span className="human-story-rupture-after">AFTER IS BUILT</span>
-      </div>
-
-      <ol className="human-story-sequence">
-        {beats.map((beat) => (
-          <li key={beat.label} className="human-story-beat">
+      <ol className="human-story-sequence" aria-label="Current path">
+        {beats.map((beat, order) => (
+          <li key={beat.label} className="human-story-beat" data-order={order + 1}>
             <div className="human-story-beat-index" aria-hidden="true">{beat.index}</div>
             <div className="human-story-beat-heading">
               <p>{beat.label}</p>

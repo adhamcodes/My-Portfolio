@@ -323,6 +323,7 @@ jobs:
               ['home', `${origin}/?reviewTier=full`, '.hero-v4-name', {}],
               ['index', `${origin}/?reviewTier=full`, '.v4-index-destination[data-current="true"]', { openIndex: true, mustFit: true }],
               ['now', `${origin}/?review=now&reviewTier=full`, '#now', { position: true, mustFit: true }],
+              ['now-direction', `${origin}/?review=now&reviewTier=full`, '.human-story-beat:last-child', { position: true, mustFit: true }],
               ['work', `${origin}/?review=work&reviewTier=full`, '#work', { position: true, mustFit: true }],
               ['growth', `${origin}/?review=growth&reviewTier=full`, '#growth', { position: true, mustFit: true }],
               ['pulse', `${origin}/?review=growth&reviewTier=full`, '.pulse-live, .pulse-zero', { position: true, mustFit: true }],

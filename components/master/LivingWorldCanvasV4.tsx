@@ -178,9 +178,17 @@ function chapterLayout(spec: FragmentSpec, chapter: ChapterId, indexOpen: boolea
   switch (chapter) {
     case "human":
       return {
-        position: [source.position[0] + spec.side * .68, source.position[1] * .92, source.position[2] - .12],
-        rotation: [source.rotation[0] * .5, source.rotation[1] * 1.4, source.rotation[2] * .65],
-        scale: [.88, .88, .94],
+        position: [
+          source.position[0] + spec.side * .78,
+          source.position[1] * .94,
+          source.position[2] - .12 - Math.abs(spec.order - 5) * .045,
+        ],
+        rotation: [
+          source.rotation[0] * .55,
+          source.rotation[1] * .55 + spec.side * (.08 + spec.order * .004),
+          source.rotation[2] * .6,
+        ],
+        scale: [.9, .9, .98],
       };
     case "work":
       return {
