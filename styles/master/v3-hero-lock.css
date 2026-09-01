@@ -41,8 +41,6 @@ html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-stat
   transform-origin: center;
 }
 
-/* Arrival owns the first frame. Navigation and sound return only after the
-   visitor leaves Origin; they are utilities, not part of the identity reveal. */
 html[data-chapter="origin"] .master-header,
 html[data-chapter="origin"] .sound-control {
   opacity: 0;
@@ -55,7 +53,6 @@ html[data-chapter="origin"] .sound-control * {
   pointer-events: none;
 }
 
-/* No panel around the identity. The void and the object are the frame. */
 .hero-v3::after {
   display: none;
 }
@@ -68,14 +65,21 @@ html[data-chapter="origin"] .sound-control * {
   opacity: .34;
 }
 
-/* MAHMOOD is a physical occluder. The Trace must disappear completely behind
-   the letterforms, then re-emerge into the void. Keeping the fill fully opaque
-   also avoids compositing artifacts between text stroke and WebGL. */
+/* The surname is an opaque physical silhouette cut out of the world. Eight
+   directional shadows create the hairline edge without WebKit text-stroke,
+   avoiding GPU/compositor artifacts when WebGL moves beneath the letters. */
 .hero-v3-last {
   color: #050506;
-  -webkit-text-stroke-color: rgba(239,233,230,.5);
+  -webkit-text-stroke: 0 transparent;
   text-shadow:
-    0 0 1px rgba(255,255,255,.08),
+    -1px 0 rgba(239,233,230,.46),
+    1px 0 rgba(239,233,230,.46),
+    0 -1px rgba(239,233,230,.46),
+    0 1px rgba(239,233,230,.46),
+    -1px -1px rgba(239,233,230,.18),
+    1px -1px rgba(239,233,230,.18),
+    -1px 1px rgba(239,233,230,.18),
+    1px 1px rgba(239,233,230,.18),
     0 0 34px rgba(207,118,151,.035);
 }
 
@@ -100,7 +104,6 @@ html[data-chapter="origin"] .sound-control * {
     font-size: clamp(3.48rem, 16.55vw, 5.9rem);
     letter-spacing: -.078em;
     color: #050506;
-    -webkit-text-stroke-color: rgba(239,233,230,.46);
   }
 
   .hero-v3-caption {
