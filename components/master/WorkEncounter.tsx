@@ -10,14 +10,20 @@ export default function WorkEncounter() {
       id="work"
       data-chapter="work"
       data-world="zeroupload"
-      className="master-scene work-encounter"
+      className="master-scene work-encounter work-encounter-v3"
       aria-labelledby="work-title"
     >
       <p className="master-number">02 / WORK</p>
 
       <div className="work-boundary" aria-hidden="true">
-        <span className="work-boundary-line" />
-        <span className="work-boundary-object" />
+        <span className="work-boundary-plane" />
+        <span className="work-boundary-packet">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="work-boundary-label work-boundary-local">YOUR DEVICE</span>
+        <span className="work-boundary-label work-boundary-remote">NOT REQUIRED</span>
       </div>
 
       <div className="work-encounter-copy">
@@ -25,11 +31,14 @@ export default function WorkEncounter() {
         <h2 id="work-title">{project.name}</h2>
         <p>{project.summary}</p>
         <WorldLink className="work-enter" href="/work/zeroupload" world="zeroupload">
-          Enter the boundary <span aria-hidden="true">→</span>
+          Cross into the project <span aria-hidden="true">→</span>
         </WorldLink>
       </div>
 
-      <p className="work-outside" aria-hidden="true">OUTSIDE</p>
+      <p className="work-law" aria-hidden="true">
+        <span>FILE</span>
+        <strong>STAYS HERE</strong>
+      </p>
     </section>
   );
 }
