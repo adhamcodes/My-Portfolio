@@ -204,8 +204,8 @@ jobs:
           async function openIndex(send, label) {
             const result = await send('Runtime.evaluate', {
               expression: `(() => {
-                if (document.querySelector('.index-world')) return true;
-                const trigger = document.querySelector('.index-trigger');
+                if (document.querySelector('.v4-index-world')) return true;
+                const trigger = document.querySelector('.v4-index-trigger');
                 if (!trigger) return false;
                 trigger.click();
                 return true;
@@ -304,19 +304,19 @@ jobs:
             const desktop = { width: 1600, height: 1000, mobile: false };
             const mobile = { width: 390, height: 844, mobile: true };
             const surfaces = [
-              ['home', `${origin}/`, '.hero-v3-name', {}],
-              ['index', `${origin}/`, '.index-destination[data-current="true"]', { openIndex: true, mustFit: true }],
-              ['now', `${origin}/?review=now`, '#now', { position: true, mustFit: true }],
-              ['work', `${origin}/?review=work`, '#work', { position: true, mustFit: true }],
-              ['growth', `${origin}/?review=growth`, '#growth', { position: true, mustFit: true }],
-              ['pulse', `${origin}/?review=growth`, '.pulse-live, .pulse-zero', { position: true, mustFit: true }],
-              ['history', `${origin}/?review=history`, '#history', { position: true, mustFit: true }],
-              ['history-archive', `${origin}/?review=history`, '.history-archive', { position: true, mustFit: true }],
-              ['present', `${origin}/?review=present`, '#present', { position: true, mustFit: true }],
-              ['contact', `${origin}/?review=contact`, '#contact', { position: true, mustFit: true }],
-              ['zeroupload', `${origin}/work/zeroupload`, '.zu-world-hero', { mustFit: true }],
-              ['zeroupload-demo', `${origin}/work/zeroupload`, '.zu-world-demo-section', { position: true, mustFit: true }],
-              ['zeroupload-story', `${origin}/work/zeroupload`, '.zu-world-story', { position: true, mustFit: true }],
+              ['home', `${origin}/?reviewTier=full`, '.hero-v4-name', {}],
+              ['index', `${origin}/?reviewTier=full`, '.v4-index-destination[data-current="true"]', { openIndex: true, mustFit: true }],
+              ['now', `${origin}/?review=now&reviewTier=full`, '#now', { position: true, mustFit: true }],
+              ['work', `${origin}/?review=work&reviewTier=full`, '#work', { position: true, mustFit: true }],
+              ['growth', `${origin}/?review=growth&reviewTier=full`, '#growth', { position: true, mustFit: true }],
+              ['pulse', `${origin}/?review=growth&reviewTier=full`, '.pulse-live, .pulse-zero', { position: true, mustFit: true }],
+              ['history', `${origin}/?review=history&reviewTier=full`, '#history', { position: true, mustFit: true }],
+              ['history-archive', `${origin}/?review=history&reviewTier=full`, '.history-archive', { position: true, mustFit: true }],
+              ['present', `${origin}/?review=present&reviewTier=full`, '#present', { position: true, mustFit: true }],
+              ['contact', `${origin}/?review=contact&reviewTier=full`, '#contact', { position: true, mustFit: true }],
+              ['zeroupload', `${origin}/work/zeroupload?reviewTier=full`, '.zu-world-hero', { mustFit: true }],
+              ['zeroupload-demo', `${origin}/work/zeroupload?reviewTier=full`, '.zu-world-demo-section', { position: true, mustFit: true }],
+              ['zeroupload-story', `${origin}/work/zeroupload?reviewTier=full`, '.zu-world-story', { position: true, mustFit: true }],
             ];
 
             for (const [name, url, selector, options] of surfaces) {
