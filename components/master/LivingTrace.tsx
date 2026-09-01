@@ -6,7 +6,7 @@ import type { MotionMode, PublicLivingState, RenderTier } from "@/core/contracts
 import type { CapabilityDecision } from "@/core/capability";
 import { createCurrentLivingState } from "@/content/living-state";
 
-const LivingTraceCanvas = dynamic(() => import("./LivingTraceCanvasV3"), { ssr: false });
+const LivingTraceCanvas = dynamic(() => import("./LivingTraceCanvas"), { ssr: false });
 
 type CapabilityView = {
   renderTier: RenderTier;
