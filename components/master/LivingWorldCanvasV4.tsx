@@ -65,9 +65,9 @@ const DOMAIN_COLOR: Record<TraceRegion["domain"], string> = {
 
 const DOMAIN_BASE: Record<TraceRegion["domain"], string> = {
   self: "#332a31",
-  work: "#263439",
-  growth: "#392e22",
-  history: "#25272d",
+  work: "#2c3234",
+  growth: "#342f29",
+  history: "#292b30",
 };
 
 function hash01(input: string) {
@@ -292,7 +292,7 @@ function Fragment({
 
     if (material.current) {
       const routeActive = indexOpen && indexFocus === spec.route;
-      const energy = routeActive ? .92 : (indexOpen ? .27 : .13) + activity * .14 + pressure * .18;
+      const energy = routeActive ? .92 : (indexOpen ? .23 : .075) + activity * .08 + pressure * .18;
       material.current.emissiveIntensity = THREE.MathUtils.damp(material.current.emissiveIntensity, energy, 5, delta);
       material.current.opacity = THREE.MathUtils.damp(material.current.opacity, indexOpen && indexFocus !== null && !routeActive ? .46 : .98, 6, delta);
     }
@@ -305,7 +305,7 @@ function Fragment({
           ref={material}
           color={DOMAIN_BASE[spec.domain]}
           emissive={DOMAIN_COLOR[spec.domain]}
-          emissiveIntensity={.13}
+          emissiveIntensity={.075}
           roughness={spec.domain === "history" ? .78 : .48}
           metalness={.12}
           clearcoat={.42}
@@ -314,7 +314,7 @@ function Fragment({
           opacity={.98}
           side={THREE.DoubleSide}
         />
-        <Edges color={DOMAIN_COLOR[spec.domain]} threshold={14} transparent opacity={indexOpen ? .58 : .26} />
+        <Edges color={DOMAIN_COLOR[spec.domain]} threshold={14} transparent opacity={indexOpen ? .56 : .19} />
       </mesh>
     </group>
   );
@@ -521,7 +521,7 @@ function Monument({
     const node = root.current;
     if (!node) return;
     const table: Record<ChapterId, [number, number, number, number, number]> = mobile ? {
-      origin: [.72, .06, -.08, .93, -.025],
+      origin: [.92, .06, -.08, .86, -.025],
       human: [0, -.08, -.22, .58, 0],
       work: [0, 0, -.28, .6, 0],
       growth: [0, -.05, -.34, .58, 0],
@@ -539,10 +539,10 @@ function Monument({
     };
     let [x, y, z, scale, rz] = table[chapter];
     if (indexOpen) {
-      x = mobile ? .34 : .9;
+      x = mobile ? 1.18 : .9;
       y = 0;
       z = -.72;
-      scale = mobile ? .76 : 1.02;
+      scale = mobile ? .68 : 1.02;
       rz = 0;
     }
     node.position.x = THREE.MathUtils.damp(node.position.x, x, 3.1, delta);

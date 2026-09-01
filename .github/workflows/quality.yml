@@ -198,7 +198,23 @@ jobs:
               awaitPromise: true,
               returnByValue: true,
             });
-            await sleep(1450);
+            await send('Runtime.evaluate', {
+              expression: `(() => {
+                const trace = document.querySelector('.living-trace');
+                if (!trace) return Promise.resolve();
+                return new Promise((resolve) => {
+                  const started = performance.now();
+                  const check = () => {
+                    if (trace.dataset.ready === 'true' || performance.now() - started > 8000) resolve();
+                    else requestAnimationFrame(check);
+                  };
+                  check();
+                });
+              })()`,
+              awaitPromise: true,
+              returnByValue: true,
+            });
+            await sleep(2000);
           }
 
           async function openIndex(send, label) {
