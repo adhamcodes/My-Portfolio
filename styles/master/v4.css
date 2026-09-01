@@ -23,7 +23,7 @@
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 32% 68% at 67% 50%, rgba(222,190,204,.06), transparent 72%),
+    radial-gradient(ellipse 36% 72% at 68% 50%, rgba(222,190,204,.095), transparent 72%),
     linear-gradient(90deg, rgba(5,5,6,.94) 0%, rgba(5,5,6,.66) 30%, rgba(5,5,6,.08) 55%, transparent 76%),
     linear-gradient(180deg, rgba(5,5,6,.12), transparent 58%, rgba(5,5,6,.42));
 }
@@ -154,7 +154,7 @@ html[data-chapter="origin"] .living-trace::after {
 }
 
 .living-trace[data-ready="true"] .living-monument-static {
-  opacity: .018;
+  opacity: 0;
 }
 
 .monument-static-mass path:first-child {
@@ -483,7 +483,7 @@ html[data-index-open="true"] .living-trace::after {
 
   .hero-v4-name-wrap {
     width: 112vw;
-    margin-top: 15svh;
+    margin-top: 17svh;
   }
 
   .hero-v4-first {
@@ -516,7 +516,7 @@ html[data-index-open="true"] .living-trace::after {
   .v4-index-world {
     padding-inline: 1rem;
     overflow-x: hidden;
-    background: linear-gradient(180deg, rgba(5,5,6,.96), rgba(5,5,6,.72) 62%, rgba(5,5,6,.9));
+    background: linear-gradient(180deg, rgba(5,5,6,.94), rgba(5,5,6,.46) 58%, rgba(5,5,6,.84));
   }
 
   .v4-index-heading {

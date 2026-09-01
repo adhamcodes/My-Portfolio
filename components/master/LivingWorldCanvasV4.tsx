@@ -57,10 +57,17 @@ type FragmentSpec = {
 };
 
 const DOMAIN_COLOR: Record<TraceRegion["domain"], string> = {
-  self: "#dcc8d1",
-  work: "#84a8af",
-  growth: "#b78c55",
-  history: "#737780",
+  self: "#f0cfdd",
+  work: "#92c5cd",
+  growth: "#d5a45f",
+  history: "#8a8f9b",
+};
+
+const DOMAIN_BASE: Record<TraceRegion["domain"], string> = {
+  self: "#332a31",
+  work: "#263439",
+  growth: "#392e22",
+  history: "#25272d",
 };
 
 function hash01(input: string) {
@@ -73,14 +80,20 @@ function hash01(input: string) {
 }
 
 function fragmentsFor(tier: RenderTier): FragmentSpec[] {
-  const bands = tier === "full" ? 9 : 6;
+  const bands = tier === "full" ? 11 : 8;
   const routeDomains: TraceRegion["domain"][] = ["self", "work", "growth", "history", "self"];
   const routeCounts = [0, 0, 0, 0, 0];
   const fragments: FragmentSpec[] = [];
-  const innerX = (y: number, side: -1 | 1) => side * (.09 + Math.sin((y + 3.1) * 1.72) * .1 + Math.cos(y * 2.35) * .035);
+  const innerX = (y: number, side: -1 | 1) => side * (
+    .26
+    + Math.sin((y + 3.1) * 1.58 + side * .32) * .11
+    + Math.cos(y * 2.2 - side * .4) * .045
+  );
   const outerX = (y: number, side: -1 | 1) => {
     const taper = 1 - Math.min(1, Math.abs(y) / 3.2);
-    return side * (1.56 + taper * .86 + Math.sin(y * 1.18 + side) * .12);
+    const shoulder = Math.sin(y * 1.62 + side * .68) * .22;
+    const asymmetry = side === 1 ? .22 + Math.cos(y * .72) * .1 : Math.sin(y * .82) * .08;
+    return side * (1.16 + taper * .96 + shoulder + asymmetry);
   };
 
   for (let band = 0; band < bands; band += 1) {
@@ -91,9 +104,23 @@ function fragmentsFor(tier: RenderTier): FragmentSpec[] {
       const innerTop: [number, number] = [innerX(y1, side), y1];
       const outerTop: [number, number] = [outerX(y1, side), y1];
       const outerBottom: [number, number] = [outerX(y0, side), y0];
+      const center: [number, number] = [
+        (innerBottom[0] + innerTop[0] + outerTop[0] + outerBottom[0]) / 4,
+        (y0 + y1) / 2,
+      ];
       const panels: Array<Array<[number, number]>> = side === 1
-        ? [[innerBottom, innerTop, outerTop], [innerBottom, outerTop, outerBottom]]
-        : [[innerBottom, outerTop, innerTop], [innerBottom, outerBottom, outerTop]];
+        ? [
+            [innerBottom, innerTop, center],
+            [innerTop, outerTop, center],
+            [outerTop, outerBottom, center],
+            [outerBottom, innerBottom, center],
+          ]
+        : [
+            [innerBottom, center, innerTop],
+            [innerTop, center, outerTop],
+            [outerTop, center, outerBottom],
+            [outerBottom, center, innerBottom],
+          ];
 
       panels.forEach((panel, triangle) => {
         const seed = `v4:facet:${band}:${side}:${triangle}`;
@@ -110,13 +137,13 @@ function fragmentsFor(tier: RenderTier): FragmentSpec[] {
           route,
           sequence,
           polygon: panel.map(([x, y]) => [x - centerX, y - centerY]),
-          depth: .16 + hash01(`${seed}:depth`) * .34,
+          depth: .18 + hash01(`${seed}:depth`) * .4,
           origin: {
             position: [centerX, centerY, (hash01(`${seed}:z`) - .5) * .34],
             rotation: [
-              (hash01(`${seed}:rx`) - .5) * .055,
-              side * (hash01(`${seed}:ry`) - .5) * .075,
-              (hash01(`${seed}:rz`) - .5) * .018,
+              (hash01(`${seed}:rx`) - .5) * .09,
+              side * (hash01(`${seed}:ry`) - .5) * .13,
+              (hash01(`${seed}:rz`) - .5) * .032,
             ],
             scale: [.965, .965, 1],
           },
@@ -135,13 +162,15 @@ function fragmentsFor(tier: RenderTier): FragmentSpec[] {
 
 function chapterLayout(spec: FragmentSpec, chapter: ChapterId, indexOpen: boolean, mobile: boolean): Layout {
   if (indexOpen) {
-    const column = spec.sequence % (mobile ? 3 : 8);
-    const x = mobile ? -.72 + column * .52 : .38 + column * .54;
-    const y = (mobile ? 2.05 : 2.15) - spec.route * (mobile ? 1.02 : 1.07);
+    const columns = mobile ? 4 : 9;
+    const column = spec.sequence % columns;
+    const lane = Math.floor(spec.sequence / columns);
+    const x = mobile ? -.72 + column * .54 : .14 + column * .57;
+    const y = (mobile ? 2.05 : 1.92) - spec.route * (mobile ? 1.02 : .91) + lane * .09;
     return {
-      position: [x, y, -.35 + (spec.sequence % 3) * .045],
-      rotation: [0, 0, spec.sequence % 2 === 0 ? -.025 : .018],
-      scale: [mobile ? .25 : .32, .075, .38],
+      position: [x, y, -.32 + lane * .085],
+      rotation: [lane * .018, 0, spec.sequence % 2 === 0 ? -.035 : .026],
+      scale: [mobile ? .34 : .41, mobile ? .21 : .3, mobile ? .48 : .6],
     };
   }
 
@@ -263,9 +292,9 @@ function Fragment({
 
     if (material.current) {
       const routeActive = indexOpen && indexFocus === spec.route;
-      const energy = routeActive ? .66 : (indexOpen ? .14 : .055) + activity * .12 + pressure * .14;
+      const energy = routeActive ? .92 : (indexOpen ? .27 : .13) + activity * .14 + pressure * .18;
       material.current.emissiveIntensity = THREE.MathUtils.damp(material.current.emissiveIntensity, energy, 5, delta);
-      material.current.opacity = THREE.MathUtils.damp(material.current.opacity, indexOpen && indexFocus !== null && !routeActive ? .42 : .94, 6, delta);
+      material.current.opacity = THREE.MathUtils.damp(material.current.opacity, indexOpen && indexFocus !== null && !routeActive ? .46 : .98, 6, delta);
     }
   });
 
@@ -274,17 +303,18 @@ function Fragment({
       <mesh geometry={geometry}>
         <meshPhysicalMaterial
           ref={material}
-          color={indexOpen ? "#19171d" : "#17151a"}
+          color={DOMAIN_BASE[spec.domain]}
           emissive={DOMAIN_COLOR[spec.domain]}
-          emissiveIntensity={.04}
-          roughness={spec.domain === "history" ? .72 : .42}
-          metalness={.18}
-          clearcoat={.34}
-          clearcoatRoughness={.56}
+          emissiveIntensity={.13}
+          roughness={spec.domain === "history" ? .78 : .48}
+          metalness={.12}
+          clearcoat={.42}
+          clearcoatRoughness={.48}
           transparent
-          opacity={.94}
+          opacity={.98}
+          side={THREE.DoubleSide}
         />
-        <Edges color={DOMAIN_COLOR[spec.domain]} threshold={18} transparent opacity={indexOpen ? .42 : .16} />
+        <Edges color={DOMAIN_COLOR[spec.domain]} threshold={14} transparent opacity={indexOpen ? .58 : .26} />
       </mesh>
     </group>
   );
@@ -297,7 +327,7 @@ function Aperture({ chapter, indexOpen, motionMode }: { chapter: ChapterId; inde
     const centers: Array<[number, number]> = [
       [-.03, -3.2], [.08, -2.45], [-.1, -1.72], [.1, -.98], [-.07, -.25], [.12, .52], [-.08, 1.22], [.08, 1.95], [-.02, 3.2],
     ];
-    const halfWidth = .035;
+    const halfWidth = .055;
     const shape = new THREE.Shape();
     centers.forEach(([x, y], index) => {
       const point: [number, number] = [x - halfWidth, y];
@@ -318,17 +348,52 @@ function Aperture({ chapter, indexOpen, motionMode }: { chapter: ChapterId; inde
     group.current.position.x = THREE.MathUtils.damp(group.current.position.x, targetX, 3.4, delta);
     group.current.scale.y = THREE.MathUtils.damp(group.current.scale.y, indexOpen ? .78 : growth, 3.4, delta);
     const pulse = motionMode === "reduced" ? 0 : Math.sin(state.clock.elapsedTime * .48) * .025;
-    material.current.opacity = .22 + pulse;
+    material.current.opacity = (indexOpen ? .31 : .39) + pulse;
   });
 
   return (
     <group ref={group} position={[0, 0, -.52]}>
       <mesh geometry={geometry}>
-        <meshBasicMaterial ref={material} color="#edd6df" transparent opacity={.22} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+        <meshBasicMaterial ref={material} color="#f4d7e3" transparent opacity={.39} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
       </mesh>
       <mesh geometry={geometry} position={[.01, 0, -.03]} scale={[4.8, 1.04, 1]}>
-        <meshBasicMaterial color="#8baeb7" transparent opacity={.032} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+        <meshBasicMaterial color="#91c2ca" transparent opacity={.062} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
       </mesh>
+    </group>
+  );
+}
+
+function IndexArchitecture({ open, mobile }: { open: boolean; mobile: boolean }) {
+  const group = useRef<THREE.Group>(null);
+  const routeDomains: TraceRegion["domain"][] = ["self", "work", "growth", "history", "self"];
+
+  useFrame((_, delta) => {
+    if (!group.current) return;
+    group.current.scale.x = THREE.MathUtils.damp(group.current.scale.x, open ? 1 : .004, 4.4, delta);
+    group.current.position.x = THREE.MathUtils.damp(group.current.position.x, open ? 0 : -.28, 4.4, delta);
+  });
+
+  return (
+    <group ref={group} position={[-.28, 0, -.7]} scale={[.004, 1, 1]} visible={open}>
+      <mesh position={[.02, .1, 0]}>
+        <boxGeometry args={[.025, mobile ? 4.9 : 4.35, .025]} />
+        <meshBasicMaterial color="#e6c8d5" transparent opacity={.22} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+      </mesh>
+      {routeDomains.map((domain, route) => {
+        const y = (mobile ? 2.05 : 1.92) - route * (mobile ? 1.02 : .91);
+        return (
+          <group key={domain + route} position={[0, y, 0]}>
+            <mesh position={[2.45, 0, 0]}>
+              <boxGeometry args={[4.9, .018, .018]} />
+              <meshBasicMaterial color={DOMAIN_COLOR[domain]} transparent opacity={.18} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+            </mesh>
+            <mesh position={[.02, 0, .035]}>
+              <circleGeometry args={[.07, 18]} />
+              <meshBasicMaterial color={DOMAIN_COLOR[domain]} transparent opacity={.76} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+            </mesh>
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -456,7 +521,7 @@ function Monument({
     const node = root.current;
     if (!node) return;
     const table: Record<ChapterId, [number, number, number, number, number]> = mobile ? {
-      origin: [.2, .08, -.1, .72, -.03],
+      origin: [.72, .06, -.08, .93, -.025],
       human: [0, -.08, -.22, .58, 0],
       work: [0, 0, -.28, .6, 0],
       growth: [0, -.05, -.34, .58, 0],
@@ -464,7 +529,7 @@ function Monument({
       understanding: [0, 0, -.38, .58, 0],
       present: [0, 0, -.32, .62, 0],
     } : {
-      origin: [1.45, .02, -.18, 1.08, -.035],
+      origin: [1.62, .02, -.14, 1.2, -.035],
       human: [.55, 0, -.3, .9, 0],
       work: [.15, 0, -.34, .94, 0],
       growth: [.1, .02, -.38, .9, 0],
@@ -474,10 +539,10 @@ function Monument({
     };
     let [x, y, z, scale, rz] = table[chapter];
     if (indexOpen) {
-      x = mobile ? .02 : 1.05;
+      x = mobile ? .34 : .9;
       y = 0;
       z = -.72;
-      scale = mobile ? .68 : .94;
+      scale = mobile ? .76 : 1.02;
       rz = 0;
     }
     node.position.x = THREE.MathUtils.damp(node.position.x, x, 3.1, delta);
@@ -514,6 +579,7 @@ function Monument({
   return (
     <group ref={root}>
       <Aperture chapter={chapter} indexOpen={indexOpen} motionMode={motionMode} />
+      <IndexArchitecture open={indexOpen} mobile={mobile} />
       {specs.map((spec) => (
         <Fragment
           key={spec.id}
@@ -552,10 +618,11 @@ function World({
   return (
     <>
       <fog attach="fog" args={["#050506", 8.5, 17]} />
-      <ambientLight intensity={.34} />
-      <directionalLight position={[3.2, 4.6, 6]} color="#efd8e1" intensity={1.85} />
-      <pointLight position={[-2.8, -1.8, 4.2]} color="#789fa8" intensity={1.05} distance={13} decay={1.8} />
-      <pointLight position={[3.6, 1.2, 2.8]} color="#c58c9f" intensity={.72} distance={9} decay={2} />
+      <ambientLight intensity={.52} />
+      <hemisphereLight args={["#f0dce4", "#101319", .72]} />
+      <directionalLight position={[3.2, 4.6, 6]} color="#f4dce5" intensity={2.45} />
+      <pointLight position={[-2.8, -1.8, 4.2]} color="#86b7c0" intensity={1.28} distance={13} decay={1.8} />
+      <pointLight position={[3.6, 1.2, 2.8]} color="#d3a0b3" intensity={1.02} distance={9} decay={2} />
       <ConstructionMatter tier={tier} motionMode={motionMode} indexOpen={indexOpen} />
       <Monument tier={tier} motionMode={motionMode} state={state} chapter={chapter} indexOpen={indexOpen} indexFocus={indexFocus} interaction={interaction} />
     </>
@@ -655,7 +722,7 @@ export default function LivingWorldCanvasV4({ renderTier, motionMode, livingStat
         gl.setClearColor(0x000000, 0);
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = .92;
+        gl.toneMappingExposure = 1.08;
         onReady();
       }}
     >
