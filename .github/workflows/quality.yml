@@ -237,16 +237,20 @@ jobs:
               const root = document.querySelector(${JSON.stringify(selector)});
               if (!root) return false;
               const target = root.matches('h1,h2,h3,a,button') ? root : (root.querySelector('h1,h2,h3,a,button') || root);
+              document.documentElement.style.scrollBehavior = 'auto';
+              document.body.style.scrollBehavior = 'auto';
+              target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
               const rect = target.getBoundingClientRect();
-              const top = Math.max(0, window.scrollY + rect.top - window.innerHeight * 0.18);
-              window.scrollTo({ top, behavior: 'auto' });
+              if (rect.top < window.innerHeight * 0.12 || rect.bottom > window.innerHeight * 0.88) {
+                window.scrollBy({ top: rect.top - window.innerHeight * 0.18, behavior: 'auto' });
+              }
               return true;
             })()`;
 
-            for (let attempt = 0; attempt < 2; attempt += 1) {
+            for (let attempt = 0; attempt < 3; attempt += 1) {
               const result = await send('Runtime.evaluate', { expression, returnByValue: true });
               if (!result.result?.value) throw new Error(`${label} target could not be positioned.`);
-              await sleep(attempt === 0 ? 500 : 350);
+              await sleep(attempt === 0 ? 650 : 450);
             }
           }
 
@@ -353,6 +357,7 @@ jobs:
           NODE
 
       - name: Upload visual review surfaces
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: master-2-visual-review
