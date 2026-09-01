@@ -1,0 +1,88 @@
+.trace-static-knot path,
+.trace-static-tail {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+}
+
+.trace-static-knot path {
+  stroke: rgba(232, 200, 214, .58);
+  stroke-width: 1.25;
+  filter: drop-shadow(0 0 10px rgba(207, 105, 145, .14));
+}
+
+.trace-static-knot path:nth-child(2) {
+  stroke: rgba(154, 184, 191, .4);
+  stroke-width: .9;
+}
+
+.trace-static-knot path:nth-child(3) {
+  stroke: rgba(185, 127, 153, .42);
+  stroke-width: .75;
+}
+
+.trace-static-tail {
+  stroke: rgba(226, 202, 213, .22);
+  stroke-width: .8;
+}
+
+html[data-chapter="origin"] .living-trace-static {
+  opacity: .5;
+}
+
+html[data-chapter="origin"] .living-trace[data-ready="true"] .living-trace-static {
+  opacity: .018;
+}
+
+html[data-render-tier="static-low"][data-chapter="origin"] .living-trace-static,
+html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-static {
+  opacity: .64;
+  transform: translate3d(12%, -1%, 0) scale(.9);
+  transform-origin: center;
+}
+
+@media (max-width: 760px) {
+  .hero-v3-name-wrap {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .hero-v3-first {
+    font-size: clamp(4.55rem, 22vw, 7.8rem);
+    letter-spacing: -.082em;
+  }
+
+  .hero-v3-last {
+    width: 100%;
+    margin-left: 0;
+    font-size: clamp(3.55rem, 16.9vw, 6rem);
+    letter-spacing: -.078em;
+  }
+
+  .hero-v3-name-breach {
+    flex: 0 0 clamp(.6rem, 2.4vw, 1rem);
+    width: auto;
+    margin-inline: clamp(.18rem, .8vw, .35rem);
+  }
+
+  .hero-v3-caption {
+    width: min(78vw, 21.5rem);
+  }
+
+  html[data-chapter="origin"] .living-trace {
+    transform: translate3d(9%, -3%, 0) scale(.88);
+    transform-origin: 66% 46%;
+    transition: transform 900ms var(--adham-ease-transform);
+  }
+
+  html[data-render-tier="static-low"][data-chapter="origin"] .living-trace-static,
+  html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-static {
+    transform: translate3d(14%, -4%, 0) scale(.72);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-chapter="origin"] .living-trace {
+    transition: none;
+  }
+}
