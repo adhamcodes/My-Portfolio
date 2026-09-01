@@ -305,7 +305,7 @@ html[data-index-open="true"] #main-story {
 }
 
 html[data-index-open="true"] .living-trace {
-  z-index: calc(var(--adham-z-overlay) + 1);
+  z-index: var(--adham-z-world);
   opacity: 1;
   mask-image: radial-gradient(ellipse 86% 94% at 79% 50%, #000 58%, rgba(0,0,0,.84) 76%, transparent 100%);
   transition: opacity var(--adham-duration-response) linear;
