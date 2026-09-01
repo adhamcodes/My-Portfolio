@@ -216,7 +216,7 @@ html[data-chapter="human"] .living-trace::after {
 
   .human-story-monument {
     max-width: 100%;
-    font-size: clamp(4.2rem, 19vw, 7.2rem);
+    font-size: clamp(3rem, 15.4vw, 6rem);
     line-height: .75;
   }
 
