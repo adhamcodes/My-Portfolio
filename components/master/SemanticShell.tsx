@@ -12,8 +12,6 @@ type SemanticShellProps = {
   preview?: boolean;
 };
 
-const qualityProbe = process.env.GITHUB_ACTIONS === "true";
-
 export default function SemanticShell({ preview = false }: SemanticShellProps) {
   return (
     <main className="master-shell">
@@ -39,40 +37,6 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
         <HistoryChapter />
         <Ending />
       </div>
-
-      {qualityProbe && (
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(() => {
-              const params = new URLSearchParams(location.search);
-              const review = params.get('review');
-              if (!review) return;
-              const run = () => {
-                document.documentElement.style.scrollBehavior = 'auto';
-                document.body.style.scrollBehavior = 'auto';
-                if (review === 'index') {
-                  document.querySelector('.index-trigger')?.click();
-                  return;
-                }
-                const scene = document.getElementById(review);
-                const target = scene?.querySelector('h1, h2, h3') || scene;
-                if (!target) return;
-                const place = () => {
-                  const rect = target.getBoundingClientRect();
-                  const top = Math.max(0, window.scrollY + rect.top - window.innerHeight * 0.18);
-                  window.scrollTo(0, top);
-                };
-                place();
-                setTimeout(place, 120);
-                setTimeout(place, 420);
-                setTimeout(place, 900);
-              };
-              if (document.readyState === 'complete') setTimeout(run, 500);
-              else addEventListener('load', () => setTimeout(run, 500), { once: true });
-            })();`,
-          }}
-        />
-      )}
     </main>
   );
 }
