@@ -49,9 +49,9 @@
 .index-layer {
   position: fixed;
   inset: 0;
-  z-index: var(--adham-z-overlay);
+  z-index: calc(var(--adham-z-overlay) + 2);
   display: grid;
-  background: #050506;
+  background: transparent;
   animation: index-layer-in var(--adham-duration-settle) var(--adham-ease-reveal) both;
 }
 
@@ -63,7 +63,7 @@
   padding: max(1.25rem, env(safe-area-inset-top)) var(--adham-page-gutter) max(1.5rem, env(safe-area-inset-bottom));
   background:
     radial-gradient(ellipse 34% 52% at 79% 48%, rgba(200,122,152,.075), transparent 72%),
-    linear-gradient(90deg, rgba(5,5,6,1) 0%, rgba(5,5,6,.99) 49%, rgba(5,5,6,.91) 61%, rgba(5,5,6,.42) 78%, rgba(5,5,6,.66) 100%);
+    linear-gradient(90deg, rgba(5,5,6,1) 0%, rgba(5,5,6,.99) 49%, rgba(5,5,6,.9) 61%, rgba(5,5,6,.32) 78%, rgba(5,5,6,.48) 100%);
 }
 
 .index-world::before {
@@ -319,7 +319,13 @@ html[data-index-open="true"] .index-world,
 html[data-index-open="true"] .index-heading,
 html[data-index-open="true"] .index-map,
 html[data-index-open="true"] .index-external {
-  z-index: calc(var(--adham-z-overlay) + 2);
+  z-index: 2;
+}
+
+html[data-index-open="true"] .index-heading,
+html[data-index-open="true"] .index-map,
+html[data-index-open="true"] .index-external {
+  z-index: 3;
 }
 
 @keyframes index-layer-in {
@@ -338,8 +344,8 @@ html[data-index-open="true"] .index-external {
   .index-world {
     padding-inline: 1rem;
     background:
-      radial-gradient(circle at 55% 72%, rgba(210,79,130,.055), transparent 32%),
-      linear-gradient(180deg, rgba(5,5,6,.99), rgba(5,5,6,.91) 64%, rgba(5,5,6,.98));
+      radial-gradient(circle at 58% 68%, rgba(210,79,130,.08), transparent 38%),
+      linear-gradient(180deg, rgba(5,5,6,.93), rgba(5,5,6,.7) 58%, rgba(5,5,6,.84));
   }
 
   .index-world::before,
@@ -348,13 +354,13 @@ html[data-index-open="true"] .index-external {
   }
 
   .index-heading {
-    padding-top: .25rem;
+    padding-top: max(.5rem, env(safe-area-inset-top));
     padding-right: 5.75rem;
   }
 
   .index-heading button {
     position: absolute;
-    top: 0;
+    top: max(.25rem, env(safe-area-inset-top));
     right: 0;
     z-index: 4;
     display: inline-flex;
@@ -424,7 +430,7 @@ html[data-index-open="true"] .index-external {
   }
 
   html[data-index-open="true"] .living-trace {
-    opacity: .46;
+    opacity: .52;
     mask-image: radial-gradient(ellipse 126% 82% at 58% 64%, #000 42%, rgba(0,0,0,.64) 72%, transparent 100%);
   }
 }
