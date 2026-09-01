@@ -6,39 +6,62 @@
 }
 
 .trace-static-knot path {
-  stroke: rgba(232, 200, 214, .58);
-  stroke-width: 1.25;
-  filter: drop-shadow(0 0 10px rgba(207, 105, 145, .14));
+  stroke: rgba(232, 200, 214, .62);
+  stroke-width: 1.35;
+  filter: drop-shadow(0 0 13px rgba(207, 105, 145, .16));
 }
 
 .trace-static-knot path:nth-child(2) {
-  stroke: rgba(154, 184, 191, .4);
-  stroke-width: .9;
+  stroke: rgba(154, 184, 191, .43);
+  stroke-width: .95;
 }
 
 .trace-static-knot path:nth-child(3) {
-  stroke: rgba(185, 127, 153, .42);
-  stroke-width: .75;
+  stroke: rgba(185, 127, 153, .46);
+  stroke-width: .82;
 }
 
 .trace-static-tail {
-  stroke: rgba(226, 202, 213, .22);
-  stroke-width: .8;
+  stroke: rgba(226, 202, 213, .25);
+  stroke-width: .9;
 }
 
 html[data-chapter="origin"] .living-trace-static {
-  opacity: .5;
+  opacity: .52;
 }
 
 html[data-chapter="origin"] .living-trace[data-ready="true"] .living-trace-static {
-  opacity: .018;
+  opacity: .075;
 }
 
 html[data-render-tier="static-low"][data-chapter="origin"] .living-trace-static,
 html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-static {
-  opacity: .64;
+  opacity: .68;
   transform: translate3d(12%, -1%, 0) scale(.9);
   transform-origin: center;
+}
+
+/* Arrival owns the first frame. Navigation and sound return only after the
+   visitor leaves Origin; they are utilities, not part of the identity reveal. */
+html[data-chapter="origin"] .master-header,
+html[data-chapter="origin"] .sound-control {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, -28%, 0);
+}
+
+html[data-chapter="origin"] .master-header *,
+html[data-chapter="origin"] .sound-control * {
+  pointer-events: none;
+}
+
+.hero-v3-last {
+  color: rgba(226,220,217,.13);
+  -webkit-text-stroke-color: rgba(239,233,230,.38);
+}
+
+.hero-v3-caption {
+  color: rgba(231,226,220,.79);
 }
 
 @media (max-width: 760px) {
@@ -53,16 +76,11 @@ html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-stat
   }
 
   .hero-v3-last {
-    width: 100%;
+    width: max-content;
     margin-left: 0;
-    font-size: clamp(3.55rem, 16.9vw, 6rem);
+    font-size: clamp(3.48rem, 16.55vw, 5.9rem);
     letter-spacing: -.078em;
-  }
-
-  .hero-v3-name-breach {
-    flex: 0 0 clamp(.6rem, 2.4vw, 1rem);
-    width: auto;
-    margin-inline: clamp(.18rem, .8vw, .35rem);
+    -webkit-text-stroke-color: rgba(239,233,230,.34);
   }
 
   .hero-v3-caption {
@@ -84,5 +102,10 @@ html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-stat
 @media (prefers-reduced-motion: reduce) {
   html[data-chapter="origin"] .living-trace {
     transition: none;
+  }
+
+  html[data-chapter="origin"] .master-header,
+  html[data-chapter="origin"] .sound-control {
+    transform: none;
   }
 }
