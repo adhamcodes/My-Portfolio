@@ -292,6 +292,7 @@
   transition: opacity 220ms var(--adham-ease-response), filter 300ms var(--adham-ease-response);
 }
 
+html[data-index-open="true"] .master-shell,
 html[data-index-open="true"] .master-header {
   z-index: calc(var(--adham-z-overlay) + 2);
 }
