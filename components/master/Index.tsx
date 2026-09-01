@@ -78,7 +78,7 @@ export default function Index() {
     hasOpened.current = true;
     const previousOverflow = document.body.style.overflow;
     const background = [
-      document.querySelector<HTMLElement>(".hero-v2"),
+      document.querySelector<HTMLElement>(".hero-v3"),
       document.getElementById("main-story"),
     ].filter((node): node is HTMLElement => Boolean(node));
 
