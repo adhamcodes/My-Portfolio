@@ -111,7 +111,7 @@ const structuredData = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${instrumentSans.variable} ${newsreader.variable} ${spaceMono.variable}`}>
+    <html lang="en" data-chapter="origin" className={`${instrumentSans.variable} ${newsreader.variable} ${spaceMono.variable}`}>
       <body>
         <CapabilityDirector />
         <ExperienceDirector />
