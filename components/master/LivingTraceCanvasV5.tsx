@@ -20,7 +20,7 @@ type Props = {
   onReady: () => void;
 };
 
-type Interaction = { x: number; y: number; velocity: number };
+type Interaction = { x: number; y: number; velocity: number; active: boolean };
 type Role = "core" | "branch" | "direction" | "fossil" | "horizon" | "atlas";
 
 type StrandSpec = {
@@ -34,6 +34,17 @@ type StrandSpec = {
   phase: number;
   role: Role;
   dormant?: boolean;
+};
+
+type ForceUniforms = {
+  point: { value: THREE.Vector3 };
+  radius: { value: number };
+  strength: { value: number };
+};
+
+type ShaderPatch = {
+  uniforms: Record<string, unknown>;
+  vertexShader: string;
 };
 
 const COLORS: Record<TraceRegion["domain"], string> = {
@@ -63,6 +74,31 @@ function curve(points: Array<[number, number, number]>, tension = .38) {
 
 function regionFor(projection: WorldProjection, domain: TraceRegion["domain"]) {
   return projection.regions.filter((region) => region.domain === domain);
+}
+
+function installLocalForce(shader: ShaderPatch, force: ForceUniforms) {
+  shader.uniforms.uTraceForcePoint = force.point;
+  shader.uniforms.uTraceForceRadius = force.radius;
+  shader.uniforms.uTraceForceStrength = force.strength;
+  shader.vertexShader = `
+uniform vec3 uTraceForcePoint;
+uniform float uTraceForceRadius;
+uniform float uTraceForceStrength;
+${shader.vertexShader}`;
+  shader.vertexShader = shader.vertexShader.replace(
+    "#include <begin_vertex>",
+    `#include <begin_vertex>
+      vec2 traceDelta = position.xy - uTraceForcePoint.xy;
+      float traceDistance = length(traceDelta);
+      float traceCore = 1.0 - smoothstep(0.0, uTraceForceRadius * 0.38, traceDistance);
+      float tracePropagation = smoothstep(0.0, uTraceForceRadius * 0.28, traceDistance)
+        * (1.0 - smoothstep(uTraceForceRadius * 0.34, uTraceForceRadius, traceDistance))
+        * 0.34;
+      float traceFalloff = clamp(traceCore + tracePropagation, 0.0, 1.0);
+      vec2 traceDirection = traceDistance > 0.0001 ? traceDelta / traceDistance : vec2(0.0, 1.0);
+      transformed.xy += traceDirection * traceFalloff * uTraceForceStrength;
+      transformed.z += sin(traceFalloff * 3.14159265) * uTraceForceStrength * 0.16;`,
+  );
 }
 
 function originSpecs(projection: WorldProjection, tier: RenderTier): StrandSpec[] {
@@ -389,30 +425,77 @@ function Strand({ spec, tier, motionMode, interaction, chapter }: {
   const material = useRef<THREE.MeshPhysicalMaterial>(null);
   const glow = useRef<THREE.MeshBasicMaterial>(null);
   const signal = useRef<THREE.Mesh>(null);
+  const camera = useThree((state) => state.camera);
+  const force = useMemo<ForceUniforms>(() => ({
+    point: { value: new THREE.Vector3(1000, 1000, 1000) },
+    radius: { value: 1 },
+    strength: { value: 0 },
+  }), []);
+  const forceMath = useMemo(() => ({
+    ndc: new THREE.Vector3(),
+    direction: new THREE.Vector3(),
+    worldPoint: new THREE.Vector3(),
+    groupOrigin: new THREE.Vector3(),
+    worldScale: new THREE.Vector3(1, 1, 1),
+  }), []);
   const segments = tier === "full" ? 132 : 78;
   const radial = tier === "full" ? 9 : 6;
 
   useFrame((state, delta) => {
     if (material.current) {
       material.current.opacity = THREE.MathUtils.damp(material.current.opacity, spec.opacity, 4.2, delta);
+      const pulse = motionMode === "reduced" || spec.dormant
+        ? 0
+        : Math.sin(state.clock.elapsedTime * .26 + spec.phase) * .026;
       material.current.emissiveIntensity = THREE.MathUtils.damp(
         material.current.emissiveIntensity,
-        spec.dormant ? .035 : .15 + Math.sin(state.clock.elapsedTime * .26 + spec.phase) * .026,
+        spec.dormant ? .035 : .15 + pulse,
         2.5,
         delta,
       );
     }
     if (glow.current) glow.current.opacity = THREE.MathUtils.damp(glow.current.opacity, spec.glow, 3.5, delta);
-    if (!group.current || motionMode === "reduced") return;
 
     const pointer = interaction.current;
-    const response = chapter === "origin" ? .035 : chapter === "growth" ? .018 : .012;
-    const sign = Math.sin(spec.phase + .4) > 0 ? 1 : -1;
-    group.current.position.x = THREE.MathUtils.damp(group.current.position.x, pointer.x * response * sign, 3, delta);
-    group.current.position.y = THREE.MathUtils.damp(group.current.position.y, pointer.y * response * .72 + pointer.velocity * .02 * sign, 3.2, delta);
-    group.current.rotation.z = THREE.MathUtils.damp(group.current.rotation.z, pointer.x * response * .055 * sign, 2.4, delta);
+    let targetStrength = 0;
+    if (group.current && motionMode !== "reduced" && pointer.active) {
+      group.current.updateWorldMatrix(true, false);
+      group.current.getWorldPosition(forceMath.groupOrigin);
+      group.current.getWorldScale(forceMath.worldScale);
 
-    if (signal.current && !spec.dormant && spec.role !== "fossil") {
+      forceMath.ndc.set(pointer.x, pointer.y, .12).unproject(camera);
+      forceMath.direction.copy(forceMath.ndc).sub(camera.position).normalize();
+      if (Math.abs(forceMath.direction.z) > .0001) {
+        const travel = (forceMath.groupOrigin.z - camera.position.z) / forceMath.direction.z;
+        if (travel > 0) {
+          forceMath.worldPoint.copy(camera.position).addScaledVector(forceMath.direction, travel);
+          group.current.worldToLocal(forceMath.worldPoint);
+          const settle = 1 - Math.exp(-delta * 10.5);
+          force.point.value.lerp(forceMath.worldPoint, settle);
+
+          const scale = Math.max(Math.abs(forceMath.worldScale.x), .08);
+          const worldRadius = spec.role === "atlas" ? .7 : chapter === "origin" ? .94 : .78;
+          force.radius.value = worldRadius / scale;
+          const roleStrength = spec.role === "core"
+            ? 1
+            : spec.role === "fossil"
+              ? .42
+              : spec.role === "horizon"
+                ? .52
+                : .72;
+          const velocityBoost = Math.min(Math.abs(pointer.velocity) * .012, .055);
+          targetStrength = Math.min((.092 + velocityBoost) * roleStrength / scale, .32);
+        }
+      }
+    }
+    force.strength.value = THREE.MathUtils.damp(
+      force.strength.value,
+      targetStrength,
+      targetStrength > 0 ? 7.2 : 2.8,
+      delta,
+    );
+
+    if (signal.current && motionMode !== "reduced" && !spec.dormant && spec.role !== "fossil") {
       const speed = spec.role === "core" ? .028 : .016;
       const t = (state.clock.elapsedTime * speed + spec.phase / 6.28) % 1;
       signal.current.position.copy(spec.curve.getPoint(t));
@@ -425,7 +508,16 @@ function Strand({ spec, tier, motionMode, interaction, chapter }: {
       {spec.glow > 0 && (
         <mesh>
           <tubeGeometry args={[spec.curve, segments, spec.radius * 2.8, radial, false]} />
-          <meshBasicMaterial ref={glow} color={spec.color} transparent opacity={0} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+          <meshBasicMaterial
+            ref={glow}
+            color={spec.color}
+            transparent
+            opacity={0}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+            onBeforeCompile={(shader) => installLocalForce(shader, force)}
+          />
         </mesh>
       )}
       <mesh>
@@ -442,6 +534,7 @@ function Strand({ spec, tier, motionMode, interaction, chapter }: {
           transparent
           opacity={0}
           depthWrite={false}
+          onBeforeCompile={(shader) => installLocalForce(shader, force)}
         />
       </mesh>
       {!spec.dormant && spec.role !== "fossil" && (
@@ -585,7 +678,7 @@ export default function LivingTraceCanvasV5({ renderTier, motionMode, livingStat
   const [chapter, setChapter] = useState<ChapterId>("origin");
   const [indexOpen, setIndexOpen] = useState(false);
   const [visible, setVisible] = useState(true);
-  const interaction = useRef<Interaction>({ x: 0, y: 0, velocity: 0 });
+  const interaction = useRef<Interaction>({ x: 0, y: 0, velocity: 0, active: false });
   const projection = useMemo(() => createWorldProjection(livingState, chapter), [livingState, chapter]);
 
   useEffect(() => {
@@ -594,11 +687,23 @@ export default function LivingTraceCanvasV5({ renderTier, motionMode, livingStat
     if (stored) setChapter(stored);
     setIndexOpen(root.dataset.indexOpen === "true");
     setVisible(document.visibilityState === "visible");
+    if (motionMode === "reduced") interaction.current.active = false;
 
+    const deactivate = () => {
+      interaction.current.active = false;
+      interaction.current.velocity = 0;
+    };
     const onPointer = (event: PointerEvent) => {
-      if (motionMode === "reduced") return;
+      if (motionMode === "reduced" || event.pointerType === "touch") {
+        deactivate();
+        return;
+      }
       interaction.current.x = (event.clientX / Math.max(window.innerWidth, 1)) * 2 - 1;
       interaction.current.y = -((event.clientY / Math.max(window.innerHeight, 1)) * 2 - 1);
+      interaction.current.active = true;
+    };
+    const onPointerOut = (event: PointerEvent) => {
+      if (!event.relatedTarget) deactivate();
     };
     const onMotion = (event: Event) => {
       interaction.current.velocity = (event as CustomEvent<{ scrollVelocity?: number }>).detail?.scrollVelocity ?? 0;
@@ -608,15 +713,23 @@ export default function LivingTraceCanvasV5({ renderTier, motionMode, livingStat
       if (next) setChapter(next);
     };
     const onIndex = (event: Event) => setIndexOpen(Boolean((event as CustomEvent<{ open?: boolean }>).detail?.open));
-    const onVisibility = (event: Event) => setVisible(Boolean((event as CustomEvent<{ visible?: boolean }>).detail?.visible));
+    const onVisibility = (event: Event) => {
+      const nextVisible = Boolean((event as CustomEvent<{ visible?: boolean }>).detail?.visible);
+      setVisible(nextVisible);
+      if (!nextVisible) deactivate();
+    };
 
     window.addEventListener("pointermove", onPointer, { passive: true });
+    window.addEventListener("pointerout", onPointerOut, { passive: true });
+    window.addEventListener("blur", deactivate);
     window.addEventListener("adham:motion", onMotion);
     window.addEventListener("adham:chapter", onChapter);
     window.addEventListener("adham:index", onIndex);
     window.addEventListener("adham:visibility", onVisibility);
     return () => {
       window.removeEventListener("pointermove", onPointer);
+      window.removeEventListener("pointerout", onPointerOut);
+      window.removeEventListener("blur", deactivate);
       window.removeEventListener("adham:motion", onMotion);
       window.removeEventListener("adham:chapter", onChapter);
       window.removeEventListener("adham:index", onIndex);
