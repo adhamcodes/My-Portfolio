@@ -9,6 +9,8 @@ type GitHubPublicEvent = {
     action?: string;
     ref_type?: string;
     ref?: string | null;
+    size?: number;
+    distinct_size?: number;
     commits?: Array<{ sha?: string }>;
     pull_request?: { merged?: boolean };
   };
@@ -26,9 +28,13 @@ function repositoryLabel(name?: string) {
 function pushEvents(event: GitHubPublicEvent): LivingEvent[] {
   if (!event.id || !event.created_at) return [];
   const repositoryId = event.repo?.name;
+  const payloadCount = event.payload?.size ?? event.payload?.distinct_size;
+  const commitCount = Number.isFinite(payloadCount)
+    ? Math.max(0, Math.floor(payloadCount ?? 0))
+    : Math.max(0, event.payload?.commits?.length ?? 0);
 
-  // A public push is one factual activity moment. Individual commit counts are not
-  // projected because Pulse is not a productivity scoreboard.
+  // A public push remains one event for history/idempotency. Its factual commit
+  // count is preserved for the Activity Veil without becoming an achievement score.
   return [{
     domain: "code",
     id: `github:push:${event.id}`,
@@ -36,6 +42,7 @@ function pushEvents(event: GitHubPublicEvent): LivingEvent[] {
     occurredAt: event.created_at,
     ...(repositoryId ? { repositoryId } : {}),
     ...(repositoryLabel(repositoryId) ? { label: repositoryLabel(repositoryId) } : {}),
+    facts: { commitCount },
     source: "github",
   }];
 }
