@@ -28,6 +28,7 @@ import "@/styles/master/v3.css";
 import "@/styles/master/v3-trace.css";
 import "@/styles/master/v3-hero-lock.css";
 import "@/styles/master/v3-zeroupload.css";
+import "@/styles/master/v4.css";
 import "@/styles/master/accessibility.css";
 import "@/styles/master/system.css";
 

@@ -79,7 +79,7 @@ export default function Index() {
     hasOpened.current = true;
     const previousOverflow = document.body.style.overflow;
     const background = [
-      document.querySelector<HTMLElement>(".hero-v3"),
+      document.querySelector<HTMLElement>(".hero-v4"),
       document.getElementById("main-story"),
     ].filter((node): node is HTMLElement => Boolean(node));
 
@@ -123,9 +123,13 @@ export default function Index() {
     }));
   };
 
+  const focusRoute = (route: number | null) => {
+    window.dispatchEvent(new CustomEvent("adham:index-focus", { detail: { route } }));
+  };
+
   const world = open && typeof document !== "undefined" ? createPortal(
     <div
-      className="index-layer"
+      className="v4-index-layer"
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) setOpen(false);
@@ -134,25 +138,25 @@ export default function Index() {
       <div
         ref={dialogRef}
         id="world-index"
-        className="index-world"
+        className="v4-index-world"
         role="dialog"
         aria-modal="true"
         aria-label="Portfolio index"
       >
-        <div className="index-heading">
+        <div className="v4-index-heading">
           <p>INDEX</p>
           <button type="button" onClick={() => setOpen(false)} aria-label="Close index">
             CLOSE <span aria-hidden="true">ESC</span>
           </button>
         </div>
 
-        <nav className="index-map" aria-label="Portfolio destinations">
-          <span className="index-axis" aria-hidden="true" />
+        <nav className="v4-index-map" aria-label="Portfolio destinations">
+          <span className="v4-index-axis" aria-hidden="true" />
           {destinations.map((item, index) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className="index-destination"
+              className="v4-index-destination"
               data-current={current === item.id ? "true" : "false"}
               aria-current={current === item.id ? "location" : undefined}
               style={{ "--index-order": index } as React.CSSProperties}
@@ -160,16 +164,20 @@ export default function Index() {
                 event.preventDefault();
                 travel(item.id);
               }}
+              onMouseEnter={() => focusRoute(index)}
+              onMouseLeave={() => focusRoute(null)}
+              onFocus={() => focusRoute(index)}
+              onBlur={() => focusRoute(null)}
             >
-              <span className="index-node" aria-hidden="true" />
-              <span className="index-label">{item.label}</span>
-              <span className="index-detail">{item.detail}</span>
+              <span className="v4-index-node" aria-hidden="true" />
+              <span className="v4-index-label">{item.label}</span>
+              <span className="v4-index-detail">{item.detail}</span>
             </a>
           ))}
         </nav>
 
         <a
-          className="index-external"
+          className="v4-index-external"
           href={masterIdentity.github}
           target="_blank"
           rel="noreferrer"
@@ -187,7 +195,7 @@ export default function Index() {
       <button
         ref={triggerRef}
         type="button"
-        className="index-trigger"
+        className="v4-index-trigger"
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="world-index"

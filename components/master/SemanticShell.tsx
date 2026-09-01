@@ -51,7 +51,7 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
                 document.documentElement.style.scrollBehavior = 'auto';
                 document.body.style.scrollBehavior = 'auto';
                 if (review === 'index') {
-                  document.querySelector('.index-trigger')?.click();
+                  document.querySelector('.v4-index-trigger')?.click();
                   return;
                 }
                 const scene = document.getElementById(review);

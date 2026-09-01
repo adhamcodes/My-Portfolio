@@ -6,7 +6,7 @@ import type { MotionMode, PublicLivingState, RenderTier } from "@/core/contracts
 import type { CapabilityDecision } from "@/core/capability";
 import { createCurrentLivingState } from "@/content/living-state";
 
-const LivingTraceCanvas = dynamic(() => import("./LivingTraceCanvasV5"), { ssr: false });
+const LivingWorldCanvas = dynamic(() => import("./LivingWorldCanvasV4"), { ssr: false });
 
 type CapabilityView = {
   renderTier: RenderTier;
@@ -36,17 +36,44 @@ class TraceBoundary extends Component<TraceBoundaryProps, { failed: boolean }> {
 
 function StaticTrace() {
   return (
-    <svg className="living-trace-static" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <g className="trace-static-knot">
-        <path d="M650 470 C560 410 568 298 665 264 C765 229 860 302 829 390 C800 474 683 486 632 414 C591 356 630 288 712 296 C800 305 836 394 785 457 C748 503 688 497 650 470" />
-        <path d="M615 432 C555 355 608 246 706 248 C808 251 859 346 813 428 C768 506 657 500 610 420 C574 357 613 298 687 286 C770 273 830 339 815 409" />
-        <path d="M626 451 C584 376 624 292 710 276 C792 261 857 333 838 411 C819 489 714 515 649 455 C597 408 603 332 661 300" />
+    <svg className="living-trace-static living-monument-static" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="monument-face" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#262329" />
+          <stop offset="1" stopColor="#09090b" />
+        </linearGradient>
+        <linearGradient id="monument-seam" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#e8cbd8" stopOpacity="0" />
+          <stop offset=".42" stopColor="#e8cbd8" stopOpacity=".72" />
+          <stop offset="1" stopColor="#91bbc2" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <g className="monument-static-mass monument-static-left">
+        <path d="M596 84 L448 106 L404 180 L468 228 L388 290 L455 354 L382 430 L458 486 L420 578 L585 610 L617 526 L572 458 L622 378 L575 304 L624 234 Z" />
+        <path d="M457 122 L345 166 L390 229 L310 292 L392 345 L318 433 L424 478 L381 552 L498 582" />
       </g>
-      <path className="trace-static-tail" d="M815 409 C930 426 1025 402 1260 350" />
-      <path className="trace-static-work-v3" d="M730 370 C835 330 930 335 1035 390 C1100 424 1165 421 1250 395" />
-      <path className="trace-static-growth-v3 trace-static-growth-a" d="M690 330 C650 254 668 190 731 130 C764 98 788 67 798 24" />
-      <path className="trace-static-growth-v3 trace-static-growth-b" d="M735 410 C795 480 835 536 886 608 C907 638 932 666 968 700" />
-      <path className="trace-static-history-v3" d="M620 434 C548 493 466 519 386 490 C321 467 298 402 342 351 C387 299 469 314 492 367 C511 412 472 455 425 443" />
+      <g className="monument-static-mass monument-static-right">
+        <path d="M638 72 L789 104 L846 174 L790 238 L872 286 L812 358 L886 428 L810 486 L852 566 L681 616 L649 530 L695 452 L646 384 L702 303 L651 226 Z" />
+        <path d="M783 116 L904 164 L858 226 L940 291 L860 350 L930 424 L820 480 L866 548 L744 590" />
+      </g>
+      <path className="monument-static-seam" d="M624 72 L610 166 L632 230 L616 304 L638 382 L620 456 L650 532 L634 626" />
+      <g className="monument-static-veil">
+        <rect x="740" y="148" width="122" height="68" rx="3" />
+        <rect x="866" y="256" width="96" height="54" rx="3" />
+        <rect x="720" y="488" width="142" height="74" rx="3" />
+      </g>
+      <g className="monument-static-map">
+        <path d="M520 178 H1015" />
+        <path d="M520 266 H1015" />
+        <path d="M520 354 H1015" />
+        <path d="M520 442 H1015" />
+        <path d="M520 530 H1015" />
+        <circle cx="520" cy="178" r="5" />
+        <circle cx="520" cy="266" r="5" />
+        <circle cx="520" cy="354" r="5" />
+        <circle cx="520" cy="442" r="5" />
+        <circle cx="520" cy="530" r="5" />
+      </g>
     </svg>
   );
 }
@@ -144,7 +171,7 @@ export default function LivingTrace() {
             setReady(false);
           }}
         >
-          <LivingTraceCanvas
+          <LivingWorldCanvas
             renderTier={capability.renderTier}
             motionMode={capability.motionMode}
             livingState={livingState}
