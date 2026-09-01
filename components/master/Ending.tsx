@@ -5,27 +5,37 @@ export default function Ending() {
     <section
       id="present"
       data-chapter="present"
-      className="master-scene ending"
+      className="master-scene ending ending-v3"
       aria-labelledby="present-title"
     >
       <p className="master-number">05 / PRESENT</p>
 
-      <div className="ending-copy">
-        <p className="ending-human">I&apos;m still building.</p>
-        <h2 id="present-title">THIS IS THE CURRENT FRAME.</h2>
-        <p className="ending-thought">The record stops here only because the future has not happened yet.</p>
+      <div className="ending-convergence" aria-hidden="true">
+        <span className="ending-convergence-history" />
+        <span className="ending-convergence-work" />
+        <span className="ending-convergence-growth" />
+        <i className="ending-convergence-now" />
+        <b className="ending-convergence-future" />
       </div>
 
-      <div className="ending-unresolved" aria-hidden="true">
-        <span />
-        <span />
-        <span />
+      <div className="ending-copy">
+        <p className="ending-human">I&apos;m still building.</p>
+        <h2 id="present-title">
+          <span>THIS IS THE</span>
+          <span>CURRENT FRAME.</span>
+        </h2>
+        <p className="ending-thought">Everything behind this point can become evidence or history. Everything beyond it is deliberately unresolved.</p>
+      </div>
+
+      <div className="ending-horizon" aria-hidden="true">
+        <span>KNOWN</span>
         <i />
+        <strong>NOT YET WRITTEN</strong>
       </div>
 
       <div id="contact" className="ending-contact">
-        <div>
-          <p>ADHAM MAHMOOD</p>
+        <div className="ending-signature">
+          <p>Adham Mahmood</p>
           <span>Software engineering → AI/ML engineering</span>
         </div>
         <nav aria-label="Contact and source">
