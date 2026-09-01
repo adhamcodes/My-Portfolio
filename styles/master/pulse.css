@@ -1,12 +1,19 @@
 .pulse-live,
 .pulse-zero {
-  margin-top: clamp(7rem, 14vw, 13rem);
+  position: relative;
+  z-index: 4;
+  width: min(72rem, 86%);
+  margin-top: clamp(8rem, 15vw, 15rem);
+}
+
+.pulse-live {
+  margin-left: auto;
 }
 
 .pulse-live-copy,
 .pulse-zero > div:last-child {
   display: grid;
-  grid-template-columns: minmax(5rem, .3fr) minmax(0, 1fr);
+  grid-template-columns: minmax(7rem, .3fr) minmax(0, 1fr);
   gap: clamp(2rem, 6vw, 7rem);
   align-items: start;
 }
@@ -16,65 +23,71 @@
   margin: 0;
   color: rgba(196,147,74,.72);
   font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: .65rem;
+  font-size: .62rem;
   letter-spacing: .17em;
 }
 
 .pulse-live-copy > span,
 .pulse-zero span {
-  max-width: 42rem;
+  max-width: 40rem;
   color: rgba(183,179,173,.62);
   font-family: var(--font-newsreader), Georgia, serif;
-  font-size: clamp(1.05rem, 1.45vw, 1.3rem);
+  font-size: clamp(1.03rem, 1.4vw, 1.26rem);
   line-height: 1.5;
 }
 
 .pulse-field {
   width: 100%;
   height: auto;
-  margin-top: clamp(3.5rem, 7vw, 6rem);
+  margin-top: clamp(3.7rem, 7vw, 6.4rem);
   overflow: visible;
 }
 
 .pulse-lane text,
 .pulse-time-label {
-  fill: rgba(124,121,117,.56);
+  fill: rgba(124,121,117,.5);
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: 8px;
-  letter-spacing: 1.4px;
+  letter-spacing: 1.35px;
 }
 
 .pulse-lane line {
-  stroke: rgba(242,239,233,.08);
+  stroke: rgba(242,239,233,.055);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
-.pulse-signal line {
-  stroke: rgba(242,239,233,.16);
+.pulse-time-axis {
+  stroke: rgba(242,239,233,.13);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
-.pulse-signal circle {
-  fill: rgba(242,239,233,.52);
+.pulse-cluster > line {
+  stroke: rgba(242,239,233,.07);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
 
-.pulse-signal-code circle {
-  fill: rgba(152,184,191,.72);
+.pulse-cluster-halo {
+  fill: none;
+  stroke-width: .65;
+  opacity: .2;
+  vector-effect: non-scaling-stroke;
 }
 
-.pulse-signal-learning circle {
-  fill: rgba(196,147,74,.78);
+.pulse-cluster-core {
+  opacity: .78;
 }
 
-.pulse-signal-work circle {
-  fill: rgba(210,79,130,.7);
-}
-
-.pulse-signal-career circle {
-  fill: rgba(228,201,212,.72);
-}
+.pulse-cluster-code .pulse-cluster-core { fill: rgba(152,184,191,.76); }
+.pulse-cluster-code .pulse-cluster-halo { stroke: rgba(152,184,191,.54); }
+.pulse-cluster-learning .pulse-cluster-core { fill: rgba(196,147,74,.82); }
+.pulse-cluster-learning .pulse-cluster-halo { stroke: rgba(196,147,74,.62); }
+.pulse-cluster-work .pulse-cluster-core { fill: rgba(210,79,130,.74); }
+.pulse-cluster-work .pulse-cluster-halo { stroke: rgba(210,79,130,.52); }
+.pulse-cluster-career .pulse-cluster-core { fill: rgba(228,201,212,.78); }
+.pulse-cluster-career .pulse-cluster-halo { stroke: rgba(228,201,212,.52); }
 
 .pulse-time-label-end {
   text-anchor: end;
@@ -93,32 +106,59 @@
 }
 
 .pulse-zero {
-  position: relative;
-  padding-top: 2rem;
+  display: grid;
+  grid-template-columns: minmax(12rem, .72fr) minmax(0, 1fr);
+  gap: clamp(2rem, 6vw, 7rem);
+  align-items: center;
+  margin-right: auto;
 }
 
-.pulse-zero-line {
+.pulse-zero-axis {
+  position: relative;
+  display: block;
   height: 1px;
-  margin-bottom: 2rem;
-  background: linear-gradient(90deg, rgba(196,147,74,.26), rgba(242,239,233,.08) 32%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(196,147,74,.28) 19%, rgba(242,239,233,.09) 68%, transparent);
+}
+
+.pulse-zero-axis i {
+  position: absolute;
+  right: 15%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border: 1px solid rgba(196,147,74,.36);
+  border-radius: 50%;
+  background: #050506;
+  transform: translateY(-50%);
+}
+
+.pulse-zero > div:last-child {
+  grid-template-columns: 1fr;
+  gap: .8rem;
 }
 
 @media (max-width: 760px) {
   .pulse-live,
   .pulse-zero {
-    margin-top: 7rem;
+    width: 100%;
+    margin-top: 8rem;
   }
 
   .pulse-live-copy,
+  .pulse-zero,
   .pulse-zero > div:last-child {
     grid-template-columns: 1fr;
-    gap: .8rem;
+    gap: .9rem;
+  }
+
+  .pulse-zero-axis {
+    margin-bottom: 1rem;
   }
 
   .pulse-field {
-    width: 128%;
+    width: 123%;
     max-width: none;
-    margin-left: -7%;
+    margin-left: -11%;
     margin-top: 3.5rem;
   }
 
@@ -129,7 +169,8 @@
 }
 
 @media (prefers-contrast: more) {
-  .pulse-lane line {
+  .pulse-lane line,
+  .pulse-time-axis {
     stroke: rgba(242,239,233,.28);
   }
 
