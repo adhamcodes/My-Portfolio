@@ -68,13 +68,19 @@ html[data-chapter="origin"] .sound-control * {
   opacity: .34;
 }
 
+/* MAHMOOD is not transparent glass. It is a physical occluder: the organism
+   disappears behind the letters and re-emerges outside them. This makes type
+   and world share depth instead of merely overlapping. */
 .hero-v3-last {
-  color: rgba(226,220,217,.13);
-  -webkit-text-stroke-color: rgba(239,233,230,.38);
+  color: rgba(5, 5, 6, .9);
+  -webkit-text-stroke-color: rgba(239,233,230,.48);
+  text-shadow:
+    0 0 1px rgba(255,255,255,.08),
+    0 0 34px rgba(207,118,151,.035);
 }
 
 .hero-v3-caption {
-  color: rgba(231,226,220,.79);
+  color: rgba(231,226,220,.82);
 }
 
 @media (max-width: 760px) {
@@ -93,7 +99,8 @@ html[data-chapter="origin"] .sound-control * {
     margin-left: 0;
     font-size: clamp(3.48rem, 16.55vw, 5.9rem);
     letter-spacing: -.078em;
-    -webkit-text-stroke-color: rgba(239,233,230,.34);
+    color: rgba(5, 5, 6, .91);
+    -webkit-text-stroke-color: rgba(239,233,230,.44);
   }
 
   .hero-v3-caption {
