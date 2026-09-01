@@ -43,6 +43,10 @@ function StaticTrace() {
         <path d="M626 451 C584 376 624 292 710 276 C792 261 857 333 838 411 C819 489 714 515 649 455 C597 408 603 332 661 300" />
       </g>
       <path className="trace-static-tail" d="M815 409 C930 426 1025 402 1260 350" />
+      <path className="trace-static-work-v3" d="M730 370 C835 330 930 335 1035 390 C1100 424 1165 421 1250 395" />
+      <path className="trace-static-growth-v3 trace-static-growth-a" d="M690 330 C650 254 668 190 731 130 C764 98 788 67 798 24" />
+      <path className="trace-static-growth-v3 trace-static-growth-b" d="M735 410 C795 480 835 536 886 608 C907 638 932 666 968 700" />
+      <path className="trace-static-history-v3" d="M620 434 C548 493 466 519 386 490 C321 467 298 402 342 351 C387 299 469 314 492 367 C511 412 472 455 425 443" />
     </svg>
   );
 }
