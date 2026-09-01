@@ -57,15 +57,9 @@ export default function SemanticShell({ preview = false }: SemanticShellProps) {
                 const scene = document.getElementById(review);
                 const target = scene?.querySelector('h1, h2, h3') || scene;
                 if (!target) return;
-                const place = () => {
-                  const rect = target.getBoundingClientRect();
-                  const top = Math.max(0, window.scrollY + rect.top - window.innerHeight * 0.18);
-                  window.scrollTo(0, top);
-                };
-                place();
-                setTimeout(place, 120);
-                setTimeout(place, 420);
-                setTimeout(place, 900);
+                const rect = target.getBoundingClientRect();
+                const top = Math.max(0, window.scrollY + rect.top - window.innerHeight * 0.18);
+                window.scrollTo(0, top);
               };
               if (document.readyState === 'complete') setTimeout(run, 500);
               else addEventListener('load', () => setTimeout(run, 500), { once: true });

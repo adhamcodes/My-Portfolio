@@ -29,7 +29,9 @@ function writePreference(value: SoundPreference) {
 function makeAudio(): WebAudioState {
   const context = new AudioContext();
   const master = context.createGain();
-  master.gain.value = 0.075;
+  // Sound is opt-in and event-driven. This level is intentionally audible but
+  // still far below soundtrack territory.
+  master.gain.value = 0.14;
   master.connect(context.destination);
   return { context, master };
 }
@@ -96,18 +98,23 @@ function noise(audio: WebAudioState, options: {
 }
 
 function playIndex(audio: WebAudioState) {
-  tone(audio, { frequency: 132, endFrequency: 118, duration: 0.72, gain: 0.13, type: "sine" });
-  tone(audio, { frequency: 198, endFrequency: 176, duration: 0.56, gain: 0.055, delay: 0.045, type: "triangle" });
+  tone(audio, { frequency: 132, endFrequency: 116, duration: 0.78, gain: 0.18, type: "sine" });
+  tone(audio, { frequency: 198, endFrequency: 174, duration: 0.62, gain: 0.08, delay: 0.045, type: "triangle" });
 }
 
 function playBoundary(audio: WebAudioState) {
-  noise(audio, { duration: 0.11, gain: 0.12, frequency: 2100, type: "bandpass" });
-  tone(audio, { frequency: 102, endFrequency: 92, duration: 0.22, gain: 0.06, delay: 0.035, type: "sine" });
+  noise(audio, { duration: 0.13, gain: 0.15, frequency: 2100, type: "bandpass" });
+  tone(audio, { frequency: 104, endFrequency: 91, duration: 0.28, gain: 0.08, delay: 0.035, type: "sine" });
 }
 
 function playHistory(audio: WebAudioState) {
-  tone(audio, { frequency: 84, endFrequency: 70, duration: 1.1, gain: 0.085, type: "sine" });
-  noise(audio, { duration: 0.68, gain: 0.032, frequency: 560, type: "lowpass", delay: 0.1 });
+  tone(audio, { frequency: 86, endFrequency: 69, duration: 1.16, gain: 0.105, type: "sine" });
+  noise(audio, { duration: 0.72, gain: 0.042, frequency: 520, type: "lowpass", delay: 0.1 });
+}
+
+function playPresent(audio: WebAudioState) {
+  tone(audio, { frequency: 112, endFrequency: 124, duration: .9, gain: .085, type: "sine" });
+  tone(audio, { frequency: 168, endFrequency: 186, duration: .72, gain: .045, delay: .08, type: "triangle" });
 }
 
 export default function SoundDirector() {
@@ -116,6 +123,7 @@ export default function SoundDirector() {
   const enabledRef = useRef(false);
   const indexPlayed = useRef(false);
   const historyPlayed = useRef(false);
+  const presentPlayed = useRef(false);
 
   const ensureAudio = async () => {
     if (!audioRef.current) audioRef.current = makeAudio();
@@ -173,11 +181,18 @@ export default function SoundDirector() {
 
     const onChapter = (event: Event) => {
       const chapter = (event as CustomEvent<string>).detail;
-      if (chapter !== "history" || historyPlayed.current || !enabledRef.current || quietScene()) return;
+      if (!enabledRef.current || quietScene()) return;
       const audio = audioRef.current;
       if (!audio || audio.context.state !== "running") return;
-      historyPlayed.current = true;
-      playHistory(audio);
+
+      if (chapter === "history" && !historyPlayed.current) {
+        historyPlayed.current = true;
+        playHistory(audio);
+      }
+      if (chapter === "present" && !presentPlayed.current) {
+        presentPlayed.current = true;
+        playPresent(audio);
+      }
     };
 
     window.addEventListener("adham:index", onIndex);

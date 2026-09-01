@@ -33,12 +33,16 @@ export default function CapabilityDirector() {
     const nav = navigator as NavigatorWithMemory;
     const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const coarseQuery = window.matchMedia("(pointer: coarse)");
+    const automatedBrowser = navigator.webdriver === true;
 
     let raf = 0;
     let sampleTimer = 0;
     let current: CapabilityDecision | null = null;
     let baseInput: CapabilityInput = {
-      webgl: supportsWebGL(),
+      // Headless review runners are not a meaningful GPU benchmark. Keep their
+      // deterministic certification on the authored static fallback instead of
+      // asking SwiftShader to stand in for a visitor's real hardware.
+      webgl: supportsWebGL() && !automatedBrowser,
       hardwareConcurrency: navigator.hardwareConcurrency || 4,
       deviceMemory: nav.deviceMemory,
       saveData: Boolean(nav.connection?.saveData),

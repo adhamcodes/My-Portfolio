@@ -44,6 +44,14 @@ async function canvasToWebp(canvas: HTMLCanvasElement) {
   });
 }
 
+function sizeOutcome(source: number, output: number) {
+  if (source <= 0) return "LOCAL RESULT";
+  const percent = Math.round(Math.abs(1 - output / source) * 100);
+  if (output < source) return `${percent}% SMALLER`;
+  if (output > source) return `${percent}% LARGER`;
+  return "SAME SIZE";
+}
+
 export default function LocalImageTransform() {
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -125,7 +133,7 @@ export default function LocalImageTransform() {
   };
 
   return (
-    <div className="zu-demo">
+    <div className="zu-demo" data-result={result ? "true" : "false"} data-working={working ? "true" : "false"}>
       <div
         className="zu-drop"
         onDragOver={(event) => event.preventDefault()}
@@ -143,28 +151,36 @@ export default function LocalImageTransform() {
         <button type="button" onClick={() => inputRef.current?.click()} disabled={working}>
           {working ? "Transforming here…" : result ? "Choose another image" : "Choose an image"}
         </button>
-        <p>JPEG, PNG, or WebP under 25 MB. The demo resizes only when needed and encodes a WebP result in this tab.</p>
+        <p>JPEG, PNG, or WebP under 25 MB. This demonstration resizes only when needed and encodes a WebP result in this tab.</p>
       </div>
 
       <div className="zu-demo-boundary" aria-hidden="true">
         <span />
         <strong>THE BOUNDARY</strong>
+        <i />
       </div>
 
       <div className="zu-outside" aria-live="polite">
         <p className="zu-demo-label">OUTSIDE</p>
-        <p className="zu-outside-statement">Nothing from this demo needs to cross.</p>
+        <p className="zu-outside-statement">Nothing from this demonstration needs to cross.</p>
+        <span className="zu-outside-empty" aria-hidden="true">0 BYTES RECEIVED</span>
       </div>
 
       {error && <p className="zu-demo-error" role="alert">{error}</p>}
 
       {result && (
         <div className="zu-result">
+          <div className="zu-result-proof" aria-live="polite">
+            <span>OPERATION COMPLETED HERE</span>
+            <strong>{sizeOutcome(result.sourceBytes, result.outputBytes)}</strong>
+            <small>{formatBytes(result.sourceBytes)} → {formatBytes(result.outputBytes)}</small>
+          </div>
+
           <figure>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={result.sourceUrl} alt="Local source preview" />
             <figcaption>
-              <span>Original</span>
+              <span>Original / device</span>
               <span>{result.sourceWidth} × {result.sourceHeight}</span>
               <span>{formatBytes(result.sourceBytes)}</span>
             </figcaption>
@@ -174,7 +190,7 @@ export default function LocalImageTransform() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={result.outputUrl} alt="Locally transformed preview" />
             <figcaption>
-              <span>Local result</span>
+              <span>Result / device</span>
               <span>{result.outputWidth} × {result.outputHeight}</span>
               <span>{formatBytes(result.outputBytes)}</span>
             </figcaption>
@@ -186,7 +202,7 @@ export default function LocalImageTransform() {
         </div>
       )}
 
-      <p className="zu-demo-truth">This demonstration processes the selected image in your browser. The demo does not send the file to a server.</p>
+      <p className="zu-demo-truth">This demonstration processes the selected image in your browser. The demonstration does not send the file to a server.</p>
     </div>
   );
 }

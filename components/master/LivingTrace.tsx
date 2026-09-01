@@ -6,7 +6,7 @@ import type { MotionMode, PublicLivingState, RenderTier } from "@/core/contracts
 import type { CapabilityDecision } from "@/core/capability";
 import { createCurrentLivingState } from "@/content/living-state";
 
-const LivingTraceCanvas = dynamic(() => import("./LivingTraceCanvas"), { ssr: false });
+const LivingTraceCanvas = dynamic(() => import("./LivingTraceCanvasV5"), { ssr: false });
 
 type CapabilityView = {
   renderTier: RenderTier;
@@ -37,11 +37,16 @@ class TraceBoundary extends Component<TraceBoundaryProps, { failed: boolean }> {
 function StaticTrace() {
   return (
     <svg className="living-trace-static" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <path className="trace-static-main" d="M-70 555 C120 515 168 312 330 347 C493 383 502 210 690 286 C854 352 925 215 1270 304" />
-      <path className="trace-static-work" d="M546 296 C682 343 742 470 1030 536" />
-      <path className="trace-static-growth" d="M293 351 C316 239 396 145 520 90" />
-      <path className="trace-static-growth" d="M403 327 C470 409 500 527 626 641" />
-      <path className="trace-static-growth" d="M703 290 C815 238 879 125 1010 70" />
+      <g className="trace-static-knot">
+        <path d="M650 470 C560 410 568 298 665 264 C765 229 860 302 829 390 C800 474 683 486 632 414 C591 356 630 288 712 296 C800 305 836 394 785 457 C748 503 688 497 650 470" />
+        <path d="M615 432 C555 355 608 246 706 248 C808 251 859 346 813 428 C768 506 657 500 610 420 C574 357 613 298 687 286 C770 273 830 339 815 409" />
+        <path d="M626 451 C584 376 624 292 710 276 C792 261 857 333 838 411 C819 489 714 515 649 455 C597 408 603 332 661 300" />
+      </g>
+      <path className="trace-static-tail" d="M815 409 C930 426 1025 402 1260 350" />
+      <path className="trace-static-work-v3" d="M730 370 C835 330 930 335 1035 390 C1100 424 1165 421 1250 395" />
+      <path className="trace-static-growth-v3 trace-static-growth-a" d="M690 330 C650 254 668 190 731 130 C764 98 788 67 798 24" />
+      <path className="trace-static-growth-v3 trace-static-growth-b" d="M735 410 C795 480 835 536 886 608 C907 638 932 666 968 700" />
+      <path className="trace-static-history-v3" d="M620 434 C548 493 466 519 386 490 C321 467 298 402 342 351 C387 299 469 314 492 367 C511 412 472 455 425 443" />
     </svg>
   );
 }
