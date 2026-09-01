@@ -65,22 +65,13 @@ html[data-chapter="origin"] .sound-control * {
   opacity: .34;
 }
 
-/* The surname is an opaque physical silhouette cut out of the world. Eight
-   directional shadows create the hairline edge without WebKit text-stroke,
-   avoiding GPU/compositor artifacts when WebGL moves beneath the letters. */
+/* The surname is a quiet, opaque material plane. It occludes the organism
+   cleanly without relying on text-stroke or shadow stacks that can produce
+   browser/GPU compositor artifacts over WebGL. */
 .hero-v3-last {
-  color: #050506;
+  color: #5b575d;
   -webkit-text-stroke: 0 transparent;
-  text-shadow:
-    -1px 0 rgba(239,233,230,.46),
-    1px 0 rgba(239,233,230,.46),
-    0 -1px rgba(239,233,230,.46),
-    0 1px rgba(239,233,230,.46),
-    -1px -1px rgba(239,233,230,.18),
-    1px -1px rgba(239,233,230,.18),
-    -1px 1px rgba(239,233,230,.18),
-    1px 1px rgba(239,233,230,.18),
-    0 0 34px rgba(207,118,151,.035);
+  text-shadow: none;
 }
 
 .hero-v3-caption {
@@ -103,7 +94,7 @@ html[data-chapter="origin"] .sound-control * {
     margin-left: 0;
     font-size: clamp(3.48rem, 16.55vw, 5.9rem);
     letter-spacing: -.078em;
-    color: #050506;
+    color: #5b575d;
   }
 
   .hero-v3-caption {
