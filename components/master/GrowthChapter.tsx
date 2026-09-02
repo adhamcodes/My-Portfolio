@@ -6,25 +6,31 @@ import { getCurrentPublicLivingState } from "@/server/living-state";
 function trackCopy(id: string) {
   if (id === "foundry180") {
     return {
-      eyebrow: "PRIMARY PATH",
-      direction: "Software engineering",
-      detail: "Foundry is the structured path through software foundations and engineering. Its public record starts with the first verified completed unit—not with a calendar date.",
-      horizon: "180 curriculum units",
+      number: "01",
+      role: "THE BEGINNING",
+      direction: "Foundry180",
+      thesis: "Software engineering foundation",
+      detail: "The learning system exists. The personal record does not move until the first unit is actually completed.",
+      horizon: "180 curriculum units prepared",
     };
   }
   if (id === "ai-ml") {
     return {
-      eyebrow: "LONG-TERM DIRECTION",
+      number: "02",
+      role: "THE HORIZON",
       direction: "AI / ML engineering",
-      detail: "A specialization to earn through fundamentals, experiments, and systems that actually exist. Until then it remains a direction, not a claimed identity.",
-      horizon: "Evidence will decide its shape",
+      thesis: "Destination, not decoration",
+      detail: "A specialization to earn through foundations, experiments, and systems that become real—not a title claimed in advance.",
+      horizon: "Its shape will be decided by evidence",
     };
   }
   return {
-    eyebrow: "SUPPORTING CAPABILITY",
+    number: "03",
+    role: "THE LEVERAGE",
     direction: "AI automation",
-    detail: "Automation supports the main engineering path. It gains public weight only when real work gives it something worth preserving.",
-    horizon: "Secondary by design",
+    thesis: "Capability in support of the path",
+    detail: "Automation strengthens the main engineering direction. It gains weight here only when shipped work makes that weight true.",
+    horizon: "Supporting by design",
   };
 }
 
@@ -44,50 +50,61 @@ export default async function GrowthChapter() {
     <section
       id="growth"
       data-chapter="growth"
-      className="master-scene growth-chapter growth-chapter-v3"
+      className="master-scene growth-chapter growth-chapter-v4"
       aria-labelledby="growth-title"
     >
       <p className="master-number">03 / GROWTH</p>
 
-      <div className="growth-heading">
+      <header className="growth-heading">
         <h2 id="growth-title">
-          <span>BECOMING</span>
-          <span>HAS DIRECTIONS.</span>
+          <span>THE FUTURE</span>
+          <span>HAS STRUCTURE.</span>
         </h2>
-        <p>Learning can begin, pause, resume, finish, and become history. The world changes when evidence exists; emptiness is allowed to stay empty.</p>
-      </div>
+        <p>Foundry is the beginning. AI / ML is the horizon. Automation is leverage along the way. None of them advances here until the work becomes true.</p>
+      </header>
 
-      <div className="growth-orbit" aria-label="Current learning directions">
-        <span className="growth-origin" aria-hidden="true">
+      <div className="growth-construction" aria-label="Current learning directions and verified state">
+        <div className="growth-zero-site">
+          <p>FOUNDRY180 / PERSONAL RECORD</p>
+          <strong aria-hidden="true">0</strong>
+          <div>
+            <b>0 / 180 verified units</b>
+            <span>The structure is ready. The record begins with the first completed unit.</span>
+          </div>
+        </div>
+
+        <span className="growth-scaffold" aria-hidden="true">
           <i />
           <i />
           <i />
         </span>
 
-        {state.growth.map((track, index) => {
-          const copy = trackCopy(track.id);
-          const completed = track.completedUnits ?? 0;
-          return (
-            <article key={track.id} className="growth-direction" data-track={track.id} data-state={track.status}>
-              <div className="growth-direction-line" aria-hidden="true">
-                <span />
-              </div>
-              <div className="growth-direction-meta">
-                <span>{String(index + 1).padStart(2, "0")} / {copy.eyebrow}</span>
-                <strong>{trackState(track)}</strong>
-              </div>
-              <h3>{copy.direction}</h3>
-              <p>{copy.detail}</p>
-              <div className="growth-direction-horizon">
-                <span>{copy.horizon}</span>
-                {completed > 0 && track.totalUnits && (
-                  <strong>{completed} / {track.totalUnits} verified units</strong>
-                )}
-                {track.currentUnit && <strong>Current: {track.currentUnit}</strong>}
-              </div>
-            </article>
-          );
-        })}
+        <ol className="growth-vectors">
+          {state.growth.map((track) => {
+            const copy = trackCopy(track.id);
+            const completed = track.completedUnits ?? 0;
+            return (
+              <li key={track.id} className="growth-vector" data-track={track.id} data-state={track.status}>
+                <article>
+                  <header>
+                    <span>{copy.number} / {copy.role}</span>
+                    <strong>{trackState(track)}</strong>
+                  </header>
+                  <p className="growth-vector-thesis">{copy.thesis}</p>
+                  <h3>{copy.direction}</h3>
+                  <p className="growth-vector-detail">{copy.detail}</p>
+                  <footer>
+                    <span>{copy.horizon}</span>
+                    {completed > 0 && track.totalUnits && (
+                      <strong>{completed} / {track.totalUnits} verified units</strong>
+                    )}
+                    {track.currentUnit && <strong>Current: {track.currentUnit}</strong>}
+                  </footer>
+                </article>
+              </li>
+            );
+          })}
+        </ol>
       </div>
 
       <ActivityVeil snapshot={activity} />

@@ -197,11 +197,25 @@ function chapterLayout(spec: FragmentSpec, chapter: ChapterId, indexOpen: boolea
         scale: [.52 + (spec.order % 3) * .1, .16 + (spec.route === 1 ? .12 : 0), .58],
       };
     case "growth": {
-      const branch = spec.route - 2;
+      const lane = [-1.42, -.72, 0, .82, 1.52][spec.route];
+      const progress = Math.min(1, (spec.order + (spec.side === 1 ? .42 : 0)) / 10.6);
+      const gap = (spec.order + spec.route) % 5 === 0 ? .7 : 1;
       return {
-        position: [branch * .66 + spec.side * .2, -2.25 + spec.order * .34, -.28 + Math.abs(branch) * -.12],
-        rotation: [0, spec.side * .08, branch * -.09],
-        scale: [.26 + (spec.route === 2 ? .18 : .06), .42, .5],
+        position: [
+          lane * (.3 + progress * 1.22) + spec.side * .13,
+          -2.72 + progress * 5.62,
+          -.38 - Math.abs(lane) * .09 - (1 - gap) * .24,
+        ],
+        rotation: [
+          source.rotation[0] * .2,
+          spec.side * .075,
+          lane * -.075 + (spec.route === 2 ? 0 : spec.side * .018),
+        ],
+        scale: [
+          (.22 + (spec.route === 0 ? .16 : spec.route === 2 ? .1 : .04)) * gap,
+          (.34 + progress * .14) * gap,
+          .46,
+        ],
       };
     }
     case "history":
@@ -532,7 +546,7 @@ function Monument({
       origin: [.92, .06, -.08, .86, -.025],
       human: [0, -.08, -.22, .58, 0],
       work: [0, 0, -.28, .6, 0],
-      growth: [0, -.05, -.34, .58, 0],
+      growth: [.08, -.05, -.42, .64, 0],
       history: [0, 0, -.52, .58, 0],
       understanding: [0, 0, -.38, .58, 0],
       present: [0, 0, -.32, .62, 0],
@@ -540,7 +554,7 @@ function Monument({
       origin: [1.62, .02, -.14, 1.2, -.035],
       human: [.55, 0, -.3, .9, 0],
       work: [.15, 0, -.34, .94, 0],
-      growth: [.1, .02, -.38, .9, 0],
+      growth: [.82, -.08, -.5, .96, -.02],
       history: [.18, 0, -.64, .9, 0],
       understanding: [.18, 0, -.46, .9, 0],
       present: [.4, 0, -.38, .94, 0],
