@@ -606,7 +606,7 @@ function Monument({
       growth: [.18, -.16, -.5, .58, 0],
       history: [0, 0, -.52, .58, 0],
       understanding: [0, 0, -.38, .58, 0],
-      present: [0, 0, -.32, .62, 0],
+      present: [0, -1.02, -.42, .54, 0],
     } : {
       origin: [1.62, .02, -.14, 1.2, -.035],
       human: [.55, 0, -.3, .9, 0],
@@ -614,7 +614,7 @@ function Monument({
       growth: [.78, -.12, -.62, .94, -.02],
       history: [.18, 0, -.64, .9, 0],
       understanding: [.18, 0, -.46, .9, 0],
-      present: [.4, 0, -.38, .94, 0],
+      present: [2.18, .02, -.46, .82, 0],
     };
     let [x, y, z, scale, rz] = table[chapter];
     if (indexOpen) {
