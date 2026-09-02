@@ -197,24 +197,24 @@ function chapterLayout(spec: FragmentSpec, chapter: ChapterId, indexOpen: boolea
         scale: [.52 + (spec.order % 3) * .1, .16 + (spec.route === 1 ? .12 : 0), .58],
       };
     case "growth": {
-      const lane = [-1.95, -1.95, 0, 1.72, 1.72][spec.route];
+      const lane = spec.route - 2;
       const progress = Math.min(1, (spec.order + (spec.side === 1 ? .42 : 0)) / 10.6);
-      const gap = (spec.order + spec.route) % 5 === 0 ? .7 : 1;
+      const gap = (spec.order + spec.route) % 5 === 0 ? .38 : 1;
       return {
         position: [
-          lane * (.38 + progress * 1.22) + spec.side * .12,
-          -2.88 + progress * 5.86,
-          -.38 - Math.abs(lane) * .09 - (1 - gap) * .24,
+          lane * (.18 + progress * 1.42) + spec.side * .06,
+          -2.94 + progress * 5.94,
+          -.46 - Math.abs(lane) * .1 - (1 - gap) * .34,
         ],
         rotation: [
           source.rotation[0] * .2,
-          spec.side * .075,
-          lane * -.075 + (spec.route === 2 ? 0 : spec.side * .018),
+          spec.side * .055,
+          lane * -.12 + (spec.route === 2 ? 0 : spec.side * .014),
         ],
         scale: [
-          (.2 + (spec.route === 0 ? .14 : spec.route === 2 ? .12 : .035)) * gap,
-          (.34 + progress * .14) * gap,
-          .46,
+          (.13 + (spec.route === 2 ? .13 : .045)) * gap,
+          (.28 + progress * .13) * gap,
+          .4,
         ],
       };
     }
@@ -546,7 +546,7 @@ function Monument({
       origin: [.92, .06, -.08, .86, -.025],
       human: [0, -.08, -.22, .58, 0],
       work: [0, 0, -.28, .6, 0],
-      growth: [.64, -.05, -.46, .52, 0],
+      growth: [.18, -.16, -.5, .58, 0],
       history: [0, 0, -.52, .58, 0],
       understanding: [0, 0, -.38, .58, 0],
       present: [0, 0, -.32, .62, 0],
@@ -554,7 +554,7 @@ function Monument({
       origin: [1.62, .02, -.14, 1.2, -.035],
       human: [.55, 0, -.3, .9, 0],
       work: [.15, 0, -.34, .94, 0],
-      growth: [2.12, -.08, -.56, .82, -.025],
+      growth: [.78, -.12, -.62, .94, -.02],
       history: [.18, 0, -.64, .9, 0],
       understanding: [.18, 0, -.46, .9, 0],
       present: [.4, 0, -.38, .94, 0],
