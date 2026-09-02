@@ -315,8 +315,14 @@ function Fragment({
     if (material.current) {
       const routeActive = indexOpen && indexFocus === spec.route;
       const energy = routeActive ? .92 : (indexOpen ? .23 : .075) + activity * .08 + pressure * .18;
+      const chapterOpacity = chapter === "growth" ? (spec.route === 2 ? .34 : .18) : .98;
       material.current.emissiveIntensity = THREE.MathUtils.damp(material.current.emissiveIntensity, energy, 5, delta);
-      material.current.opacity = THREE.MathUtils.damp(material.current.opacity, indexOpen && indexFocus !== null && !routeActive ? .46 : .98, 6, delta);
+      material.current.opacity = THREE.MathUtils.damp(
+        material.current.opacity,
+        indexOpen && indexFocus !== null && !routeActive ? .46 : chapterOpacity,
+        6,
+        delta,
+      );
     }
   });
 
@@ -336,7 +342,57 @@ function Fragment({
           opacity={.98}
           side={THREE.DoubleSide}
         />
-        <Edges color={DOMAIN_COLOR[spec.domain]} threshold={14} transparent opacity={indexOpen ? .56 : .19} />
+        <Edges color={DOMAIN_COLOR[spec.domain]} threshold={14} transparent opacity={indexOpen ? .56 : chapter === "growth" ? .08 : .19} />
+      </mesh>
+    </group>
+  );
+}
+
+const GROWTH_VECTORS = [
+  { angle: .7, length: 6.25, color: "#d5a45f" },
+  { angle: 1.03, length: 5.8, color: "#c6a96f" },
+  { angle: 1.39, length: 5.65, color: "#92c5cd" },
+  { angle: 1.75, length: 5.85, color: "#a6c9ce" },
+  { angle: 2.08, length: 6.15, color: "#caa5b4" },
+] as const;
+
+function GrowthScaffold({ active, motionMode }: { active: boolean; motionMode: MotionMode }) {
+  const group = useRef<THREE.Group>(null);
+
+  useFrame((state, delta) => {
+    if (!group.current) return;
+    const target = active ? 1 : .001;
+    const scale = motionMode === "reduced"
+      ? target
+      : THREE.MathUtils.damp(group.current.scale.y, target, active ? 2.6 : 4.2, delta);
+    group.current.scale.set(1, scale, 1);
+    group.current.visible = active || scale > .012;
+    group.current.rotation.z = motionMode === "reduced" || !active
+      ? 0
+      : Math.sin(state.clock.elapsedTime * .11) * .004;
+  });
+
+  return (
+    <group ref={group} position={[0, -2.86, -.84]} scale={[1, .001, 1]} visible={active}>
+      {GROWTH_VECTORS.map((vector, index) => (
+        <group key={vector.angle} rotation={[0, 0, vector.angle]}>
+          <mesh position={[vector.length * .27, 0, 0]} scale={[vector.length * .54, .018 + index * .002, .024]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshBasicMaterial color={vector.color} transparent opacity={.19 - index * .014} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+          </mesh>
+          <mesh position={[vector.length * .87, 0, 0]} scale={[vector.length * .26, .012, .018]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshBasicMaterial color={vector.color} transparent opacity={.1} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+          </mesh>
+          <mesh position={[vector.length, 0, .01]}>
+            <ringGeometry args={[.05, .075, 18]} />
+            <meshBasicMaterial color={vector.color} transparent opacity={.54} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
+          </mesh>
+        </group>
+      ))}
+      <mesh position={[0, 0, .02]}>
+        <ringGeometry args={[.075, .11, 20]} />
+        <meshBasicMaterial color="#e0ba78" transparent opacity={.72} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
       </mesh>
     </group>
   );
@@ -601,6 +657,7 @@ function Monument({
   return (
     <group ref={root}>
       <Aperture chapter={chapter} indexOpen={indexOpen} motionMode={motionMode} />
+      <GrowthScaffold active={chapter === "growth" && !indexOpen} motionMode={motionMode} />
       <IndexArchitecture open={indexOpen} mobile={mobile} />
       {specs.map((spec) => (
         <Fragment
