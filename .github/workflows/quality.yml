@@ -345,6 +345,7 @@ jobs:
               ['now-direction', `${origin}/?review=now&reviewTier=full`, '.human-story-beat:last-child', { position: true, mustFit: true }],
               ['work', `${origin}/?review=work&reviewTier=full`, '#work', { position: true, mustFit: true }],
               ['growth', `${origin}/?review=growth&reviewTier=full`, '#growth', { position: true, mustFit: true }],
+              ['growth-origin', `${origin}/?review=growth&reviewTier=full`, '.growth-zero-site', { position: true, mustFit: true }],
               ['growth-structure', `${origin}/?review=growth&reviewTier=full`, '.growth-construction', { position: true, mustFit: true }],
               ['activity-veil', `${origin}/?review=growth&reviewTier=full`, '.activity-veil', { position: true, mustFit: true }],
               ['activity-veil-field', `${origin}/?review=growth&reviewTier=full`, '.activity-veil-stage', { position: true, mustFit: true }],
