@@ -115,6 +115,7 @@
   gap: 3rem;
   padding-top: clamp(4rem, 8vw, 8rem);
   border-top: 1px solid rgba(242,239,233,.09);
+  background: linear-gradient(180deg, rgba(5,5,6,.08), rgba(5,5,6,.9) 24%, #050506 58%);
 }
 
 .ending-contact::before {
