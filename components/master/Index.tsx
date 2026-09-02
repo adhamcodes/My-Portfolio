@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { masterIdentity } from "@/content/master";
 
 const destinations = [
@@ -78,7 +79,7 @@ export default function Index() {
     hasOpened.current = true;
     const previousOverflow = document.body.style.overflow;
     const background = [
-      document.querySelector<HTMLElement>(".hero-v2"),
+      document.querySelector<HTMLElement>(".hero-v4"),
       document.getElementById("main-story"),
     ].filter((node): node is HTMLElement => Boolean(node));
 
@@ -122,12 +123,79 @@ export default function Index() {
     }));
   };
 
+  const focusRoute = (route: number | null) => {
+    window.dispatchEvent(new CustomEvent("adham:index-focus", { detail: { route } }));
+  };
+
+  const world = open && typeof document !== "undefined" ? createPortal(
+    <div
+      className="v4-index-layer"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) setOpen(false);
+      }}
+    >
+      <div
+        ref={dialogRef}
+        id="world-index"
+        className="v4-index-world"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Portfolio index"
+      >
+        <div className="v4-index-heading">
+          <p>INDEX</p>
+          <button type="button" onClick={() => setOpen(false)} aria-label="Close index">
+            CLOSE <span aria-hidden="true">ESC</span>
+          </button>
+        </div>
+
+        <nav className="v4-index-map" aria-label="Portfolio destinations">
+          <span className="v4-index-axis" aria-hidden="true" />
+          {destinations.map((item, index) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className="v4-index-destination"
+              data-current={current === item.id ? "true" : "false"}
+              aria-current={current === item.id ? "location" : undefined}
+              style={{ "--index-order": index } as React.CSSProperties}
+              onClick={(event) => {
+                event.preventDefault();
+                travel(item.id);
+              }}
+              onMouseEnter={() => focusRoute(index)}
+              onMouseLeave={() => focusRoute(null)}
+              onFocus={() => focusRoute(index)}
+              onBlur={() => focusRoute(null)}
+            >
+              <span className="v4-index-node" aria-hidden="true" />
+              <span className="v4-index-label">{item.label}</span>
+              <span className="v4-index-detail">{item.detail}</span>
+            </a>
+          ))}
+        </nav>
+
+        <a
+          className="v4-index-external"
+          href={masterIdentity.github}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span>GITHUB ↗</span>
+          <small>Workshop / archive</small>
+        </a>
+      </div>
+    </div>,
+    document.body,
+  ) : null;
+
   return (
     <>
       <button
         ref={triggerRef}
         type="button"
-        className="index-trigger"
+        className="v4-index-trigger"
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="world-index"
@@ -135,63 +203,7 @@ export default function Index() {
       >
         INDEX <span aria-hidden="true">I</span>
       </button>
-
-      {open && (
-        <div
-          className="index-layer"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setOpen(false);
-          }}
-        >
-          <div
-            ref={dialogRef}
-            id="world-index"
-            className="index-world"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Portfolio index"
-          >
-            <div className="index-heading">
-              <p>INDEX</p>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close index">
-                CLOSE <span aria-hidden="true">ESC</span>
-              </button>
-            </div>
-
-            <nav className="index-map" aria-label="Portfolio destinations">
-              <span className="index-axis" aria-hidden="true" />
-              {destinations.map((item, index) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="index-destination"
-                  data-current={current === item.id ? "true" : "false"}
-                  style={{ "--index-order": index } as React.CSSProperties}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    travel(item.id);
-                  }}
-                >
-                  <span className="index-node" aria-hidden="true" />
-                  <span className="index-label">{item.label}</span>
-                  <span className="index-detail">{item.detail}</span>
-                </a>
-              ))}
-            </nav>
-
-            <a
-              className="index-external"
-              href={masterIdentity.github}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span>GITHUB ↗</span>
-              <small>Workshop / archive</small>
-            </a>
-          </div>
-        </div>
-      )}
+      {world}
     </>
   );
 }

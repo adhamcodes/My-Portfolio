@@ -1,0 +1,125 @@
+.trace-static-knot path,
+.trace-static-tail {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+}
+
+.trace-static-knot path {
+  stroke: rgba(232, 200, 214, .62);
+  stroke-width: 1.35;
+  filter: drop-shadow(0 0 13px rgba(207, 105, 145, .16));
+}
+
+.trace-static-knot path:nth-child(2) {
+  stroke: rgba(154, 184, 191, .43);
+  stroke-width: .95;
+}
+
+.trace-static-knot path:nth-child(3) {
+  stroke: rgba(185, 127, 153, .46);
+  stroke-width: .82;
+}
+
+.trace-static-tail {
+  stroke: rgba(226, 202, 213, .25);
+  stroke-width: .9;
+}
+
+html[data-chapter="origin"] .living-trace-static {
+  opacity: .52;
+}
+
+html[data-chapter="origin"] .living-trace[data-ready="true"] .living-trace-static {
+  opacity: .075;
+}
+
+html[data-render-tier="static-low"][data-chapter="origin"] .living-trace-static,
+html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-static {
+  opacity: .68;
+  transform: translate3d(12%, -1%, 0) scale(.9);
+  transform-origin: center;
+}
+
+html[data-chapter="origin"] .master-header,
+html[data-chapter="origin"] .sound-control {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, -28%, 0);
+}
+
+html[data-chapter="origin"] .master-header *,
+html[data-chapter="origin"] .sound-control * {
+  pointer-events: none;
+}
+
+.hero-v3::after {
+  display: none;
+}
+
+.hero-v3-field-line-a {
+  opacity: .72;
+}
+
+.hero-v3-field-line-b {
+  opacity: .34;
+}
+
+/* The surname is a quiet, opaque material plane. It occludes the organism
+   cleanly without relying on text-stroke or shadow stacks that can produce
+   browser/GPU compositor artifacts over WebGL. */
+.hero-v3-last {
+  color: #5b575d;
+  -webkit-text-stroke: 0 transparent;
+  text-shadow: none;
+}
+
+.hero-v3-caption {
+  color: rgba(231,226,220,.82);
+}
+
+@media (max-width: 760px) {
+  .hero-v3-name-wrap {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .hero-v3-first {
+    font-size: clamp(4.55rem, 22vw, 7.8rem);
+    letter-spacing: -.082em;
+  }
+
+  .hero-v3-last {
+    width: max-content;
+    margin-left: 0;
+    font-size: clamp(3.48rem, 16.55vw, 5.9rem);
+    letter-spacing: -.078em;
+    color: #5b575d;
+  }
+
+  .hero-v3-caption {
+    width: min(78vw, 21.5rem);
+  }
+
+  html[data-chapter="origin"] .living-trace {
+    transform: translate3d(9%, -3%, 0) scale(.88);
+    transform-origin: 66% 46%;
+    transition: transform 900ms var(--adham-ease-transform);
+  }
+
+  html[data-render-tier="static-low"][data-chapter="origin"] .living-trace-static,
+  html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-static {
+    transform: translate3d(14%, -4%, 0) scale(.72);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-chapter="origin"] .living-trace {
+    transition: none;
+  }
+
+  html[data-chapter="origin"] .master-header,
+  html[data-chapter="origin"] .sound-control {
+    transform: none;
+  }
+}

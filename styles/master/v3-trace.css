@@ -1,0 +1,144 @@
+.trace-static-knot path,
+.trace-static-tail,
+.trace-static-work-v3,
+.trace-static-growth-v3,
+.trace-static-history-v3 {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+}
+
+.trace-static-knot path {
+  stroke: rgba(232, 200, 214, .58);
+  stroke-width: 1.25;
+  filter: drop-shadow(0 0 10px rgba(207, 105, 145, .14));
+}
+
+.trace-static-knot path:nth-child(2) {
+  stroke: rgba(154, 184, 191, .4);
+  stroke-width: .9;
+}
+
+.trace-static-knot path:nth-child(3) {
+  stroke: rgba(185, 127, 153, .42);
+  stroke-width: .75;
+}
+
+.trace-static-tail {
+  stroke: rgba(226, 202, 213, .22);
+  stroke-width: .8;
+}
+
+.trace-static-work-v3,
+.trace-static-growth-v3,
+.trace-static-history-v3 {
+  transition: opacity 700ms var(--adham-ease-response), stroke-width 700ms var(--adham-ease-response);
+}
+
+.trace-static-work-v3 {
+  stroke: rgba(154,184,191,.5);
+  stroke-width: 1.05;
+  opacity: .3;
+}
+
+.trace-static-growth-v3 {
+  stroke: rgba(205,160,97,.44);
+  stroke-width: .9;
+  stroke-dasharray: 7 9;
+  opacity: .2;
+}
+
+.trace-static-history-v3 {
+  stroke: rgba(137,140,148,.44);
+  stroke-width: .9;
+  opacity: .18;
+}
+
+html[data-chapter="origin"] .living-trace-static {
+  opacity: .5;
+}
+
+html[data-chapter="origin"] .living-trace[data-ready="true"] .living-trace-static {
+  opacity: .018;
+}
+
+html[data-render-tier="static-low"] .living-trace-static,
+html .living-trace[data-failed="true"] .living-trace-static {
+  transition: transform 900ms var(--adham-ease-transform), opacity 600ms linear;
+}
+
+html[data-render-tier="static-low"][data-chapter="origin"] .living-trace-static,
+html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-static {
+  opacity: .64;
+  transform: translate3d(12%, -1%, 0) scale(.9);
+  transform-origin: center;
+}
+
+html[data-render-tier="static-low"][data-chapter="human"] .trace-static-knot,
+html[data-chapter="human"] .living-trace[data-failed="true"] .trace-static-knot {
+  opacity: .72;
+}
+
+html[data-render-tier="static-low"][data-chapter="work"] .trace-static-knot,
+html[data-chapter="work"] .living-trace[data-failed="true"] .trace-static-knot {
+  opacity: .18;
+}
+
+html[data-render-tier="static-low"][data-chapter="work"] .trace-static-work-v3,
+html[data-chapter="work"] .living-trace[data-failed="true"] .trace-static-work-v3 {
+  opacity: .92;
+  stroke-width: 2;
+}
+
+html[data-render-tier="static-low"][data-chapter="growth"] .trace-static-knot,
+html[data-chapter="growth"] .living-trace[data-failed="true"] .trace-static-knot {
+  opacity: .16;
+}
+
+html[data-render-tier="static-low"][data-chapter="growth"] .trace-static-growth-v3,
+html[data-chapter="growth"] .living-trace[data-failed="true"] .trace-static-growth-v3 {
+  opacity: .84;
+  stroke-width: 1.45;
+}
+
+html[data-render-tier="static-low"][data-chapter="history"] .trace-static-knot,
+html[data-chapter="history"] .living-trace[data-failed="true"] .trace-static-knot {
+  opacity: .12;
+}
+
+html[data-render-tier="static-low"][data-chapter="history"] .trace-static-history-v3,
+html[data-chapter="history"] .living-trace[data-failed="true"] .trace-static-history-v3 {
+  opacity: .9;
+  stroke-width: 1.6;
+}
+
+html[data-render-tier="static-low"][data-chapter="present"] .trace-static-knot,
+html[data-chapter="present"] .living-trace[data-failed="true"] .trace-static-knot {
+  opacity: .45;
+}
+
+html[data-render-tier="static-low"][data-chapter="present"] .trace-static-work-v3,
+html[data-render-tier="static-low"][data-chapter="present"] .trace-static-growth-v3,
+html[data-render-tier="static-low"][data-chapter="present"] .trace-static-history-v3,
+html[data-chapter="present"] .living-trace[data-failed="true"] .trace-static-work-v3,
+html[data-chapter="present"] .living-trace[data-failed="true"] .trace-static-growth-v3,
+html[data-chapter="present"] .living-trace[data-failed="true"] .trace-static-history-v3 {
+  opacity: .4;
+}
+
+@media (max-width: 760px) {
+  html[data-render-tier="static-low"][data-chapter="origin"] .living-trace-static,
+  html[data-chapter="origin"] .living-trace[data-failed="true"] .living-trace-static {
+    transform: translate3d(18%, -5%, 0) scale(.75);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-static-work-v3,
+  .trace-static-growth-v3,
+  .trace-static-history-v3,
+  html[data-render-tier="static-low"] .living-trace-static,
+  html .living-trace[data-failed="true"] .living-trace-static {
+    transition: none;
+  }
+}

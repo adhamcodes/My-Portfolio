@@ -135,6 +135,14 @@ export type CodeEvent = {
   occurredAt: IsoDateTime;
   repositoryId?: EntityId;
   label?: string;
+  /**
+   * Factual provider measurements attached to this event. These values may be
+   * incomplete because public activity APIs expose a bounded recent window.
+   * They are never interpreted as time spent, quality, mastery, or achievement.
+   */
+  facts?: {
+    commitCount?: number;
+  };
   source: "github" | "import";
 };
 
@@ -189,6 +197,45 @@ export type PulseSnapshot = {
   generatedAt: IsoDateTime;
   signals: PulseSignal[];
   counts: Record<PulseDomain, number>;
+};
+
+// -----------------------------------------------------------------------------
+// ACTIVITY VEIL — factual code rhythm, never a productivity score
+// -----------------------------------------------------------------------------
+
+export type ActivityVeilCoverage = {
+  source: "github-public-events" | "curated-import";
+  /** Human-readable warning about the bounded or curated source window. */
+  disclosure: string;
+  complete: boolean;
+};
+
+export type ActivityVeilDay = {
+  date: IsoDate;
+  latestAt: IsoDateTime;
+  commitCount: number;
+  pushCount: number;
+  pullRequestsOpened: number;
+  pullRequestsMerged: number;
+  tagsPublished: number;
+  repositories: EntityId[];
+  /** Capped artistic energy for atmosphere only; never exposed as a score. */
+  atmosphere: number;
+};
+
+export type ActivityVeilLandmark = {
+  id: EntityId;
+  occurredAt: IsoDateTime;
+  kind: "pull_request_merged" | "tag_published";
+  repositoryId?: EntityId;
+  label?: string;
+};
+
+export type ActivityVeilSnapshot = {
+  generatedAt: IsoDateTime;
+  coverage: ActivityVeilCoverage;
+  days: ActivityVeilDay[];
+  landmarks: ActivityVeilLandmark[];
 };
 
 // -----------------------------------------------------------------------------
@@ -256,4 +303,5 @@ export type WorldProjection = {
  * 6. Completion changes state; it never deletes the historical record.
  * 7. Coding activity is not learning activity, and neither is a mastery score.
  * 8. Event IDs are idempotency keys. Reducers never count duplicate rows as progress.
+ * 9. Activity-provider coverage is explicit. A bounded public window is never called a complete record.
  */

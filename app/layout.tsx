@@ -17,6 +17,7 @@ import "@/styles/master/work.css";
 import "@/styles/master/quiet.css";
 import "@/styles/master/growth.css";
 import "@/styles/master/pulse.css";
+import "@/styles/master/activity-veil.css";
 import "@/styles/master/history.css";
 import "@/styles/master/ending.css";
 import "@/styles/master/worlds.css";
@@ -24,6 +25,11 @@ import "@/styles/master/index.css";
 import "@/styles/master/travel.css";
 import "@/styles/master/sound.css";
 import "@/styles/master/mobile.css";
+import "@/styles/master/v3.css";
+import "@/styles/master/v3-trace.css";
+import "@/styles/master/v3-hero-lock.css";
+import "@/styles/master/v3-zeroupload.css";
+import "@/styles/master/v4.css";
 import "@/styles/master/accessibility.css";
 import "@/styles/master/system.css";
 
@@ -109,7 +115,7 @@ const structuredData = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${instrumentSans.variable} ${newsreader.variable} ${spaceMono.variable}`}>
+    <html lang="en" data-chapter="origin" className={`${instrumentSans.variable} ${newsreader.variable} ${spaceMono.variable}`}>
       <body>
         <CapabilityDirector />
         <ExperienceDirector />

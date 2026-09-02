@@ -5,27 +5,31 @@ export default function Ending() {
     <section
       id="present"
       data-chapter="present"
-      className="master-scene ending"
+      className="master-scene ending ending-v4"
       aria-labelledby="present-title"
     >
       <p className="master-number">05 / PRESENT</p>
 
-      <div className="ending-copy">
-        <p className="ending-human">I&apos;m still building.</p>
-        <h2 id="present-title">THIS IS THE CURRENT FRAME.</h2>
-        <p className="ending-thought">The record stops here only because the future has not happened yet.</p>
-      </div>
+      <div className="ending-stage">
+        <div className="ending-copy">
+          <p className="ending-human">I&apos;m still building.</p>
+          <h2 id="present-title">
+            <span>THE CURRENT</span>
+            <span>FRAME.</span>
+          </h2>
+          <p className="ending-thought">This is where the work, the learning, and I stand today.</p>
+        </div>
 
-      <div className="ending-unresolved" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-        <i />
+        <div className="ending-horizon" aria-hidden="true">
+          <span>KNOWN</span>
+          <i />
+          <strong>OPEN</strong>
+        </div>
       </div>
 
       <div id="contact" className="ending-contact">
-        <div>
-          <p>ADHAM MAHMOOD</p>
+        <div className="ending-signature">
+          <p>Adham Mahmood</p>
           <span>Software engineering → AI/ML engineering</span>
         </div>
         <nav aria-label="Contact and source">

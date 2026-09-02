@@ -68,10 +68,12 @@ jobs:
             exit 1
           fi
           curl --fail --silent --show-error http://127.0.0.1:3000/api/living-state > /tmp/living-state.json
+          curl --fail --silent --show-error http://127.0.0.1:3000/api/activity-veil > /tmp/activity-veil.json
 
           node - <<'NODE'
           const fs = require('node:fs');
           const state = JSON.parse(fs.readFileSync('/tmp/living-state.json', 'utf8'));
+          const activity = JSON.parse(fs.readFileSync('/tmp/activity-veil.json', 'utf8'));
           const valid = state
             && Number.isFinite(state.schemaVersion)
             && typeof state.generatedAt === 'string'
@@ -87,7 +89,20 @@ jobs:
             console.error('Quiet entered public Living State before its launch gate passed.');
             process.exit(1);
           }
+          const activityValid = activity
+            && typeof activity.generatedAt === 'string'
+            && activity.coverage?.source === 'github-public-events'
+            && activity.coverage?.complete === false
+            && typeof activity.coverage?.disclosure === 'string'
+            && Array.isArray(activity.days)
+            && Array.isArray(activity.landmarks)
+            && activity.days.every((day) => typeof day.date === 'string' && Number.isFinite(day.commitCount) && day.commitCount >= 0);
+          if (!activityValid) {
+            console.error('Activity Veil API returned an invalid or overclaimed public projection.');
+            process.exit(1);
+          }
           console.log(`Living-state schema ${state.schemaVersion}: ${state.events.length} public events`);
+          console.log(`Activity Veil: ${activity.days.length} observed public activity days, complete=${activity.coverage.complete}`);
           NODE
 
           if ! grep -q 'mailto:adham.mahmood.work@gmail.com' /tmp/home.html; then
@@ -198,14 +213,30 @@ jobs:
               awaitPromise: true,
               returnByValue: true,
             });
-            await sleep(1050);
+            await send('Runtime.evaluate', {
+              expression: `(() => {
+                const trace = document.querySelector('.living-trace');
+                if (!trace) return Promise.resolve();
+                return new Promise((resolve) => {
+                  const started = performance.now();
+                  const check = () => {
+                    if (trace.dataset.ready === 'true' || performance.now() - started > 8000) resolve();
+                    else requestAnimationFrame(check);
+                  };
+                  check();
+                });
+              })()`,
+              awaitPromise: true,
+              returnByValue: true,
+            });
+            await sleep(2000);
           }
 
           async function openIndex(send, label) {
             const result = await send('Runtime.evaluate', {
               expression: `(() => {
-                if (document.querySelector('.index-world')) return true;
-                const trigger = document.querySelector('.index-trigger');
+                if (document.querySelector('.v4-index-world')) return true;
+                const trigger = document.querySelector('.v4-index-trigger');
                 if (!trigger) return false;
                 trigger.click();
                 return true;
@@ -221,51 +252,70 @@ jobs:
               const root = document.querySelector(${JSON.stringify(selector)});
               if (!root) return false;
               const target = root.matches('h1,h2,h3,a,button') ? root : (root.querySelector('h1,h2,h3,a,button') || root);
+              document.documentElement.style.scrollBehavior = 'auto';
+              document.body.style.scrollBehavior = 'auto';
+              target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
               const rect = target.getBoundingClientRect();
-              const top = Math.max(0, window.scrollY + rect.top - window.innerHeight * 0.18);
-              window.scrollTo({ top, behavior: 'auto' });
+              if (rect.top < window.innerHeight * 0.12 || rect.bottom > window.innerHeight * 0.88) {
+                window.scrollBy({ top: rect.top - window.innerHeight * 0.18, behavior: 'auto' });
+              }
               return true;
             })()`;
 
-            for (let attempt = 0; attempt < 2; attempt += 1) {
+            for (let attempt = 0; attempt < 3; attempt += 1) {
               const result = await send('Runtime.evaluate', { expression, returnByValue: true });
               if (!result.result?.value) throw new Error(`${label} target could not be positioned.`);
-              await sleep(attempt === 0 ? 500 : 350);
+              await sleep(attempt === 0 ? 650 : 450);
             }
           }
 
-          async function certify(send, selector, label, mustFit) {
-            const result = await send('Runtime.evaluate', {
-              expression: `(() => {
-                const node = document.querySelector(${JSON.stringify(selector)});
-                if (!node) return { found: false };
-                const subject = node.matches('h1,h2,h3,a,button') ? node : (node.querySelector('h1,h2,h3,a,button') || node);
-                const rect = subject.getBoundingClientRect();
-                const style = getComputedStyle(subject);
-                return {
-                  found: true,
-                  text: (subject.textContent || '').trim().slice(0, 180),
-                  top: rect.top,
-                  bottom: rect.bottom,
-                  left: rect.left,
-                  right: rect.right,
-                  opacity: Number(style.opacity || 1),
-                  visibility: style.visibility,
-                  display: style.display,
-                  viewportWidth: innerWidth,
-                  viewportHeight: innerHeight,
-                  screenWidth: screen.width,
-                  screenHeight: screen.height,
-                };
-              })()`,
-              returnByValue: true,
-            });
-            const view = result.result?.value;
-            const intersects = view?.bottom > 0 && view?.top < view?.viewportHeight && view?.right > 0 && view?.left < view?.viewportWidth;
-            const visible = view?.found && intersects && view.opacity > 0.01 && view.visibility !== 'hidden' && view.display !== 'none' && view.text;
-            const fits = !mustFit || (view.left >= -2 && view.right <= view.screenWidth + 2);
-            if (!visible || !fits) throw new Error(`${label} failed visual certification: ${JSON.stringify({ ...view, mustFit, fits })}`);
-            console.log(`${label}: ${view.text.replace(/\s+/g, ' ')} @ x ${Math.round(view.left)}..${Math.round(view.right)} / screen ${view.screenWidth}, y ${Math.round(view.top)}..${Math.round(view.bottom)}`);
+          async function certify(send, selector, label, mustFit, expectedChapter) {
+            let failure = null;
+            for (let attempt = 0; attempt < 9; attempt += 1) {
+              const result = await send('Runtime.evaluate', {
+                expression: `(() => {
+                  const node = document.querySelector(${JSON.stringify(selector)});
+                  if (!node) return { found: false };
+                  const subject = node.matches('h1,h2,h3,a,button') ? node : (node.querySelector('h1,h2,h3,a,button') || node);
+                  const trace = document.querySelector('.living-trace');
+                  const rect = subject.getBoundingClientRect();
+                  const style = getComputedStyle(subject);
+                  return {
+                    found: true,
+                    text: (subject.textContent || '').trim().slice(0, 180),
+                    top: rect.top,
+                    bottom: rect.bottom,
+                    left: rect.left,
+                    right: rect.right,
+                    opacity: Number(style.opacity || 1),
+                    visibility: style.visibility,
+                    display: style.display,
+                    viewportWidth: innerWidth,
+                    viewportHeight: innerHeight,
+                    screenWidth: screen.width,
+                    screenHeight: screen.height,
+                    chapter: document.documentElement.dataset.chapter || null,
+                    worldChapter: document.documentElement.dataset.worldChapter || null,
+                    traceReady: trace?.dataset.ready || null,
+                    traceFailed: trace?.dataset.failed || null,
+                  };
+                })()`,
+                returnByValue: true,
+              });
+              const view = result.result?.value;
+              const intersects = view?.bottom > 0 && view?.top < view?.viewportHeight && view?.right > 0 && view?.left < view?.viewportWidth;
+              const visible = view?.found && intersects && view.opacity > 0.01 && view.visibility !== 'hidden' && view.display !== 'none' && view.text;
+              const fits = !mustFit || (view.left >= -2 && view.right <= view.screenWidth + 2);
+              const chapterAligned = !expectedChapter || (view.chapter === expectedChapter && view.worldChapter === expectedChapter);
+              if (visible && fits && chapterAligned) {
+                console.log(`${label}: ${view.text.replace(/\s+/g, ' ')} @ x ${Math.round(view.left)}..${Math.round(view.right)} / screen ${view.screenWidth}, y ${Math.round(view.top)}..${Math.round(view.bottom)}`);
+                return;
+              }
+              failure = { ...view, mustFit, fits, expectedChapter, chapterAligned };
+              if (view?.traceFailed === 'true') break;
+              await sleep(300);
+            }
+            throw new Error(`${label} failed visual certification: ${JSON.stringify(failure)}`);
           }
 
           async function capture(send, name, url, viewport, selector, options = {}) {
@@ -281,7 +331,7 @@ jobs:
             await ready(send);
             if (options.openIndex) await openIndex(send, name);
             if (options.position) await position(send, selector, name);
-            await certify(send, selector, name, Boolean(options.mustFit));
+            await certify(send, selector, name, Boolean(options.mustFit), options.chapter);
             const shot = await send('Page.captureScreenshot', {
               format: 'png',
               fromSurface: true,
@@ -295,34 +345,48 @@ jobs:
           }
 
           async function main() {
-            const target = await newTarget();
-            const socket = await connect(target.webSocketDebuggerUrl);
-            const send = installProtocol(socket);
-            await send('Page.enable');
-            await send('Runtime.enable');
-
             const desktop = { width: 1600, height: 1000, mobile: false };
             const mobile = { width: 390, height: 844, mobile: true };
             const surfaces = [
-              ['home', `${origin}/`, '.hero-v2-name', {}],
-              ['index', `${origin}/`, '.index-world', { openIndex: true, mustFit: true }],
-              ['now', `${origin}/?review=now`, '#now', { position: true, mustFit: true }],
-              ['work', `${origin}/?review=work`, '#work', { position: true, mustFit: true }],
-              ['growth', `${origin}/?review=growth`, '#growth', { position: true, mustFit: true }],
-              ['history', `${origin}/?review=history`, '#history', { position: true, mustFit: true }],
-              ['present', `${origin}/?review=present`, '#present', { position: true, mustFit: true }],
-              ['contact', `${origin}/?review=contact`, '#contact', { position: true, mustFit: true }],
-              ['zeroupload', `${origin}/work/zeroupload`, '.zu-world-hero', { mustFit: true }],
+              ['home', `${origin}/?reviewTier=full`, '.hero-v4-name', { chapter: 'origin' }],
+              ['index', `${origin}/?reviewTier=full`, '.v4-index-destination[data-current="true"]', { openIndex: true, mustFit: true, chapter: 'origin' }],
+              ['now', `${origin}/?review=now&reviewTier=full`, '#now', { position: true, mustFit: true, chapter: 'human' }],
+              ['now-direction', `${origin}/?review=now&reviewTier=full`, '.human-story-beat:last-child', { position: true, mustFit: true, chapter: 'human' }],
+              ['work', `${origin}/?review=work&reviewTier=full`, '#work', { position: true, mustFit: true, chapter: 'work' }],
+              ['growth', `${origin}/?review=growth&reviewTier=full`, '#growth', { position: true, mustFit: true, chapter: 'growth' }],
+              ['growth-origin', `${origin}/?review=growth&reviewTier=full`, '.growth-zero-site', { position: true, mustFit: true, chapter: 'growth' }],
+              ['growth-structure', `${origin}/?review=growth&reviewTier=full`, '.growth-construction', { position: true, mustFit: true, chapter: 'growth' }],
+              ['activity-veil', `${origin}/?review=growth&reviewTier=full`, '.activity-veil', { position: true, mustFit: true, chapter: 'growth' }],
+              ['activity-veil-field', `${origin}/?review=growth&reviewTier=full`, '.activity-veil-stage', { position: true, mustFit: true, chapter: 'growth' }],
+              ['history', `${origin}/?review=history&reviewTier=full`, '#history', { position: true, mustFit: true, chapter: 'history' }],
+              ['history-archive', `${origin}/?review=history&reviewTier=full`, '.history-archive', { position: true, mustFit: true, chapter: 'history' }],
+              ['present', `${origin}/?review=present&reviewTier=full`, '#present', { position: true, mustFit: true, chapter: 'present' }],
+              ['contact', `${origin}/?review=contact&reviewTier=full`, '#contact', { position: true, mustFit: true, chapter: 'present' }],
+              ['zeroupload', `${origin}/work/zeroupload?reviewTier=full`, '.zu-world-hero', { mustFit: true, chapter: 'work' }],
+              ['zeroupload-demo', `${origin}/work/zeroupload?reviewTier=full`, '.zu-world-demo-section', { position: true, mustFit: true, chapter: 'work' }],
+              ['zeroupload-story', `${origin}/work/zeroupload?reviewTier=full`, '.zu-world-story', { position: true, mustFit: true, chapter: 'work' }],
             ];
 
-            for (const [name, url, selector, options] of surfaces) {
-              await capture(send, `${name}-desktop`, url, desktop, selector, options);
-            }
-            for (const [name, url, selector, options] of surfaces) {
-              await capture(send, `${name}-mobile`, url, mobile, selector, options);
+            async function captureViewport(viewport, suffix) {
+              const target = await newTarget();
+              const socket = await connect(target.webSocketDebuggerUrl);
+              const send = installProtocol(socket);
+              try {
+                await send('Page.enable');
+                await send('Runtime.enable');
+                for (const [name, url, selector, options] of surfaces) {
+                  await capture(send, `${name}-${suffix}`, url, viewport, selector, options);
+                }
+              } finally {
+                socket.close();
+                await fetch(`http://127.0.0.1:9222/json/close/${target.id}`).catch(() => {});
+              }
             }
 
-            socket.close();
+            // A fresh target per viewport releases prior WebGL contexts before
+            // SwiftShader begins the next certification pass.
+            await captureViewport(desktop, 'desktop');
+            await captureViewport(mobile, 'mobile');
           }
 
           main().catch((error) => {
@@ -332,6 +396,7 @@ jobs:
           NODE
 
       - name: Upload visual review surfaces
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: master-2-visual-review

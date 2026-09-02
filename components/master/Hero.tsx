@@ -3,19 +3,25 @@ export default function Hero() {
     <section
       id="origin"
       data-chapter="origin"
-      className="master-scene master-origin hero-v2"
+      className="master-scene master-origin hero-v4"
       aria-labelledby="origin-title"
     >
-      <div className="hero-v2-name-wrap">
-        <h1 id="origin-title" className="hero-v2-name">
-          <span className="hero-v2-line">ADHAM</span>
-          <span className="hero-v2-line hero-v2-line-outline">MAHMOOD</span>
+      <div className="hero-v4-name-wrap">
+        <h1 id="origin-title" className="hero-v4-name">
+          <span className="hero-v4-first">ADHAM</span>
+          <span className="hero-v4-last">MAHMOOD</span>
         </h1>
       </div>
 
-      <p className="hero-v2-thought">
-        I&apos;m rebuilding from the foundations, turning what I learn into shipped work, and letting the record change with me.
-      </p>
+      <div className="hero-v4-thought">
+        <span aria-hidden="true" />
+        <p>Learning how software holds together—then pushing it toward intelligence.</p>
+      </div>
+
+      <div className="hero-v4-entry" aria-hidden="true">
+        <i />
+        <span>ENTER</span>
+      </div>
     </section>
   );
 }

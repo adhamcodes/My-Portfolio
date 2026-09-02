@@ -1,78 +1,113 @@
-import type { CSSProperties } from "react";
-import PulseField from "@/components/master/PulseField";
-import { buildPulseSnapshot } from "@/core/pulse";
+import ActivityVeil from "@/components/master/ActivityVeil";
+import { buildActivityVeilSnapshot } from "@/core/activity-veil";
+import type { GrowthTrack } from "@/core/contracts";
 import { getCurrentPublicLivingState } from "@/server/living-state";
 
 function trackCopy(id: string) {
   if (id === "foundry180") {
     return {
-      eyebrow: "PRIMARY PATH",
-      direction: "Software engineering",
-      detail: "A 180-unit software-engineering journey. The public record begins with the first real completed unit.",
+      number: "01",
+      role: "THE BEGINNING",
+      direction: "Foundry180",
+      thesis: "Software engineering foundation",
+      detail: "The learning system exists. The personal record does not move until the first unit is actually completed.",
+      horizon: "180 curriculum units prepared",
     };
   }
   if (id === "ai-ml") {
     return {
-      eyebrow: "DIRECTION",
+      number: "02",
+      role: "THE HORIZON",
       direction: "AI / ML engineering",
-      detail: "A future specialization. Empty by design until real study, experiments, or artifacts exist.",
+      thesis: "Destination, not decoration",
+      detail: "A specialization to earn through foundations, experiments, and systems that become real—not a title claimed in advance.",
+      horizon: "Its shape will be decided by evidence",
     };
   }
   return {
-    eyebrow: "SUPPORTING CAPABILITY",
+    number: "03",
+    role: "THE LEVERAGE",
     direction: "AI automation",
-    detail: "A supporting capability. It stays secondary until real work gives it weight.",
+    thesis: "Capability in support of the path",
+    detail: "Automation strengthens the main engineering direction. It gains weight here only when shipped work makes that weight true.",
+    horizon: "Supporting by design",
   };
+}
+
+function trackState(track: GrowthTrack) {
+  if (track.status === "active") return "IN MOTION";
+  if (track.status === "paused") return "PAUSED / PRESERVED";
+  if (track.status === "completed") return "COMPLETED / HISTORICAL";
+  if (track.status === "archived") return "ARCHIVED";
+  return "OPEN DIRECTION";
 }
 
 export default async function GrowthChapter() {
   const state = await getCurrentPublicLivingState();
-  const pulse = buildPulseSnapshot(state);
+  const activity = buildActivityVeilSnapshot(state);
 
   return (
     <section
       id="growth"
       data-chapter="growth"
-      className="master-scene growth-chapter"
+      className="master-scene growth-chapter growth-chapter-v4"
       aria-labelledby="growth-title"
     >
       <p className="master-number">03 / GROWTH</p>
 
-      <div className="growth-heading">
-        <h2 id="growth-title">BECOMING LEAVES A RECORD.</h2>
-        <p>Learning can begin at zero, pause, resume, finish, and become history. Calendar time never pretends to be progress.</p>
+      <header className="growth-heading">
+        <h2 id="growth-title">
+          <span>THE FUTURE</span>
+          <span>HAS STRUCTURE.</span>
+        </h2>
+        <p>Foundry is the beginning. AI / ML is the horizon. Automation is leverage along the way. None of them advances here until the work becomes true.</p>
+      </header>
+
+      <div className="growth-construction" aria-label="Current learning directions and verified state">
+        <div className="growth-zero-site">
+          <p>FOUNDRY180 / PERSONAL RECORD</p>
+          <strong aria-hidden="true">0</strong>
+          <div>
+            <b>0 / 180 verified units</b>
+            <span>The structure is ready. The record begins with the first completed unit.</span>
+          </div>
+        </div>
+
+        <span className="growth-scaffold" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+
+        <ol className="growth-vectors">
+          {state.growth.map((track) => {
+            const copy = trackCopy(track.id);
+            const completed = track.completedUnits ?? 0;
+            return (
+              <li key={track.id} className="growth-vector" data-track={track.id} data-state={track.status}>
+                <article>
+                  <header>
+                    <span>{copy.number} / {copy.role}</span>
+                    <strong>{trackState(track)}</strong>
+                  </header>
+                  <p className="growth-vector-thesis">{copy.thesis}</p>
+                  <h3>{copy.direction}</h3>
+                  <p className="growth-vector-detail">{copy.detail}</p>
+                  <footer>
+                    <span>{copy.horizon}</span>
+                    {completed > 0 && track.totalUnits && (
+                      <strong>{completed} / {track.totalUnits} verified units</strong>
+                    )}
+                    {track.currentUnit && <strong>Current: {track.currentUnit}</strong>}
+                  </footer>
+                </article>
+              </li>
+            );
+          })}
+        </ol>
       </div>
 
-      <div className="growth-topology" aria-label="Current learning directions">
-        <span className="growth-root" aria-hidden="true" />
-        {state.growth.map((track, index) => {
-          const copy = trackCopy(track.id);
-          return (
-            <article
-              key={track.id}
-              className="growth-path"
-              data-state={track.status}
-              style={{ "--growth-index": index } as CSSProperties}
-            >
-              <span className="growth-node" aria-hidden="true" />
-              <div className="growth-path-meta">
-                <span>{copy.eyebrow}</span>
-                <strong>{track.status === "not_started" ? "NOT STARTED" : track.status.replace("_", " ").toUpperCase()}</strong>
-              </div>
-              <h3>{copy.direction}</h3>
-              <p>{copy.detail}</p>
-              {track.id === "foundry180" && (
-                <p className="growth-truth">
-                  <span>{track.completedUnits ?? 0}</span>
-                  <span>of {track.totalUnits ?? 180} units completed</span>
-                </p>
-              )}
-            </article>
-          );
-        })}
-      </div>
-
-      <PulseField pulse={pulse} />
+      <ActivityVeil snapshot={activity} />
     </section>
   );
 }
