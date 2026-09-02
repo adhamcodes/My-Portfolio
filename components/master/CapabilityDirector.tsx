@@ -136,7 +136,11 @@ export default function CapabilityDirector() {
 
     const handleVisibility = () => {
       publishVisibility();
-      if (document.visibilityState === "visible" && current?.renderTier !== "static-low") {
+      if (
+        !automatedWorldReview
+        && document.visibilityState === "visible"
+        && current?.renderTier !== "static-low"
+      ) {
         scheduleFrameSample(1200);
       } else {
         cancelAnimationFrame(raf);
@@ -144,7 +148,10 @@ export default function CapabilityDirector() {
       }
     };
 
-    scheduleFrameSample(900);
+    // SwiftShader frame pacing measures the CI runner, not the authored world.
+    // Keep explicit full-world review deterministic while preserving adaptive
+    // degradation for every normal visitor.
+    if (!automatedWorldReview) scheduleFrameSample(900);
     reducedQuery.addEventListener("change", handleMotionPreference);
     coarseQuery.addEventListener("change", handlePointerPreference);
     document.addEventListener("visibilitychange", handleVisibility);
