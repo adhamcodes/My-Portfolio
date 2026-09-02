@@ -5,7 +5,7 @@ export default function HistoryChapter() {
     <section
       id="history"
       data-chapter="history"
-      className="master-scene history-chapter history-chapter-v3"
+      className="master-scene history-chapter history-chapter-v4"
       aria-labelledby="history-title"
     >
       <p className="master-number">04 / HISTORY</p>
@@ -27,32 +27,33 @@ export default function HistoryChapter() {
         <b>PRESENT</b>
       </div>
 
-      <div className="history-archive">
+      <div className="history-archive" aria-label="Preserved earlier work">
         <div className="history-axis" aria-hidden="true">
-          <span>EARLIER</span>
+          <span>DEEPER</span>
           <i />
-          <strong>NOW</strong>
+          <strong>CURRENT SURFACE</strong>
         </div>
 
-        {historicalWork.map((work) => (
-          <article key={work.id} className="history-fossil history-fossil-v3">
+        {historicalWork.map((work, index) => (
+          <article key={work.id} className="history-fossil history-fossil-v4">
             <div className="history-fossil-mark" aria-hidden="true">
+              <strong>{work.name}</strong>
               <span />
               <span />
               <span />
               <i />
             </div>
             <div className="history-fossil-identity">
-              <p>ARCHIVED WORK / PRESERVED</p>
+              <p>STRATUM {String(index + 1).padStart(2, "0")} / PREVIOUS FRAME</p>
               <h3>{work.name}</h3>
-              <span>Not current evidence. Still part of the record.</span>
+              <span>Withdrawn from the present. Preserved in the identity.</span>
             </div>
             <p>{work.summary}</p>
           </article>
         ))}
       </div>
 
-      <p className="history-note">Dates and milestones enter this field only when verified. Missing chronology stays missing instead of being invented for symmetry.</p>
+      <p className="history-note">What leaves the present settles here.</p>
     </section>
   );
 }
