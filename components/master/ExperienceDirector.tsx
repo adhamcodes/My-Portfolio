@@ -10,7 +10,10 @@ export default function ExperienceDirector() {
 
   useEffect(() => {
     const root = document.documentElement;
-    const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-chapter]"));
+    // The document root also carries the published chapter state. Scoping the
+    // candidates to <body> keeps that state carrier from competing with the
+    // actual narrative scenes during chapter resolution.
+    const sections = Array.from(document.body.querySelectorAll<HTMLElement>("[data-chapter]"));
     let currentChapter: ChapterId = "origin";
     let currentWorld = "";
     let scrollRaf = 0;

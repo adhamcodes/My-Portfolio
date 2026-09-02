@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { buildActivityVeilSnapshot } from "@/core/activity-veil";
+import { isChapterId } from "@/core/experience";
 import type {
   ActivityVeilDay,
   ChapterId,
@@ -717,10 +718,20 @@ export default function LivingWorldCanvasV4({ renderTier, motionMode, livingStat
 
   useEffect(() => {
     const root = document.documentElement;
-    const stored = root.dataset.chapter as ChapterId | undefined;
-    if (stored) setChapter(stored);
+    const syncChapter = () => {
+      const next = root.dataset.chapter;
+      if (isChapterId(next)) setChapter(next);
+    };
+
+    syncChapter();
     setIndexOpen(root.dataset.indexOpen === "true");
     setVisible(document.visibilityState === "visible");
+
+    // The event is the fast path; observing the canonical attribute also
+    // closes listener-mount races and makes the world resilient to restored
+    // scroll positions and direct chapter jumps.
+    const chapterObserver = new MutationObserver(syncChapter);
+    chapterObserver.observe(root, { attributes: true, attributeFilter: ["data-chapter"] });
 
     const deactivate = () => {
       interaction.current.active = false;
@@ -747,7 +758,7 @@ export default function LivingWorldCanvasV4({ renderTier, motionMode, livingStat
     };
     const onChapter = (event: Event) => {
       const next = (event as CustomEvent<ChapterId>).detail;
-      if (next) setChapter(next);
+      if (isChapterId(next)) setChapter(next);
     };
     const onIndex = (event: Event) => {
       const open = Boolean((event as CustomEvent<{ open?: boolean }>).detail?.open);
@@ -776,6 +787,7 @@ export default function LivingWorldCanvasV4({ renderTier, motionMode, livingStat
     window.addEventListener("adham:index-focus", onIndexFocus);
     window.addEventListener("adham:visibility", onVisibility);
     return () => {
+      chapterObserver.disconnect();
       window.removeEventListener("pointermove", updatePointer);
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointerup", onPointerUp);
@@ -789,6 +801,14 @@ export default function LivingWorldCanvasV4({ renderTier, motionMode, livingStat
       window.removeEventListener("adham:visibility", onVisibility);
     };
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.worldChapter = chapter;
+    return () => {
+      if (root.dataset.worldChapter === chapter) delete root.dataset.worldChapter;
+    };
+  }, [chapter]);
 
   return (
     <Canvas
