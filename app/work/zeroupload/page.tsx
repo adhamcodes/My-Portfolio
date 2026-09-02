@@ -32,7 +32,7 @@ export default function ZeroUploadWorldPage() {
 
         <section data-chapter="work" data-world="zeroupload" className="zu-world-hero" aria-labelledby="zu-title">
           <p className="zu-world-kicker">BOUNDARY / 01</p>
-          <h1 id="zu-title">ZEROUPLOAD</h1>
+          <h1 id="zu-title"><span>ZERO</span><span>UPLOAD</span></h1>
           <p className="zu-world-thesis">
             A file tool built around a rule: when useful processing can happen on the device, the file should not need to leave it.
           </p>
@@ -40,9 +40,9 @@ export default function ZeroUploadWorldPage() {
           <div className="zu-world-plane" aria-hidden="true">
             <span className="zu-world-plane-line" />
             <span className="zu-world-plane-pressure"><i /><i /><i /></span>
-            <span className="zu-world-plane-object">FILE</span>
+            <span className="zu-world-plane-object">LOCAL FILE</span>
             <span className="zu-world-plane-device">YOUR DEVICE</span>
-            <span className="zu-world-plane-outside">NO TRANSFER NEEDED</span>
+            <span className="zu-world-plane-outside">0 BYTES CROSS</span>
           </div>
         </section>
 

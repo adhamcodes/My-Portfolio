@@ -133,7 +133,12 @@ export default function LocalImageTransform() {
   };
 
   return (
-    <div className="zu-demo" data-result={result ? "true" : "false"} data-working={working ? "true" : "false"}>
+    <div
+      className="zu-demo"
+      data-result={result ? "true" : "false"}
+      data-working={working ? "true" : "false"}
+      aria-busy={working}
+    >
       <div
         className="zu-drop"
         onDragOver={(event) => event.preventDefault()}
