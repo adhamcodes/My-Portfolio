@@ -108,6 +108,7 @@
 .ending-contact {
   position: relative;
   z-index: 5;
+  isolation: isolate;
   min-height: 42svh;
   display: flex;
   justify-content: space-between;
@@ -115,6 +116,14 @@
   gap: 3rem;
   padding-top: clamp(4rem, 8vw, 8rem);
   border-top: 1px solid rgba(242,239,233,.09);
+}
+
+.ending-contact::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(50% - 50vw);
+  pointer-events: none;
   background: linear-gradient(180deg, rgba(5,5,6,.08), rgba(5,5,6,.9) 24%, #050506 58%);
 }
 
